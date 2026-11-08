@@ -1119,7 +1119,7 @@ const PulseWaze = {
 // =========================================================================
 // ACTIVE PUBLIC HTTPS TUNNEL & SHARE SYNCHRONIZER
 // =========================================================================
-const PULSE_TUNNEL_URL = 'https://fb74765bf1b74d.lhr.life';
+const PULSE_TUNNEL_URL = 'https://boys-linda-lafayette-skating.trycloudflare.com';
 
 function getEffectiveOrigin() {
   if (typeof window === 'undefined') return PULSE_TUNNEL_URL;
