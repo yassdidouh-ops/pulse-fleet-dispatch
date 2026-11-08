@@ -362,7 +362,7 @@
           <span class="text-[9px] bg-noir text-white px-1.5 py-0.2 font-bold">EN LIGNE</span>
         </div>
         <div class="flex items-center justify-between gap-2">
-          <input id="share-url-public" class="bg-white border border-neutral-300 px-2.5 py-1.5 font-bold text-xs flex-1 outline-none text-noir" readonly value="https://a90389d46bbc3d.lhr.life/messages.html" />
+          <input id="share-url-public" class="bg-white border border-neutral-300 px-2.5 py-1.5 font-bold text-xs flex-1 outline-none text-noir" readonly value="https://bc8b85ebe510c4.lhr.life/messages.html" />
           <button onclick="copyPublicUrl()" class="bg-noir text-white px-3 py-1.5 font-black uppercase text-[11px] hover:bg-neutral-800">
             COPIER
           </button>
@@ -592,7 +592,7 @@ ${msg.body}
 
     // Share Modal
     function openShareModal() {
-      const currentOrigin = window.location.origin.includes('lhr.life') ? window.location.origin : 'https://f3dfe920cfc829.lhr.life';
+      const currentOrigin = window.location.origin.includes('lhr.life') ? window.location.origin : 'https://bc8b85ebe510c4.lhr.life';
       const page = window.location.pathname.split('/').pop() || 'messages.html';
       const pubInput = document.getElementById('share-url-public');
       if (pubInput) pubInput.value = `${currentOrigin}/${page}`;
