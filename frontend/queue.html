@@ -233,6 +233,9 @@
       <a href="messages.html" class="nav-btn" title="Messages Radio MDT">
         <i data-lucide="message-square" class="w-5 h-5"></i>
       </a>
+      <a href="receipt.html" class="nav-btn" title="Facturation & Reçus CAD">
+        <i data-lucide="receipt" class="w-5 h-5"></i>
+      </a>
       <div class="flex-1"></div>
       <button onclick="PulseState.resetDemoData(); renderAll();" class="nav-btn" title="Réinitialiser données démo">
         <i data-lucide="rotate-ccw" class="w-5 h-5"></i>
@@ -284,6 +287,15 @@
             NOUVELLE COURSE [F2]
           </a>
 
+          <!-- Tactical Fleet Export & Audit Tools -->
+          <button onclick="exportCallsCSV()" title="Exporter toutes les courses en format CSV" class="bg-white text-noir font-mono text-xs font-bold uppercase px-3 py-2 border-1.5 border-noir hover:bg-neutral-100 flex items-center gap-1.5 shadow-[2px_2px_0px_#09090b] cursor-pointer transition-all active:translate-x-[1px] active:translate-y-[1px]">
+            <span>📥</span> EXPORT CSV COURSES
+          </button>
+
+          <button onclick="exportAuditJSON()" title="Exporter l'audit système complet en format JSON" class="bg-white text-noir font-mono text-xs font-bold uppercase px-3 py-2 border-1.5 border-noir hover:bg-neutral-100 flex items-center gap-1.5 shadow-[2px_2px_0px_#09090b] cursor-pointer transition-all active:translate-x-[1px] active:translate-y-[1px]">
+            <span>📊</span> EXPORT JSON AUDIT CAD
+          </button>
+
           <button onclick="renderAll()" class="bg-white text-noir font-mono text-xs font-bold uppercase px-3 py-2 border border-neutral-300 hover:border-noir flex items-center gap-1">
             <i data-lucide="refresh-cw" class="w-3.5 h-3.5"></i>
             ACTUALISER
@@ -320,7 +332,7 @@
                 <th>VÉHICULE REQUIS</th>
                 <th>UNITÉ ATTRIBUÉE</th>
                 <th>STATUT ACTUEL</th>
-                <th style="text-align:right; width:220px;">ACTIONS OPÉRATEUR</th>
+                <th style="text-align:right; width:260px;">ACTIONS OPÉRATEUR</th>
               </tr>
             </thead>
             <tbody id="queue-table-body">
@@ -577,6 +589,9 @@
                   <i data-lucide="check" class="w-3 h-3"></i> ÉTAPE
                 </button>
               `}
+              <a href="receipt.html?call=${call.id}" title="Générer Facture / Reçu" class="table-act-btn bg-white text-noir border-noir hover:bg-neutral-100 text-decoration-none">
+                🧾 FACTURE
+              </a>
               <button onclick="cancelCallAction('${call.id}')" class="table-act-btn bg-white text-rose-700 border-rose-700 hover:bg-rose-50" title="Annuler">
                 <i data-lucide="x" class="w-3 h-3"></i>
               </button>
@@ -658,6 +673,114 @@
         PulseState.updateCallStatus(callId, 'ANNULÉ');
         renderAll();
       }
+    }
+
+    // --- FLEET DATA EXPORT & AUDIT TOOLS ---
+    function getExportDateStr() {
+      const now = new Date();
+      const yyyy = now.getFullYear();
+      const mm = String(now.getMonth() + 1).padStart(2, '0');
+      const dd = String(now.getDate()).padStart(2, '0');
+      return `${yyyy}-${mm}-${dd}`;
+    }
+
+    function exportCallsCSV() {
+      const calls = PulseState.getCalls();
+      const headers = [
+        'ID_COURSE',
+        'DATE_HEURE',
+        'CLIENT',
+        'TELEPHONE',
+        'PRISE_EN_CHARGE',
+        'DESTINATION',
+        'ZONE',
+        'VEHICULE',
+        'STATUT',
+        'UNITE_ASSIGNEE',
+        'RESTRICTIONS',
+        'NOTES'
+      ];
+
+      const escapeCSV = (val) => {
+        if (val === null || val === undefined) return '""';
+        const str = String(val).replace(/"/g, '""');
+        return `"${str}"`;
+      };
+
+      const rows = calls.map(c => {
+        const pickupStr = c.suite ? `${c.pickup} (${c.suite})` : (c.pickup || '');
+        const unitStr = c.assignedUnit ? `UNIT-${String(c.assignedUnit).padStart(3, '0')}` : 'AUCUNE';
+        const restrictionsStr = Array.isArray(c.restrictions) ? c.restrictions.join(' | ') : (c.restrictions || '');
+        
+        return [
+          escapeCSV(c.id),
+          escapeCSV(c.createdAt || ''),
+          escapeCSV(c.client || ''),
+          escapeCSV(c.phone || ''),
+          escapeCSV(pickupStr),
+          escapeCSV(c.dest || ''),
+          escapeCSV(c.zone || ''),
+          escapeCSV(c.vehType || ''),
+          escapeCSV(c.status || ''),
+          escapeCSV(unitStr),
+          escapeCSV(restrictionsStr),
+          escapeCSV(c.notes || '')
+        ].join(',');
+      });
+
+      const csvContent = [headers.join(','), ...rows].join('\r\n');
+      const blob = new Blob(["\uFEFF" + csvContent], { type: 'text/csv;charset=utf-8;' });
+      const filename = `pulse_cad_courses_${getExportDateStr()}.csv`;
+      
+      triggerDownload(blob, filename);
+      showToast("EXPORT CSV TÉLÉCHARGÉ DANS VOS FICHIERS");
+    }
+
+    function exportAuditJSON() {
+      const snapshot = {
+        exportDate: new Date().toISOString(),
+        operator: "OP-408",
+        network: "CENTRAL CAD MONTRÉAL",
+        vehicles: PulseState.getVehicles(),
+        calls: PulseState.getCalls(),
+        messages: PulseState.getMessages()
+      };
+
+      const jsonStr = JSON.stringify(snapshot, null, 2);
+      const blob = new Blob([jsonStr], { type: 'application/json;charset=utf-8;' });
+      const filename = `pulse_cad_audit_${getExportDateStr()}.json`;
+
+      triggerDownload(blob, filename);
+      showToast("EXPORT AUDIT JSON COMPLET GÉNÉRÉ");
+    }
+
+    function triggerDownload(blob, filename) {
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = filename;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      setTimeout(() => URL.revokeObjectURL(url), 1000);
+    }
+
+    function showToast(msg) {
+      const existing = document.getElementById('pulse-toast');
+      if (existing) existing.remove();
+
+      const toast = document.createElement('div');
+      toast.id = 'pulse-toast';
+      toast.className = 'fixed bottom-5 right-5 z-50 bg-noir text-white border-2 border-noir p-3 font-mono text-xs font-black uppercase tracking-wider shadow-[4px_4px_0px_#71717a] transition-all flex items-center gap-2';
+      toast.innerHTML = `<span class="w-2 h-2 bg-emerald-400 inline-block animate-ping"></span> ${msg}`;
+      document.body.appendChild(toast);
+      setTimeout(() => {
+        toast.style.opacity = '0';
+        toast.style.transform = 'translateY(6px)';
+      }, 2200);
+      setTimeout(() => {
+        if (toast.parentNode) toast.parentNode.removeChild(toast);
+      }, 2600);
     }
 
     // Share Modal
