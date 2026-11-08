@@ -1119,7 +1119,7 @@ const PulseWaze = {
 // =========================================================================
 // ACTIVE PUBLIC HTTPS TUNNEL & SHARE SYNCHRONIZER
 // =========================================================================
-const PULSE_TUNNEL_URL = 'https://d459b01192e48d.lhr.life';
+const PULSE_TUNNEL_URL = 'https://fb74765bf1b74d.lhr.life';
 
 function getEffectiveOrigin() {
   if (typeof window === 'undefined') return PULSE_TUNNEL_URL;
