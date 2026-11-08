@@ -1,0 +1,1537 @@
+<!DOCTYPE html>
+<html lang="fr-CA">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>PULSE MDT — Terminal Mobile Chauffeur</title>
+
+  <!-- High-Readability Enterprise Typography: Plus Jakarta Sans + IBM Plex Mono -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&family=IBM+Plex+Mono:wght@400;500;600;700&display=swap" rel="stylesheet" />
+
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <script src="state.js"></script>
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Plus Jakarta Sans', 'sans-serif'],
+            mono: ['IBM Plex Mono', 'monospace'],
+          },
+          colors: {
+            noir: '#09090b',
+            charcoal: '#18181b',
+            bordercol: '#d4d4d8',
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+    body {
+      font-family: 'Plus Jakarta Sans', -apple-system, sans-serif;
+      background-color: #09090b;
+      color: #09090b;
+      margin: 0;
+      min-height: 100vh;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    ::-webkit-scrollbar { width: 5px; height: 5px; }
+    ::-webkit-scrollbar-track { background: #f4f4f5; }
+    ::-webkit-scrollbar-thumb { background: #18181b; }
+
+    /* Brutalist Structural Card */
+    .brut-card {
+      background: #ffffff;
+      border: 2px solid #09090b;
+      box-shadow: 3px 3px 0px #09090b;
+      transition: all 0.12s ease;
+      position: relative;
+    }
+    .brut-card-dark {
+      background: #18181b;
+      border: 2px solid #ffffff;
+      box-shadow: 3px 3px 0px #ffffff;
+      color: #ffffff;
+    }
+
+    /* Tactile Buttons */
+    .brut-btn-black {
+      background: #09090b;
+      color: #ffffff;
+      border: 2px solid #09090b;
+      transition: all 0.1s ease;
+      box-shadow: 3px 3px 0px #09090b;
+      user-select: none;
+    }
+    .brut-btn-black:active {
+      transform: translate(2px, 2px);
+      box-shadow: 1px 1px 0px #09090b !important;
+    }
+
+    .brut-btn-white {
+      background: #ffffff;
+      color: #09090b;
+      border: 2px solid #09090b;
+      transition: all 0.1s ease;
+      box-shadow: 3px 3px 0px #09090b;
+      user-select: none;
+    }
+    .brut-btn-white:active {
+      transform: translate(2px, 2px);
+      box-shadow: 1px 1px 0px #09090b !important;
+    }
+
+    .brut-btn-amber {
+      background: #f59e0b;
+      color: #09090b;
+      border: 2px solid #09090b;
+      transition: all 0.1s ease;
+      box-shadow: 3px 3px 0px #09090b;
+      user-select: none;
+    }
+    .brut-btn-amber:active {
+      transform: translate(2px, 2px);
+      box-shadow: 1px 1px 0px #09090b !important;
+    }
+
+    .brut-btn-emerald {
+      background: #10b981;
+      color: #ffffff;
+      border: 2px solid #09090b;
+      transition: all 0.1s ease;
+      box-shadow: 3px 3px 0px #09090b;
+      user-select: none;
+    }
+    .brut-btn-emerald:active {
+      transform: translate(2px, 2px);
+      box-shadow: 1px 1px 0px #09090b !important;
+    }
+
+    .brut-btn-red {
+      background: #ef4444;
+      color: #ffffff;
+      border: 2px solid #09090b;
+      transition: all 0.1s ease;
+      box-shadow: 3px 3px 0px #09090b;
+      user-select: none;
+    }
+    .brut-btn-red:active {
+      transform: translate(2px, 2px);
+      box-shadow: 1px 1px 0px #09090b !important;
+    }
+
+    /* Countdown bar animation */
+    .countdown-bar {
+      transition: width 0.1s linear;
+    }
+
+    /* Pulse animation */
+    @keyframes pulse-ring {
+      0% { transform: scale(0.95); opacity: 0.8; }
+      50% { transform: scale(1.05); opacity: 1; }
+      100% { transform: scale(0.95); opacity: 0.8; }
+    }
+    .alert-pulse {
+      animation: pulse-ring 1s infinite ease-in-out;
+    }
+
+    /* In-cab HUD display */
+    .hud-screen {
+      background-color: #f4f4f5;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+  </style>
+</head>
+<body class="bg-neutral-900 flex justify-center text-noir">
+
+  <!-- MAIN MOBILE / MOUNT WRAPPER (Simulates High-Contrast Rugged MDT Terminal) -->
+  <div class="w-full max-w-lg hud-screen border-x-2 border-noir shadow-2xl relative flex flex-col justify-between">
+
+    <!-- ========================================================================= -->
+    <!-- 1. TERMINAL TOP HEADER (BRUT NOIR & BLANC ENTERPRISE)                     -->
+    <!-- ========================================================================= -->
+    <header class="bg-noir text-white border-b-2 border-noir select-none z-30 sticky top-0">
+      
+      <!-- Primary Top Bar -->
+      <div class="px-3 py-2 flex items-center justify-between border-b border-neutral-800">
+        
+        <!-- Terminal Brand & Unit Badge -->
+        <div class="flex items-center gap-2">
+          <div class="bg-white text-noir font-mono font-black text-xs px-2 py-0.5 tracking-wider flex items-center gap-1">
+            <span class="w-2 h-2 bg-emerald-500 inline-block animate-pulse"></span>
+            PULSE<span class="text-neutral-500">//</span>MDT
+          </div>
+          <span id="header-unit-code" class="font-mono text-xs font-black bg-neutral-800 text-yellow-400 px-2 py-0.5 border border-neutral-700">
+            UNIT-232
+          </span>
+        </div>
+
+        <!-- Right Quick Actions: CAD Navigation & Share -->
+        <div class="flex items-center gap-1.5">
+          <!-- CAD Nav Toggle -->
+          <button onclick="toggleCadNavMenu()" class="bg-neutral-800 hover:bg-neutral-700 text-white font-mono text-[10px] font-bold uppercase px-2 py-1 border border-neutral-700 flex items-center gap-1" title="Menu Navigation CAD">
+            <i data-lucide="compass" class="w-3.5 h-3.5"></i>
+            <span class="hidden sm:inline">CAD</span>
+          </button>
+
+          <!-- Share Button -->
+          <button onclick="openShareModal()" class="bg-neutral-800 hover:bg-neutral-700 text-white font-mono text-[10px] font-bold uppercase px-2 py-1 border border-neutral-700 flex items-center gap-1" title="Partager session">
+            <i data-lucide="share-2" class="w-3.5 h-3.5"></i>
+            <span class="hidden sm:inline">PARTAGE</span>
+          </button>
+
+          <!-- Live Network Indicator -->
+          <div class="flex items-center gap-1 bg-neutral-900 border border-neutral-700 px-2 py-0.5">
+            <span class="w-1.5 h-1.5 bg-emerald-400 rounded-full animate-ping"></span>
+            <span id="header-ping" class="font-mono text-[10px] text-emerald-400 font-bold">24ms</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Secondary Telemetry / Driver Status Bar -->
+      <div class="px-3 py-1.5 bg-neutral-950 flex items-center justify-between font-mono text-[11px] text-neutral-300">
+        
+        <!-- Driver Profile -->
+        <div class="flex items-center gap-1.5">
+          <i data-lucide="user" class="w-3.5 h-3.5 text-neutral-400"></i>
+          <span class="text-neutral-400">CHAUFFEUR:</span>
+          <span id="header-driver-name" class="font-bold text-white uppercase">J. TREMBLAY (#402)</span>
+        </div>
+
+        <!-- Live Clock -->
+        <div class="flex items-center gap-1.5 text-neutral-200 font-bold">
+          <i data-lucide="clock" class="w-3.5 h-3.5 text-neutral-400"></i>
+          <span id="live-clock">--:--:--</span>
+        </div>
+      </div>
+    </header>
+
+    <!-- SLIDING CAD NAVIGATION POPOVER -->
+    <div id="cad-nav-popover" class="hidden bg-white border-b-2 border-noir p-3 z-40 select-none shadow-xl">
+      <div class="flex items-center justify-between pb-2 mb-2 border-b border-neutral-200">
+        <span class="font-mono text-[11px] font-black uppercase text-neutral-900 flex items-center gap-1.5">
+          <i data-lucide="layers" class="w-3.5 h-3.5"></i>
+          CONSOLE CAD — ACCÈS RAPIDE
+        </span>
+        <button onclick="toggleCadNavMenu()" class="text-xs font-mono font-bold text-neutral-500 hover:text-black">
+          ✕ FERMER
+        </button>
+      </div>
+      <div class="grid grid-cols-2 sm:grid-cols-3 gap-2 font-mono text-xs font-bold">
+        <a href="index.html" class="p-2 border border-noir bg-neutral-50 hover:bg-black hover:text-white flex items-center gap-2">
+          <i data-lucide="layout-grid" class="w-4 h-4"></i> Tableau [F1]
+        </a>
+        <a href="dispatch.html" class="p-2 border border-noir bg-neutral-50 hover:bg-black hover:text-white flex items-center gap-2">
+          <i data-lucide="radio" class="w-4 h-4"></i> Dispatch [F2]
+        </a>
+        <a href="queue.html" class="p-2 border border-noir bg-neutral-50 hover:bg-black hover:text-white flex items-center gap-2">
+          <i data-lucide="list-ordered" class="w-4 h-4"></i> File CAD [F3]
+        </a>
+        <a href="map.html" class="p-2 border border-noir bg-neutral-50 hover:bg-black hover:text-white flex items-center gap-2">
+          <i data-lucide="map" class="w-4 h-4"></i> Carte GPS [F4]
+        </a>
+        <a href="messages.html" class="p-2 border border-noir bg-neutral-50 hover:bg-black hover:text-white flex items-center gap-2">
+          <i data-lucide="message-square" class="w-4 h-4"></i> Radio MDT [F5]
+        </a>
+        <a href="driver.html" class="p-2 border border-noir bg-black text-white flex items-center gap-2">
+          <i data-lucide="smartphone" class="w-4 h-4"></i> Terminal [F6]
+        </a>
+      </div>
+    </div>
+
+    <!-- ========================================================================= -->
+    <!-- 2. IN-CAB CONTROL BAR (UNIT SELECTOR & DUTY TOGGLE)                       -->
+    <!-- ========================================================================= -->
+    <div class="bg-white border-b-2 border-noir p-3 select-none">
+      
+      <!-- Unit Selector Row -->
+      <div class="flex items-center gap-2 mb-2.5">
+        <label for="unit-select" class="font-mono text-[10px] font-black uppercase text-neutral-600 flex items-center gap-1 whitespace-nowrap">
+          <i data-lucide="car" class="w-3.5 h-3.5 text-neutral-800"></i>
+          POSTE UNITÉ :
+        </label>
+        <div class="relative flex-1">
+          <select id="unit-select" onchange="onUnitSelectChange(this.value)" class="w-full bg-neutral-50 border-2 border-noir font-mono text-xs font-bold px-2.5 py-1.5 outline-none cursor-pointer focus:bg-white appearance-none pr-8">
+            <!-- Dynamically populated from PulseState.getVehicles() -->
+          </select>
+          <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-noir">
+            <i data-lucide="chevron-down" class="w-4 h-4"></i>
+          </div>
+        </div>
+      </div>
+
+      <!-- Duty State Segmented Toggle -->
+      <div class="grid grid-cols-2 gap-2">
+        <button id="btn-duty-service" onclick="setDutyState('LIBRE')" class="brut-btn-black py-2.5 px-2 flex items-center justify-center gap-1.5 font-mono text-xs font-black uppercase text-center">
+          <span class="w-2 h-2 bg-emerald-400 rounded-full inline-block"></span>
+          EN SERVICE / DISPONIBLE
+        </button>
+
+        <button id="btn-duty-pause" onclick="setDutyState('PAUSE')" class="brut-btn-white py-2.5 px-2 flex items-center justify-center gap-1.5 font-mono text-xs font-black uppercase text-center text-neutral-700">
+          <i data-lucide="coffee" class="w-3.5 h-3.5"></i>
+          PAUSE / INDISPONIBLE
+        </button>
+      </div>
+    </div>
+
+    <!-- ========================================================================= -->
+    <!-- 3. INCOMING MISSION ALERT CARD (TRIGGERED WHEN MISSION ASSIGNED)           -->
+    <!-- ========================================================================= -->
+    <div id="incoming-alert-container" class="hidden p-3 bg-amber-400 border-b-2 border-noir select-none">
+      <div class="brut-card bg-white p-3.5 alert-pulse border-2 border-noir shadow-[4px_4px_0px_#09090b]">
+        
+        <!-- Alert Header -->
+        <div class="flex items-center justify-between pb-2 mb-2 border-b-2 border-noir">
+          <div class="flex items-center gap-1.5">
+            <span class="w-3 h-3 bg-red-600 rounded-full animate-ping"></span>
+            <span class="font-mono text-xs font-black uppercase tracking-wider text-red-600">
+              🚨 NOUVEL ORDRE DE MISSION CAD
+            </span>
+          </div>
+          <span id="alert-call-id" class="font-mono text-xs font-black bg-noir text-white px-2 py-0.5">
+            #5081
+          </span>
+        </div>
+
+        <!-- 20s Countdown Bar -->
+        <div class="mb-3">
+          <div class="flex items-center justify-between font-mono text-[11px] font-black uppercase text-neutral-900 mb-1">
+            <span>DÉCOMPTE D'AFFECTATION :</span>
+            <span id="countdown-text" class="text-red-600 bg-red-50 border border-red-300 px-1.5 py-0.2">20.0s</span>
+          </div>
+          <div class="w-full h-3 bg-neutral-200 border border-noir overflow-hidden p-0.5">
+            <div id="countdown-bar-fill" class="h-full bg-red-600 countdown-bar w-full"></div>
+          </div>
+        </div>
+
+        <!-- Mission Details -->
+        <div class="space-y-2 font-mono text-xs mb-4">
+          <!-- Client -->
+          <div class="bg-neutral-50 p-2 border border-neutral-300">
+            <div class="text-[10px] text-neutral-500 font-bold uppercase">CLIENT & PROTOCOLE :</div>
+            <div id="alert-client-name" class="font-black text-sm text-noir">CORP-AIR-CANADA // AC-882</div>
+            <div id="alert-passenger-count" class="text-[11px] text-neutral-700 font-bold mt-0.5">Passagers : 2 personnes · Catégorie : BERLINE</div>
+          </div>
+
+          <!-- Pickup Address -->
+          <div class="bg-neutral-50 p-2 border border-neutral-300">
+            <div class="text-[10px] text-neutral-500 font-bold uppercase">📍 POINT DE PRISE EN CHARGE :</div>
+            <div id="alert-pickup-address" class="font-black text-xs text-neutral-900">1250 Boulevard René-Lévesque Ouest, Montréal</div>
+            <div id="alert-pickup-suite" class="text-[10px] text-neutral-600 mt-0.5 font-semibold">Tour Bell / Entrée Sud</div>
+          </div>
+
+          <!-- Destination Address -->
+          <div class="bg-neutral-50 p-2 border border-neutral-300">
+            <div class="text-[10px] text-neutral-500 font-bold uppercase">🏁 DESTINATION PRÉVUE :</div>
+            <div id="alert-dest-address" class="font-black text-xs text-neutral-900">Aéroport International Montréal-Trudeau (YUL)</div>
+          </div>
+
+          <!-- Restrictions Tags -->
+          <div>
+            <div class="text-[10px] text-neutral-500 font-bold uppercase mb-1">CONSIGNES / RESTRICTIONS :</div>
+            <div id="alert-restrictions-tags" class="flex flex-wrap gap-1">
+              <span class="bg-noir text-white text-[10px] font-bold px-1.5 py-0.5">RÉSERVATION PRIORITAIRE</span>
+              <span class="bg-neutral-200 text-neutral-800 text-[10px] font-bold px-1.5 py-0.5">PAIEMENT CARTE</span>
+            </div>
+          </div>
+
+          <!-- Dispatcher Notes -->
+          <div id="alert-notes-box" class="bg-amber-50 border border-amber-200 p-2 text-[11px] text-amber-900 italic">
+            "Hall principal devant les portes tournantes, 2 valises."
+          </div>
+        </div>
+
+        <!-- Big Tactile Action Buttons -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+          <button onclick="acceptIncomingMission()" class="brut-btn-black py-3.5 px-3 flex items-center justify-center gap-2 font-mono text-sm font-black uppercase text-center bg-noir text-white shadow-[3px_3px_0px_#09090b]">
+            <i data-lucide="check-circle" class="w-5 h-5 text-emerald-400"></i>
+            ACCEPTER LA COURSE
+          </button>
+
+          <button onclick="rejectIncomingMission()" class="brut-btn-white py-3.5 px-3 flex items-center justify-center gap-2 font-mono text-xs font-black uppercase text-center text-red-600 border-2 border-noir hover:bg-red-50">
+            <i data-lucide="x-circle" class="w-4 h-4"></i>
+            REFUSER / PASSER
+          </button>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ========================================================================= -->
+    <!-- 4. ACTIVE MISSION LIFE-CYCLE VIEW (SHOWN WHEN ASSIGNED / EN ROUTE)         -->
+    <!-- ========================================================================= -->
+    <div id="active-mission-view" class="hidden flex-1 p-3 overflow-y-auto space-y-3">
+      
+      <!-- Mission Progress Stepper -->
+      <div class="brut-card p-3">
+        <div class="flex items-center justify-between text-[10px] font-mono font-black uppercase text-neutral-500 pb-1.5 border-b border-neutral-200 mb-2">
+          <span>PROGRESSION DE LA MISSION</span>
+          <span id="active-call-badge" class="bg-noir text-white px-1.5 py-0.2">#5081</span>
+        </div>
+
+        <!-- Step Indicator Grid -->
+        <div class="grid grid-cols-4 gap-1 font-mono text-[9px] font-black text-center">
+          <div id="step-en-route" class="p-1 border border-noir bg-noir text-white">
+            1. EN ROUTE
+          </div>
+          <div id="step-sur-place" class="p-1 border border-neutral-300 bg-neutral-100 text-neutral-500">
+            2. SUR PLACE
+          </div>
+          <div id="step-en-course" class="p-1 border border-neutral-300 bg-neutral-100 text-neutral-500">
+            3. EN COURSE
+          </div>
+          <div id="step-termine" class="p-1 border border-neutral-300 bg-neutral-100 text-neutral-500">
+            4. TERMINÉ
+          </div>
+        </div>
+      </div>
+
+      <!-- Mission Main Waypoint Card -->
+      <div class="brut-card p-4">
+        
+        <!-- Dynamic Target Label -->
+        <div class="flex items-center justify-between mb-2">
+          <span id="mission-stage-label" class="font-mono text-xs font-black px-2 py-0.5 bg-yellow-400 text-noir border border-noir uppercase tracking-wider flex items-center gap-1.5">
+            <span class="w-2 h-2 bg-black inline-block animate-pulse"></span>
+            PRISE EN CHARGE CLIENT
+          </span>
+          <span id="active-client-phone" class="font-mono text-[11px] font-bold text-neutral-700">
+            (514) 872-4091
+          </span>
+        </div>
+
+        <!-- Destination Address Headline -->
+        <div class="space-y-1 mb-3">
+          <div class="font-mono text-[10px] text-neutral-500 font-bold uppercase">ADRESSE PRINCIPALE :</div>
+          <h2 id="mission-target-address" class="text-lg font-black leading-tight text-noir">
+            1250 Boulevard René-Lévesque Ouest, Montréal
+          </h2>
+          <p id="mission-target-suite" class="font-mono text-xs font-semibold text-neutral-600">
+            Tour Bell / Entrée Sud
+          </p>
+        </div>
+
+        <!-- Secondary Info & Client Name -->
+        <div class="bg-neutral-50 p-2.5 border border-neutral-300 font-mono text-xs space-y-1 mb-3">
+          <div class="flex items-center justify-between">
+            <span class="text-neutral-500">CLIENT :</span>
+            <span id="mission-client-name" class="font-black text-noir">CORP-AIR-CANADA // AC-882</span>
+          </div>
+          <div class="flex items-center justify-between">
+            <span class="text-neutral-500">DESTINATION FINALE :</span>
+            <span id="mission-final-dest" class="font-bold text-neutral-800 text-right">Aéroport YUL</span>
+          </div>
+          <div class="flex items-center justify-between">
+            <span class="text-neutral-500">PASSAGERS :</span>
+            <span id="mission-pax-count" class="font-bold text-noir">2 Passagers (Berline)</span>
+          </div>
+        </div>
+
+        <!-- Restrictions Badges -->
+        <div id="mission-restrictions-list" class="flex flex-wrap gap-1 mb-4 font-mono text-[10px] font-bold">
+          <span class="bg-neutral-200 border border-neutral-400 px-1.5 py-0.5 text-noir">PAIEMENT CARTE</span>
+        </div>
+
+        <!-- Tactical Action 1: Navigation Waze (HUGE BUTTON) -->
+        <button onclick="launchWazeNavigation()" class="w-full brut-btn-black py-3 px-3 mb-2 flex items-center justify-center gap-2 font-mono text-sm font-black uppercase text-center bg-noir text-white shadow-[3px_3px_0px_#09090b]">
+          <i data-lucide="navigation-2" class="w-5 h-5 text-cyan-400"></i>
+          📍 LANCER NAVIGATION WAZE
+        </button>
+
+        <!-- Tactical Action 2: 10-4 Acknowledgment Button -->
+        <div class="grid grid-cols-2 gap-2 mb-3">
+          <button id="btn-radio-104" onclick="send104RadioAck()" class="brut-btn-white py-2.5 px-2 flex items-center justify-center gap-1.5 font-mono text-xs font-black uppercase text-center hover:bg-neutral-100">
+            <i data-lucide="radio" class="w-4 h-4 text-emerald-600"></i>
+            10-4 BIEN REÇU
+          </button>
+
+          <a id="btn-call-client" href="tel:(514)872-4091" class="brut-btn-white py-2.5 px-2 flex items-center justify-center gap-1.5 font-mono text-xs font-black uppercase text-center hover:bg-neutral-100">
+            <i data-lucide="phone-call" class="w-4 h-4 text-blue-600"></i>
+            APPELER CLIENT
+          </a>
+        </div>
+
+        <!-- Tactical Action 3: Progressive Lifecycle Step Trigger (Prominent) -->
+        <div id="lifecycle-action-wrapper" class="pt-2 border-t border-neutral-200">
+          
+          <!-- When in EN_ROUTE: Button to arrive on site -->
+          <button id="btn-signal-arrivee" onclick="signalArriveeSurPlace()" class="w-full brut-btn-amber py-3.5 px-3 flex items-center justify-center gap-2 font-mono text-sm font-black uppercase text-center">
+            <i data-lucide="flag" class="w-5 h-5"></i>
+            🏁 SIGNALER ARRIVÉE SUR PLACE
+          </button>
+
+          <!-- When in SUR_PLACE: Button for passenger on board -->
+          <button id="btn-passager-bord" onclick="signalPassagerABord()" class="hidden w-full brut-btn-emerald py-3.5 px-3 flex items-center justify-center gap-2 font-mono text-sm font-black uppercase text-center">
+            <i data-lucide="user-check" class="w-5 h-5"></i>
+            👤 PASSAGER À BORD (DÉMARRER COURSE)
+          </button>
+
+          <!-- When in EN_COURSE: Button to complete & bill -->
+          <button id="btn-terminer-course" onclick="terminerEtEncaisser()" class="hidden w-full brut-btn-emerald py-3.5 px-3 flex items-center justify-center gap-2 font-mono text-sm font-black uppercase text-center">
+            <i data-lucide="check-square" class="w-5 h-5"></i>
+            ✅ COURSE TERMINÉE & ENCAISSER
+          </button>
+
+        </div>
+
+      </div>
+
+      <!-- Quick Radio Status / Hazard Notification -->
+      <div class="brut-card p-3 font-mono text-xs">
+        <div class="text-[10px] text-neutral-500 font-bold uppercase mb-2">SIGNALEMENT RADIO RAPIDE AU CENTRAL :</div>
+        <div class="grid grid-cols-2 gap-2 text-[10px] font-bold uppercase">
+          <button onclick="sendQuickRadioMsg('RETARD CIRCULATION', 'Ralentissement important sur le trajet client')" class="p-2 border border-neutral-400 bg-neutral-50 hover:bg-neutral-200 text-left">
+            ⚠️ Retard trafic (+5m)
+          </button>
+          <button onclick="sendQuickRadioMsg('CLIENT NON PRÉSENT', 'En attente devant la porte, client ne répond pas')" class="p-2 border border-neutral-400 bg-neutral-50 hover:bg-neutral-200 text-left">
+            ⏳ Client introuvable
+          </button>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- ========================================================================= -->
+    <!-- 5. STANDBY / IN-CAB DASHBOARD (WHEN NO ACTIVE MISSION ASSIGNED)            -->
+    <!-- ========================================================================= -->
+    <div id="standby-dashboard-view" class="flex-1 p-3 overflow-y-auto space-y-3">
+      
+      <!-- Duty Status Banner -->
+      <div id="standby-status-card" class="brut-card p-3.5 border-2 border-noir bg-white">
+        <div class="flex items-center justify-between pb-2 mb-2 border-b border-neutral-200">
+          <div class="flex items-center gap-2">
+            <span id="standby-status-dot" class="w-3 h-3 bg-emerald-500 rounded-full animate-pulse"></span>
+            <span id="standby-status-title" class="font-mono text-xs font-black uppercase tracking-wider text-noir">
+              EN PATROUILLE // DISPONIBLE
+            </span>
+          </div>
+          <span id="standby-unit-badge" class="font-mono text-[10px] font-black bg-noir text-white px-2 py-0.5">
+            UNIT-232
+          </span>
+        </div>
+
+        <p class="font-mono text-xs text-neutral-600 mb-2 leading-relaxed">
+          Le terminal MDT est connecté au système central CAD. Les nouveaux ordres de mission assignés apparaîtront automatiquement avec alerte sonore.
+        </p>
+
+        <!-- Fast Test Simulator Button -->
+        <button onclick="simulateNewIncomingMission()" class="w-full brut-btn-black py-3 px-3 flex items-center justify-center gap-2 font-mono text-xs font-black uppercase text-center bg-noir text-white hover:bg-neutral-800">
+          <i data-lucide="zap" class="w-4 h-4 text-yellow-400"></i>
+          SIMULER NOUVELLE MISSION (DÉCLENCHER ALERTE 20s)
+        </button>
+      </div>
+
+      <!-- Live Telemetry / OBD-II Gauge Cluster -->
+      <div class="brut-card p-3">
+        <div class="flex items-center justify-between font-mono text-[10px] font-black uppercase text-neutral-500 pb-2 border-b border-neutral-200 mb-2.5">
+          <span>TÉLÉMÉTRIE CAN-BUS EMBARQUÉE</span>
+          <span class="text-emerald-600 flex items-center gap-1 font-bold">
+            <span class="w-1.5 h-1.5 bg-emerald-500 inline-block"></span> EN DIRECT
+          </span>
+        </div>
+
+        <div class="grid grid-cols-2 gap-2 font-mono">
+          <!-- Speed -->
+          <div class="bg-neutral-50 p-2.5 border border-neutral-300">
+            <div class="text-[9px] text-neutral-500 uppercase font-bold">VITESSE ACTUELLE :</div>
+            <div class="flex items-baseline gap-1 mt-0.5">
+              <span id="telemetry-speed" class="text-2xl font-black text-noir">34</span>
+              <span class="text-[10px] text-neutral-600 font-bold">KM/H</span>
+            </div>
+          </div>
+
+          <!-- Odometer -->
+          <div class="bg-neutral-50 p-2.5 border border-neutral-300">
+            <div class="text-[9px] text-neutral-500 uppercase font-bold">ODOMÈTRE TOTAL :</div>
+            <div class="flex items-baseline gap-1 mt-0.5">
+              <span id="telemetry-odo" class="text-base font-black text-noir">84,219.4</span>
+              <span class="text-[10px] text-neutral-600 font-bold">KM</span>
+            </div>
+          </div>
+
+          <!-- Battery CAN -->
+          <div class="bg-neutral-50 p-2.5 border border-neutral-300">
+            <div class="text-[9px] text-neutral-500 uppercase font-bold">BATTERIE 12V :</div>
+            <div class="flex items-baseline gap-1 mt-0.5">
+              <span id="telemetry-volt" class="text-lg font-black text-noir">13.9</span>
+              <span class="text-[10px] text-neutral-600 font-bold">VOLTS</span>
+            </div>
+          </div>
+
+          <!-- Coolant Temp -->
+          <div class="bg-neutral-50 p-2.5 border border-neutral-300">
+            <div class="text-[9px] text-neutral-500 uppercase font-bold">TEMP. LIQUIDE :</div>
+            <div class="flex items-baseline gap-1 mt-0.5">
+              <span id="telemetry-temp" class="text-lg font-black text-noir">91</span>
+              <span class="text-[10px] text-neutral-600 font-bold">°C</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Zone & GPS Coordinates -->
+        <div class="bg-neutral-50 p-2 border border-neutral-300 font-mono text-[10px] mt-2 space-y-0.5">
+          <div class="flex justify-between">
+            <span class="text-neutral-500">ZONE OPÉRATIONNELLE :</span>
+            <span id="telemetry-zone" class="font-bold text-noir">ZONE-01 (CENTRE-VILLE)</span>
+          </div>
+          <div class="flex justify-between">
+            <span class="text-neutral-500">GPS FIX :</span>
+            <span id="telemetry-gps" class="font-bold text-noir">45.501923, -73.567412</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Quick Radio Transmission Codes -->
+      <div class="brut-card p-3 font-mono text-xs">
+        <div class="text-[10px] text-neutral-500 font-black uppercase mb-2">CODES RADIO 10-RAPIDES AU CENTRAL :</div>
+        <div class="grid grid-cols-2 gap-2 text-[10px] font-bold uppercase">
+          <button onclick="sendQuickRadioMsg('10-8 EN SERVICE', 'Unité disponible pour affectations')" class="p-2 border border-noir bg-neutral-50 hover:bg-neutral-200 text-left">
+            📻 10-8 En Service
+          </button>
+          <button onclick="sendQuickRadioMsg('10-7 EN PAUSE', 'Pause réglementaire 15 minutes')" class="p-2 border border-noir bg-neutral-50 hover:bg-neutral-200 text-left">
+            ☕ 10-7 Pause 15m
+          </button>
+          <button onclick="sendQuickRadioMsg('10-6 OCCUPÉ RAVITAILLEMENT', 'Arrêt station carburant / recharge')" class="p-2 border border-noir bg-neutral-50 hover:bg-neutral-200 text-left">
+            ⛽ 10-6 Ravitaillement
+          </button>
+          <button onclick="sendQuickRadioMsg('10-9 RÉPÉTER', 'Dernière transmission dispatch non audible')" class="p-2 border border-noir bg-neutral-50 hover:bg-neutral-200 text-left">
+            🔁 10-9 Répéter
+          </button>
+        </div>
+      </div>
+
+      <!-- Recent Radio MDT Messages Log -->
+      <div class="brut-card p-3">
+        <div class="flex items-center justify-between font-mono text-[10px] font-black uppercase text-neutral-500 pb-1.5 border-b border-neutral-200 mb-2">
+          <span>DERNIÈRES NOTIFICATIONS MDT</span>
+          <a href="messages.html" class="text-neutral-900 underline font-bold">VOIR TOUT</a>
+        </div>
+        <div id="standby-messages-list" class="space-y-2 font-mono text-xs">
+          <!-- Populated from PulseState.getMessages() -->
+        </div>
+      </div>
+
+    </div>
+
+    <!-- ========================================================================= -->
+    <!-- 6. RECEIPT & FARE PAYMENT MODAL (ENCAISSEMENT)                             -->
+    <!-- ========================================================================= -->
+    <div id="receipt-modal" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+      <div class="brut-card w-full max-w-sm bg-white p-5 border-2 border-noir shadow-[6px_6px_0px_#ffffff]">
+        
+        <!-- Header -->
+        <div class="text-center pb-3 border-b-2 border-dashed border-neutral-400 mb-3 font-mono">
+          <div class="font-black text-sm uppercase tracking-wider text-noir">PULSE // CAD FLOTTE MÉTRO</div>
+          <div class="text-[10px] text-neutral-500">REÇU OFFICIEL DE TRANSPORT URBAIN</div>
+          <div id="receipt-date-time" class="text-[10px] text-neutral-800 font-bold mt-1">2026-11-08 · 02:45:10</div>
+        </div>
+
+        <!-- Receipt Breakdown -->
+        <div class="font-mono text-xs space-y-1.5 mb-3 border-b-2 border-dashed border-neutral-400 pb-3">
+          <div class="flex justify-between">
+            <span class="text-neutral-600">Course Réf :</span>
+            <span id="receipt-call-id" class="font-bold text-noir">#5081</span>
+          </div>
+          <div class="flex justify-between">
+            <span class="text-neutral-600">Chauffeur :</span>
+            <span id="receipt-driver" class="font-bold text-noir">J. Tremblay (#402)</span>
+          </div>
+          <div class="flex justify-between">
+            <span class="text-neutral-600">Véhicule :</span>
+            <span id="receipt-vehicle" class="font-bold text-noir">UNIT-232</span>
+          </div>
+          
+          <div class="my-2 border-t border-neutral-200"></div>
+
+          <div class="flex justify-between">
+            <span>Prise en charge initiale :</span>
+            <span>4.10 $</span>
+          </div>
+          <div class="flex justify-between">
+            <span>Distance (18.4 km @ 1.85 $/km) :</span>
+            <span id="receipt-fare-dist">34.04 $</span>
+          </div>
+          <div class="flex justify-between">
+            <span>Temps d'attente / circulation :</span>
+            <span>6.50 $</span>
+          </div>
+          <div class="flex justify-between text-neutral-500 text-[10px]">
+            <span>TPS (5.000%) :</span>
+            <span>2.23 $</span>
+          </div>
+          <div class="flex justify-between text-neutral-500 text-[10px]">
+            <span>TVQ (9.975%) :</span>
+            <span>4.45 $</span>
+          </div>
+
+          <div class="my-2 border-t-2 border-noir"></div>
+
+          <div class="flex justify-between text-base font-black text-noir">
+            <span>TOTAL ENCAISSÉ :</span>
+            <span id="receipt-total-price">51.32 $</span>
+          </div>
+        </div>
+
+        <!-- Receipt Action Buttons -->
+        <div class="space-y-2 font-mono text-xs font-bold uppercase">
+          <button onclick="confirmPaymentAndReset()" class="w-full brut-btn-emerald py-3 px-3 flex items-center justify-center gap-2 text-white">
+            <i data-lucide="check" class="w-4 h-4"></i>
+            VALIDER & RETOUR PATROUILLE
+          </button>
+
+          <button onclick="openDetailedReceipt()" class="w-full p-2 border-2 border-noir bg-white hover:bg-neutral-100 text-center text-noir flex items-center justify-center gap-1.5 shadow-[2px_2px_0px_#09090b]">
+            <i data-lucide="file-text" class="w-4 h-4"></i>
+            VOIR REÇU OFFICIEL FISCAL (PDF)
+          </button>
+          
+          <div class="grid grid-cols-2 gap-2">
+            <button onclick="alert('REÇU IMPRIMÉ SUR L\'IMPRIMANTE EMBARQUÉE DU VÉHICULE.')" class="p-2 border border-noir bg-neutral-100 hover:bg-neutral-200 text-center">
+              🖨 Imprimer
+            </button>
+            <button onclick="alert('LIEN DE REÇU ENVOYÉ PAR SMS AU PASSAGER.')" class="p-2 border border-noir bg-neutral-100 hover:bg-neutral-200 text-center">
+              📱 SMS Reçu
+            </button>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ========================================================================= -->
+    <!-- 7. COLLABORATION SHARE MODAL (IDENTICAL SYSTEM-WIDE SPECIFICATION)         -->
+    <!-- ========================================================================= -->
+    <div id="share-modal" class="fixed inset-0 bg-black/75 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden" onclick="closeShareModalOnBg(e)">
+      <div class="brut-card max-w-lg w-full p-5 bg-white border-2 border-noir shadow-[6px_6px_0px_#09090b]" onclick="event.stopPropagation()">
+        
+        <div class="flex items-center justify-between pb-3 border-b-2 border-noir mb-4">
+          <div class="flex items-center gap-2">
+            <div class="bg-noir text-white p-1.5"><i data-lucide="share-2" class="w-4 h-4"></i></div>
+            <h3 class="font-mono text-sm font-black uppercase tracking-wider text-noir">PARTAGE MULTI-TERMINAUX CAD</h3>
+          </div>
+          <button onclick="closeShareModal()" class="text-noir hover:bg-neutral-100 p-1 font-mono font-bold">✕</button>
+        </div>
+
+        <p class="font-mono text-xs text-neutral-700 mb-4 leading-relaxed">
+          Ouvrez ce terminal mobile chauffeur sur votre smartphone ou partagez l'URL avec un collaborateur pour tester la prise en charge de mission en temps réel.
+        </p>
+
+        <!-- Public Web URL -->
+        <div class="bg-neutral-50 p-3 border-1.5 border-noir mb-3 font-mono text-xs">
+          <div class="flex items-center justify-between mb-1">
+            <span class="text-[10px] text-neutral-900 uppercase font-black flex items-center gap-1.5">
+              <span class="w-2 h-2 bg-emerald-600 inline-block animate-pulse"></span>
+              1. ACCÈS PUBLIC INTERNET (HTTPS MONDIAL) :
+            </span>
+            <span class="text-[9px] bg-noir text-white px-1.5 py-0.2 font-bold">EN LIGNE</span>
+          </div>
+          <div class="flex items-center justify-between gap-2">
+            <input id="share-url-public" class="bg-white border border-neutral-300 px-2.5 py-1.5 font-bold text-xs flex-1 outline-none text-noir" readonly value="https://a90389d46bbc3d.lhr.life/driver.html" />
+            <button onclick="copyPublicUrl()" class="bg-noir text-white px-3 py-1.5 font-black uppercase text-[11px] hover:bg-neutral-800">
+              COPIER
+            </button>
+          </div>
+        </div>
+
+        <!-- Local Network LAN URL -->
+        <div class="bg-neutral-50 p-3 border-1.5 border-neutral-300 mb-4 font-mono text-xs">
+          <div class="text-[10px] text-neutral-500 uppercase font-bold mb-1">2. ACCÈS RÉSEAU LOCAL (WI-FI / LAN) :</div>
+          <div class="flex items-center justify-between gap-2">
+            <input id="share-url-input" class="bg-white border border-neutral-300 px-2.5 py-1.5 font-bold text-xs flex-1 outline-none text-noir" readonly value="http://192.168.1.95:8091/driver.html" />
+            <button onclick="copyShareUrl()" class="bg-white text-noir border border-noir px-3 py-1.5 font-bold uppercase text-[11px] hover:bg-neutral-100">
+              COPIER
+            </button>
+          </div>
+        </div>
+
+        <div class="border border-neutral-200 p-2.5 bg-neutral-100 font-mono text-[10px] text-neutral-600 mb-4 leading-normal">
+          • Synchronisation : <strong>PulseState BroadcastChannel (Inter-onglets & CAD)</strong><br>
+          • Écran tactile : <strong>Optimisé iPhone, Android & Écrans Véhicule MDT</strong>
+        </div>
+
+        <div class="flex justify-end">
+          <button onclick="closeShareModal()" class="bg-noir text-white font-mono text-xs font-bold uppercase px-4 py-2 hover:bg-neutral-800">
+            FERMER [ESC]
+          </button>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ========================================================================= -->
+    <!-- 8. BOTTOM IN-VEHICLE SYSTEM FOOTER                                        -->
+    <!-- ========================================================================= -->
+    <footer class="bg-white border-t-2 border-noir p-2.5 px-3 flex items-center justify-between font-mono text-[10px] text-neutral-600 select-none">
+      <div class="flex items-center gap-1.5">
+        <span class="w-2 h-2 bg-black inline-block"></span>
+        <span class="font-bold text-neutral-900">MDT HARDWARE :</span>
+        <span id="footer-hardware-id">MDT-HW-99232-REV4</span>
+      </div>
+      <div>
+        VIN: <span id="footer-vin" class="font-bold text-noir">2C3CDXAG8KH23209</span>
+      </div>
+    </footer>
+
+  </div>
+
+  <!-- ========================================================================= -->
+  <!-- JAVASCRIPT APPLICATION LOGIC & SYNCHRONIZATION                            -->
+  <!-- ========================================================================= -->
+  <script>
+    // State references
+    let currentUnitId = 232;
+    let countdownInterval = null;
+    let countdownTimeLeft = 20.0;
+    let activeIncomingCall = null;
+    let audioCtx = null;
+
+    // Web Audio Synthesizer for High-Grade In-Vehicle Radio Chimes
+    function getAudioContext() {
+      if (!audioCtx) {
+        const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+        if (AudioContextClass) audioCtx = new AudioContextClass();
+      }
+      if (audioCtx && audioCtx.state === 'suspended') {
+        audioCtx.resume();
+      }
+      return audioCtx;
+    }
+
+    function playTone(type) {
+      try {
+        const ctx = getAudioContext();
+        if (!ctx) return;
+
+        if (type === 'incoming_alert') {
+          // Dual-tone urgent alert (high-low radio alert)
+          const osc1 = ctx.createOscillator();
+          const osc2 = ctx.createOscillator();
+          const gain = ctx.createGain();
+
+          osc1.type = 'sawtooth';
+          osc2.type = 'sine';
+
+          osc1.frequency.setValueAtTime(880, ctx.currentTime);
+          osc1.frequency.setValueAtTime(1174.66, ctx.currentTime + 0.15); // D6
+          osc2.frequency.setValueAtTime(440, ctx.currentTime);
+          osc2.frequency.setValueAtTime(587.33, ctx.currentTime + 0.15);
+
+          gain.gain.setValueAtTime(0.2, ctx.currentTime);
+          gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.45);
+
+          osc1.connect(gain);
+          osc2.connect(gain);
+          gain.connect(ctx.destination);
+
+          osc1.start();
+          osc2.start();
+          osc1.stop(ctx.currentTime + 0.45);
+          osc2.stop(ctx.currentTime + 0.45);
+        } else if (type === 'tick') {
+          const osc = ctx.createOscillator();
+          const gain = ctx.createGain();
+          osc.type = 'triangle';
+          osc.frequency.setValueAtTime(900, ctx.currentTime);
+          gain.gain.setValueAtTime(0.1, ctx.currentTime);
+          gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.06);
+          osc.connect(gain);
+          gain.connect(ctx.destination);
+          osc.start();
+          osc.stop(ctx.currentTime + 0.06);
+        } else if (type === 'confirm') {
+          // 10-4 or accept confirmation chime
+          const osc = ctx.createOscillator();
+          const gain = ctx.createGain();
+          osc.type = 'sine';
+          osc.frequency.setValueAtTime(523.25, ctx.currentTime); // C5
+          osc.frequency.setValueAtTime(659.25, ctx.currentTime + 0.1); // E5
+          osc.frequency.setValueAtTime(783.99, ctx.currentTime + 0.2); // G5
+          gain.gain.setValueAtTime(0.25, ctx.currentTime);
+          gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.4);
+          osc.connect(gain);
+          gain.connect(ctx.destination);
+          osc.start();
+          osc.stop(ctx.currentTime + 0.4);
+        }
+      } catch (e) {
+        console.warn('Audio playback error:', e);
+      }
+    }
+
+    // Initialize Unit Selector from state
+    function initUnitSelector() {
+      const vehicles = PulseState.getVehicles();
+      const select = document.getElementById('unit-select');
+      if (!select) return;
+
+      // Check URL query param ?unit=... or localStorage
+      const urlParams = new URLSearchParams(window.location.search);
+      const paramUnit = urlParams.get('unit');
+      const savedUnit = localStorage.getItem('pulse_driver_unit_id');
+
+      if (paramUnit && vehicles.some(v => String(v.id) === String(paramUnit) || v.code === paramUnit)) {
+        const found = vehicles.find(v => String(v.id) === String(paramUnit) || v.code === paramUnit);
+        currentUnitId = found.id;
+      } else if (savedUnit && vehicles.some(v => String(v.id) === String(savedUnit))) {
+        currentUnitId = Number(savedUnit);
+      } else {
+        currentUnitId = vehicles[0] ? vehicles[0].id : 232;
+      }
+
+      select.innerHTML = vehicles.map(v => `
+        <option value="${v.id}" ${v.id === currentUnitId ? 'selected' : ''}>
+          ${v.code} — [${v.status}] — ${v.type} (${v.zone.split(' ')[0]})
+        </option>
+      `).join('');
+
+      localStorage.setItem('pulse_driver_unit_id', currentUnitId);
+    }
+
+    function onUnitSelectChange(newId) {
+      currentUnitId = Number(newId);
+      localStorage.setItem('pulse_driver_unit_id', currentUnitId);
+      stopCountdown();
+      renderAll();
+    }
+
+    function getSelectedVehicle() {
+      const vehicles = PulseState.getVehicles();
+      return vehicles.find(v => v.id === currentUnitId) || vehicles[0];
+    }
+
+    // Toggle duty between LIBRE (en service) and PAUSE (indisponible)
+    function setDutyState(newStatus) {
+      const vehicles = PulseState.getVehicles();
+      const veh = vehicles.find(v => v.id === currentUnitId);
+      if (!veh) return;
+
+      veh.status = newStatus;
+      PulseState.saveVehicles(vehicles);
+
+      // Send dispatch radio notice
+      PulseState.sendMessage({
+        id: Date.now(),
+        prio: "NORMALE",
+        from: `${veh.code} // MDT CHAUFFEUR`,
+        to: "CENTRAL CAD DISPATCH",
+        subject: newStatus === 'LIBRE' ? "10-8 EN SERVICE / DISPONIBLE" : "10-7 EN PAUSE / INDISPONIBLE",
+        date: "AUJOURD'HUI " + new Date().toLocaleTimeString('fr-CA', { hour: '2-digit', minute: '2-digit' }),
+        unread: true,
+        body: `L'unité ${veh.code} passe au statut : ${newStatus}. Zone : ${veh.zone}.`
+      });
+
+      playTone('confirm');
+      renderAll();
+    }
+
+    // Check for Active or Assigned calls for current vehicle
+    function getVehicleCalls() {
+      const calls = PulseState.getCalls();
+      const assigned = calls.filter(c => Number(c.assignedUnit) === Number(currentUnitId));
+      
+      // Look for pending assignment (needs acceptance)
+      const incoming = assigned.find(c => c.status === 'ASSIGNÉ');
+      // Look for active in-progress mission
+      const active = assigned.find(c => ['EN_ROUTE', 'SUR_PLACE', 'EN_COURSE'].includes(c.status));
+
+      return { incoming, active, allAssigned: assigned };
+    }
+
+    // Countdown Timer logic for Incoming Mission (20s)
+    function startCountdown(call) {
+      if (countdownInterval) return; // Already running
+      activeIncomingCall = call;
+      countdownTimeLeft = 20.0;
+
+      const fill = document.getElementById('countdown-bar-fill');
+      const text = document.getElementById('countdown-text');
+      if (fill) fill.style.width = '100%';
+      if (text) text.textContent = '20.0s';
+
+      playTone('incoming_alert');
+
+      countdownInterval = setInterval(() => {
+        countdownTimeLeft -= 0.1;
+
+        if (countdownTimeLeft <= 0) {
+          stopCountdown();
+          // Timeout: auto-reject or return to pool
+          rejectIncomingMission(true);
+          return;
+        }
+
+        const pct = Math.max(0, (countdownTimeLeft / 20.0) * 100);
+        if (fill) fill.style.width = `${pct}%`;
+        if (text) text.textContent = `${countdownTimeLeft.toFixed(1)}s`;
+
+        // Audible tick when under 5s
+        if (countdownTimeLeft <= 5.0 && Math.floor(countdownTimeLeft * 10) % 10 === 0) {
+          playTone('tick');
+        }
+      }, 100);
+    }
+
+    function stopCountdown() {
+      if (countdownInterval) {
+        clearInterval(countdownInterval);
+        countdownInterval = null;
+      }
+    }
+
+    // Accept Incoming Mission
+    function acceptIncomingMission() {
+      stopCountdown();
+      const call = activeIncomingCall;
+      if (!call) return;
+
+      PulseState.updateCallStatus(call.id, 'EN_ROUTE');
+
+      // Send 10-4 Acknowledgment automatically
+      PulseState.sendMessage({
+        id: Date.now(),
+        prio: "NORMALE",
+        from: `${getSelectedVehicle().code} // MDT`,
+        to: "CENTRAL CAD DISPATCH",
+        subject: `10-4 BIEN REÇU // MISSION #${call.id}`,
+        date: "AUJOURD'HUI " + new Date().toLocaleTimeString('fr-CA', { hour: '2-digit', minute: '2-digit' }),
+        unread: true,
+        body: `10-4 bien reçu pour la mission #${call.id} (${call.client}). Véhicule en route vers : ${call.pickup}.`
+      });
+
+      playTone('confirm');
+      renderAll();
+    }
+
+    // Reject Incoming Mission (Returns to pool)
+    function rejectIncomingMission(isTimeout = false) {
+      stopCountdown();
+      const call = activeIncomingCall;
+      if (!call) return;
+
+      const calls = PulseState.getCalls();
+      const c = calls.find(item => String(item.id) === String(call.id));
+      if (c) {
+        c.status = 'EN_ATTENTE';
+        c.assignedUnit = null;
+        PulseState.saveCalls(calls);
+      }
+
+      const vehicles = PulseState.getVehicles();
+      const v = vehicles.find(item => item.id === currentUnitId);
+      if (v) {
+        v.status = 'LIBRE';
+        PulseState.saveVehicles(vehicles);
+      }
+
+      // Notify dispatch
+      PulseState.sendMessage({
+        id: Date.now(),
+        prio: "URGENTE",
+        from: `${v ? v.code : 'UNIT'} // MDT`,
+        to: "CENTRAL CAD DISPATCH",
+        subject: isTimeout ? `DÉLAI EXPIRÉ (20s) // MISSION #${call.id}` : `COURSE REFUSÉE // MISSION #${call.id}`,
+        date: "AUJOURD'HUI " + new Date().toLocaleTimeString('fr-CA', { hour: '2-digit', minute: '2-digit' }),
+        unread: true,
+        body: isTimeout
+          ? `L'unité n'a pas répondu au décompte de 20s. Mission #${call.id} remise en file d'attente générale.`
+          : `L'unité a refusé l'affectation #${call.id}. Remise en file d'attente pour réaffectation.`
+      });
+
+      activeIncomingCall = null;
+      renderAll();
+    }
+
+    // Simulation Trigger for Demo Testing
+    function simulateNewIncomingMission() {
+      const calls = PulseState.getCalls();
+      let callToAssign = calls.find(c => c.status === 'EN_ATTENTE');
+
+      if (!callToAssign) {
+        // Create an instant test call
+        const newId = String(5090 + Math.floor(Math.random() * 50));
+        callToAssign = PulseState.createCall({
+          id: newId,
+          client: "VIP HOTEL FAIRMONT // CONCIERGE-DESK",
+          phone: "(514) 861-3511",
+          pickup: "900 Boulevard René-Lévesque Ouest, Montréal",
+          suite: "Entrée Voiturier Principale",
+          dest: "Casino de Montréal, Île Notre-Dame",
+          zone: "ZONE-01 (CENTRE-VILLE)",
+          vehType: "BERLINE",
+          passengers: 3,
+          restrictions: ["RÉSERVATION PRIORITAIRE", "PAIEMENT DÉBIT/CARTE"],
+          status: "EN_ATTENTE",
+          assignedUnit: null,
+          createdAt: new Date().toLocaleTimeString('fr-CA', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false }),
+          notes: "Client VIP Fairmont avec bagages. Départ immédiat."
+        });
+      }
+
+      // Assign to current unit
+      PulseState.assignCall(callToAssign.id, currentUnitId);
+      renderAll();
+    }
+
+    // Radio 10-4 Button
+    function send104RadioAck() {
+      const { active } = getVehicleCalls();
+      const veh = getSelectedVehicle();
+      const callId = active ? `#${active.id}` : 'GÉNÉRAL';
+
+      PulseState.sendMessage({
+        id: Date.now(),
+        prio: "NORMALE",
+        from: `${veh.code} // MDT`,
+        to: "CENTRAL CAD DISPATCH",
+        subject: `10-4 MESSAGE BIEN REÇU (${callId})`,
+        date: "AUJOURD'HUI " + new Date().toLocaleTimeString('fr-CA', { hour: '2-digit', minute: '2-digit' }),
+        unread: true,
+        body: `Transmission radio 10-4 confirmée par l'unité ${veh.code}. Réception claire et 5/5.`
+      });
+
+      playTone('confirm');
+      alert(`10-4 TRANSMIS AU CENTRAL CAD AVEC SUCCÈS !\nUnité : ${veh.code}`);
+    }
+
+    // Waze Launch Navigation with Coordinate Fallback
+    function launchWazeNavigation() {
+      const { active } = getVehicleCalls();
+      const veh = getSelectedVehicle();
+
+      let lat = 45.501923;
+      let lng = -73.567412;
+
+      if (active) {
+        if (active.status === 'EN_COURSE') {
+          // Dest coordinates
+          if (active.dest.includes('YUL') || active.dest.includes('Aéroport')) {
+            lat = 45.470512; lng = -73.740834;
+          } else if (active.dest.includes('Casino')) {
+            lat = 45.505000; lng = -73.526000;
+          } else if (active.dest.includes('Guy')) {
+            lat = 45.495000; lng = -73.578000;
+          } else if (active.dest.includes('Gare Centrale')) {
+            lat = 45.500000; lng = -73.566500;
+          } else {
+            lat = 45.508800; lng = -73.554000;
+          }
+        } else {
+          // Pickup coordinates
+          if (active.pickup.includes('René-Lévesque')) {
+            lat = 45.501923; lng = -73.567412;
+          } else if (active.pickup.includes('Sanguinet') || active.pickup.includes('CHUM')) {
+            lat = 45.513500; lng = -73.558000;
+          } else if (active.pickup.includes('Jean-Paul-Riopelle')) {
+            lat = 45.504000; lng = -73.561000;
+          } else if (active.pickup.includes('Cedar')) {
+            lat = 45.498000; lng = -73.589000;
+          } else {
+            lat = veh.lat || 45.501923;
+            lng = veh.lng || -73.567412;
+          }
+        }
+      }
+
+      const wazeAppUrl = `waze://?ll=${lat},${lng}&navigate=yes`;
+      const wazeWebUrl = `https://www.waze.com/ul?ll=${lat},${lng}&navigate=yes`;
+
+      // Try application scheme, fallback to web
+      const start = Date.now();
+      window.location.href = wazeAppUrl;
+      setTimeout(() => {
+        if (Date.now() - start < 1500) {
+          window.open(wazeWebUrl, '_blank');
+        }
+      }, 500);
+    }
+
+    // Step 2: Arrivée sur place
+    function signalArriveeSurPlace() {
+      const { active } = getVehicleCalls();
+      if (!active) return;
+
+      PulseState.updateCallStatus(active.id, 'SUR_PLACE');
+      const veh = getSelectedVehicle();
+
+      PulseState.sendMessage({
+        id: Date.now(),
+        prio: "NORMALE",
+        from: `${veh.code} // MDT`,
+        to: "CENTRAL CAD DISPATCH",
+        subject: `ARRIVÉE SUR PLACE // MISSION #${active.id}`,
+        date: "AUJOURD'HUI " + new Date().toLocaleTimeString('fr-CA', { hour: '2-digit', minute: '2-digit' }),
+        unread: true,
+        body: `L'unité ${veh.code} est arrivée sur place au ${active.pickup}. Client prévenu via notification CAD.`
+      });
+
+      playTone('confirm');
+      renderAll();
+    }
+
+    // Step 3: Passager à bord
+    function signalPassagerABord() {
+      const { active } = getVehicleCalls();
+      if (!active) return;
+
+      const calls = PulseState.getCalls();
+      const c = calls.find(item => String(item.id) === String(active.id));
+      if (c) {
+        c.status = 'EN_COURSE';
+        PulseState.saveCalls(calls);
+      }
+
+      const vehicles = PulseState.getVehicles();
+      const v = vehicles.find(item => item.id === currentUnitId);
+      if (v) {
+        v.status = 'EN_COURSE';
+        PulseState.saveVehicles(vehicles);
+      }
+
+      PulseState.sendMessage({
+        id: Date.now(),
+        prio: "NORMALE",
+        from: `${v ? v.code : 'UNIT'} // MDT`,
+        to: "CENTRAL CAD DISPATCH",
+        subject: `PASSAGER À BORD // EN COURSE #${active.id}`,
+        date: "AUJOURD'HUI " + new Date().toLocaleTimeString('fr-CA', { hour: '2-digit', minute: '2-digit' }),
+        unread: true,
+        body: `Passager à bord pour la mission #${active.id}. Trajet engagé vers ${active.dest}. Taximètre actif.`
+      });
+
+      playTone('confirm');
+      renderAll();
+    }
+
+    // Step 4: Terminer et encaisser
+    let lastFinishedCallId = null;
+
+    function terminerEtEncaisser() {
+      const { active } = getVehicleCalls();
+      if (!active) return;
+
+      lastFinishedCallId = active.id;
+      const veh = getSelectedVehicle();
+
+      // Open receipt modal
+      document.getElementById('receipt-call-id').textContent = `#${active.id}`;
+      document.getElementById('receipt-driver').textContent = `J. Tremblay (#402)`;
+      document.getElementById('receipt-vehicle').textContent = veh.code;
+      document.getElementById('receipt-date-time').textContent = new Date().toLocaleString('fr-CA');
+      
+      const distFare = active.dest.includes('YUL') ? 48.50 : 28.50;
+      document.getElementById('receipt-fare-dist').textContent = `${distFare.toFixed(2)} $`;
+      document.getElementById('receipt-total-price').textContent = `${(distFare + 17.25).toFixed(2)} $`;
+
+      document.getElementById('receipt-modal').classList.remove('hidden');
+      lucide.createIcons();
+      playTone('confirm');
+    }
+
+    function openDetailedReceipt() {
+      const callId = lastFinishedCallId || (getVehicleCalls().active ? getVehicleCalls().active.id : '5081');
+      window.open(`receipt.html?callId=${callId}`, '_blank');
+    }
+
+    function confirmPaymentAndReset() {
+      const { active } = getVehicleCalls();
+      if (active) {
+        PulseState.updateCallStatus(active.id, 'TERMINÉ');
+        const veh = getSelectedVehicle();
+
+        PulseState.sendMessage({
+          id: Date.now(),
+          prio: "NORMALE",
+          from: `${veh.code} // MDT`,
+          to: "CENTRAL CAD DISPATCH",
+          subject: `COURSE TERMINÉE & ENCAISSÉE // #${active.id}`,
+          date: "AUJOURD'HUI " + new Date().toLocaleTimeString('fr-CA', { hour: '2-digit', minute: '2-digit' }),
+          unread: true,
+          body: `Mission #${active.id} finalisée avec succès. Paiement enregistré. Unité de nouveau LIBRE pour affectations.`
+        });
+      }
+
+      document.getElementById('receipt-modal').classList.add('hidden');
+      renderAll();
+    }
+
+    // Quick Radio helper
+    function sendQuickRadioMsg(subject, body) {
+      const veh = getSelectedVehicle();
+      PulseState.sendMessage({
+        id: Date.now(),
+        prio: "NORMALE",
+        from: `${veh.code} // MDT`,
+        to: "CENTRAL CAD DISPATCH",
+        subject: subject,
+        date: "AUJOURD'HUI " + new Date().toLocaleTimeString('fr-CA', { hour: '2-digit', minute: '2-digit' }),
+        unread: true,
+        body: body
+      });
+      playTone('confirm');
+      alert(`TRANSMISSION RADIO EFFECTUÉE :\n${subject}\n${body}`);
+    }
+
+    // Toggle CAD Navigation Popover
+    function toggleCadNavMenu() {
+      const el = document.getElementById('cad-nav-popover');
+      if (el) el.classList.toggle('hidden');
+    }
+
+    // RENDER APPLICATION VIEW & STATE
+    function renderAll() {
+      const veh = getSelectedVehicle();
+      if (!veh) return;
+
+      // Header updates
+      const codeEl = document.getElementById('header-unit-code');
+      if (codeEl) codeEl.textContent = veh.code;
+      const hwEl = document.getElementById('footer-hardware-id');
+      if (hwEl) hwEl.textContent = veh.mdtHardwareId || `MDT-HW-99${veh.id}-REV4`;
+      const vinEl = document.getElementById('footer-vin');
+      if (vinEl) vinEl.textContent = veh.vin || '2C3CDXAG8KH23209';
+      const pingEl = document.getElementById('header-ping');
+      if (pingEl) pingEl.textContent = `${veh.networkLatencyMs || 24}ms`;
+
+      // Duty toggle styling
+      const btnDutyService = document.getElementById('btn-duty-service');
+      const btnDutyPause = document.getElementById('btn-duty-pause');
+      const isPaused = veh.status === 'PAUSE';
+
+      if (isPaused) {
+        btnDutyService.className = 'brut-btn-white py-2.5 px-2 flex items-center justify-center gap-1.5 font-mono text-xs font-black uppercase text-center text-neutral-600';
+        btnDutyPause.className = 'brut-btn-black py-2.5 px-2 flex items-center justify-center gap-1.5 font-mono text-xs font-black uppercase text-center bg-amber-500 text-noir border-2 border-noir';
+      } else {
+        btnDutyService.className = 'brut-btn-black py-2.5 px-2 flex items-center justify-center gap-1.5 font-mono text-xs font-black uppercase text-center bg-noir text-white';
+        btnDutyPause.className = 'brut-btn-white py-2.5 px-2 flex items-center justify-center gap-1.5 font-mono text-xs font-black uppercase text-center text-neutral-700';
+      }
+
+      // Check Calls
+      const { incoming, active } = getVehicleCalls();
+
+      const incomingContainer = document.getElementById('incoming-alert-container');
+      const activeMissionView = document.getElementById('active-mission-view');
+      const standbyDashboardView = document.getElementById('standby-dashboard-view');
+
+      // 1. INCOMING MISSION ALERT
+      if (incoming) {
+        incomingContainer.classList.remove('hidden');
+        document.getElementById('alert-call-id').textContent = `#${incoming.id}`;
+        document.getElementById('alert-client-name').textContent = incoming.client;
+        document.getElementById('alert-passenger-count').textContent = `Passagers : ${incoming.passengers || 1} personne(s) · Catégorie : ${incoming.vehType || veh.type}`;
+        document.getElementById('alert-pickup-address').textContent = incoming.pickup;
+        document.getElementById('alert-pickup-suite').textContent = incoming.suite || '';
+        document.getElementById('alert-dest-address').textContent = incoming.dest;
+
+        // Restrictions
+        const tagsContainer = document.getElementById('alert-restrictions-tags');
+        if (tagsContainer) {
+          tagsContainer.innerHTML = (incoming.restrictions || ['PRIORITÉ CAD']).map(r => `
+            <span class="bg-noir text-white text-[10px] font-bold px-1.5 py-0.5">${r}</span>
+          `).join('');
+        }
+
+        // Notes
+        const notesBox = document.getElementById('alert-notes-box');
+        if (notesBox) notesBox.textContent = `"${incoming.notes || 'Aucune consigne particulière.'}"`;
+
+        startCountdown(incoming);
+      } else {
+        incomingContainer.classList.add('hidden');
+        stopCountdown();
+      }
+
+      // 2. ACTIVE MISSION LIFE-CYCLE VIEW
+      if (active) {
+        activeMissionView.classList.remove('hidden');
+        standbyDashboardView.classList.add('hidden');
+
+        document.getElementById('active-call-badge').textContent = `#${active.id} · ${active.status}`;
+        document.getElementById('mission-client-name').textContent = active.client;
+        document.getElementById('active-client-phone').textContent = active.phone || '(514) 872-0000';
+        document.getElementById('btn-call-client').href = `tel:${active.phone || '5148720000'}`;
+        document.getElementById('mission-final-dest').textContent = active.dest;
+        document.getElementById('mission-pax-count').textContent = `${active.passengers || 1} Passagers (${active.vehType || veh.type})`;
+
+        // Step tabs highlight
+        const sEnRoute = document.getElementById('step-en-route');
+        const sSurPlace = document.getElementById('step-sur-place');
+        const sEnCourse = document.getElementById('step-en-course');
+        const sTermine = document.getElementById('step-termine');
+
+        sEnRoute.className = 'p-1 border font-black ' + (active.status === 'EN_ROUTE' ? 'border-noir bg-noir text-white' : 'border-neutral-300 bg-neutral-100 text-neutral-400');
+        sSurPlace.className = 'p-1 border font-black ' + (active.status === 'SUR_PLACE' ? 'border-noir bg-amber-400 text-noir' : 'border-neutral-300 bg-neutral-100 text-neutral-400');
+        sEnCourse.className = 'p-1 border font-black ' + (active.status === 'EN_COURSE' ? 'border-noir bg-emerald-500 text-white' : 'border-neutral-300 bg-neutral-100 text-neutral-400');
+        sTermine.className = 'p-1 border font-black border-neutral-300 bg-neutral-100 text-neutral-400';
+
+        // Stage label and Target Address
+        const stageLabel = document.getElementById('mission-stage-label');
+        const targetAddress = document.getElementById('mission-target-address');
+        const targetSuite = document.getElementById('mission-target-suite');
+
+        const btnArrivee = document.getElementById('btn-signal-arrivee');
+        const btnPassager = document.getElementById('btn-passager-bord');
+        const btnTerminer = document.getElementById('btn-terminer-course');
+
+        if (active.status === 'EN_ROUTE') {
+          stageLabel.textContent = '📍 1. PRISE EN CHARGE CLIENT';
+          stageLabel.className = 'font-mono text-xs font-black px-2 py-0.5 bg-yellow-400 text-noir border border-noir uppercase tracking-wider';
+          targetAddress.textContent = active.pickup;
+          targetSuite.textContent = active.suite || 'Instructions au portail principal';
+
+          btnArrivee.classList.remove('hidden');
+          btnPassager.classList.add('hidden');
+          btnTerminer.classList.add('hidden');
+        } else if (active.status === 'SUR_PLACE') {
+          stageLabel.textContent = '🏁 2. ATTENTE DU PASSAGER SUR PLACE';
+          stageLabel.className = 'font-mono text-xs font-black px-2 py-0.5 bg-cyan-400 text-noir border border-noir uppercase tracking-wider';
+          targetAddress.textContent = active.pickup;
+          targetSuite.textContent = `Signalement : arrivé au ${active.suite || 'point de rendez-vous'}`;
+
+          btnArrivee.classList.add('hidden');
+          btnPassager.classList.remove('hidden');
+          btnTerminer.classList.add('hidden');
+        } else if (active.status === 'EN_COURSE') {
+          stageLabel.textContent = '🚗 3. ROUTE VERS LA DESTINATION';
+          stageLabel.className = 'font-mono text-xs font-black px-2 py-0.5 bg-emerald-500 text-white border border-noir uppercase tracking-wider';
+          targetAddress.textContent = active.dest;
+          targetSuite.textContent = 'Itinéraire optimisé Waze en cours';
+
+          btnArrivee.classList.add('hidden');
+          btnPassager.classList.add('hidden');
+          btnTerminer.classList.remove('hidden');
+        }
+
+        // Restrictions
+        const resList = document.getElementById('mission-restrictions-list');
+        if (resList) {
+          resList.innerHTML = (active.restrictions || []).map(r => `
+            <span class="bg-neutral-200 border border-neutral-400 px-1.5 py-0.5 text-noir">${r}</span>
+          `).join('');
+        }
+      } else {
+        // 3. STANDBY DASHBOARD VIEW
+        activeMissionView.classList.add('hidden');
+        standbyDashboardView.classList.remove('hidden');
+
+        // Status Card
+        const statusTitle = document.getElementById('standby-status-title');
+        const statusDot = document.getElementById('standby-status-dot');
+        const unitBadge = document.getElementById('standby-unit-badge');
+
+        unitBadge.textContent = veh.code;
+
+        if (veh.status === 'PAUSE') {
+          statusTitle.textContent = 'EN PAUSE // INDISPONIBLE';
+          statusDot.className = 'w-3 h-3 bg-amber-500 rounded-full';
+        } else {
+          statusTitle.textContent = 'EN PATROUILLE // DISPONIBLE';
+          statusDot.className = 'w-3 h-3 bg-emerald-500 rounded-full animate-pulse';
+        }
+
+        // Telemetry values
+        document.getElementById('telemetry-speed').textContent = Math.round(veh.speed || 0);
+        document.getElementById('telemetry-odo').textContent = (veh.odometerKm || 50000).toLocaleString('fr-CA', { minimumFractionDigits: 1 });
+        document.getElementById('telemetry-volt').textContent = (veh.batteryVoltage || 13.9).toFixed(1);
+        document.getElementById('telemetry-temp').textContent = veh.coolantTemp || 90;
+        document.getElementById('telemetry-zone').textContent = veh.zone || 'ZONE-01';
+        document.getElementById('telemetry-gps').textContent = `${(veh.lat || 45.5019).toFixed(6)}, ${(veh.lng || -73.5674).toFixed(6)}`;
+
+        // Standby Messages
+        const msgs = PulseState.getMessages().slice(0, 3);
+        const msgsContainer = document.getElementById('standby-messages-list');
+        if (msgsContainer) {
+          msgsContainer.innerHTML = msgs.map(m => `
+            <div class="p-2 border border-neutral-300 bg-neutral-50">
+              <div class="flex items-center justify-between text-[10px] text-neutral-500 mb-0.5">
+                <span class="font-black text-noir uppercase">${m.from.split('//')[0]}</span>
+                <span>${m.date}</span>
+              </div>
+              <div class="font-bold text-neutral-800 text-[11px] truncate">${m.subject}</div>
+            </div>
+          `).join('');
+        }
+      }
+
+      if (window.lucide) {
+        lucide.createIcons();
+      }
+    }
+
+    // Live Clock Update
+    function updateClock() {
+      const now = new Date();
+      const timeStr = now.toLocaleTimeString('fr-CA', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false });
+      const el = document.getElementById('live-clock');
+      if (el) el.textContent = timeStr;
+    }
+
+    // BroadcastChannel Real-Time Synchronization Listener
+    PULSE_CHANNEL.onmessage = (event) => {
+      // Re-render when any vehicle or call updates occur
+      renderAll();
+    };
+
+    // Keyboard Shortcuts (F1 to F6)
+    window.addEventListener('keydown', (e) => {
+      if (e.key === 'F1') { e.preventDefault(); window.location.href = 'index.html'; }
+      if (e.key === 'F2') { e.preventDefault(); window.location.href = 'dispatch.html'; }
+      if (e.key === 'F3') { e.preventDefault(); window.location.href = 'queue.html'; }
+      if (e.key === 'F4') { e.preventDefault(); window.location.href = 'map.html'; }
+      if (e.key === 'F5') { e.preventDefault(); window.location.href = 'messages.html'; }
+      if (e.key === 'F6') { e.preventDefault(); window.location.href = 'driver.html'; }
+      if (e.key === 'Escape') { closeShareModal(); toggleCadNavMenu(); }
+    });
+
+    // Collaboration Share Modal Functions
+    function openShareModal() {
+      const currentOrigin = window.location.origin.includes('lhr.life') ? window.location.origin : 'https://a90389d46bbc3d.lhr.life';
+      const page = window.location.pathname.split('/').pop() || 'driver.html';
+      const pubInput = document.getElementById('share-url-public');
+      if (pubInput) pubInput.value = `${currentOrigin}/${page}`;
+      document.getElementById('share-modal').classList.remove('hidden');
+    }
+
+    function closeShareModal() {
+      document.getElementById('share-modal').classList.add('hidden');
+    }
+
+    function closeShareModalOnBg(e) {
+      if (e.target === document.getElementById('share-modal')) closeShareModal();
+    }
+
+    function copyShareUrl() {
+      const input = document.getElementById('share-url-input');
+      input.select();
+      navigator.clipboard.writeText(input.value);
+      alert("LIEN LOCAL COPIÉ DANS LE PRESSE-PAPIER !");
+    }
+
+    function copyPublicUrl() {
+      const input = document.getElementById('share-url-public');
+      input.select();
+      navigator.clipboard.writeText(input.value);
+      alert("LIEN PUBLIC MONDIAL (HTTPS) COPIÉ ! Votre collaborateur peut ouvrir le terminal chauffeur directement sur son téléphone.");
+    }
+
+    // App Initialization
+    window.addEventListener('DOMContentLoaded', () => {
+      lucide.createIcons();
+      initUnitSelector();
+      renderAll();
+      updateClock();
+      setInterval(updateClock, 1000);
+      // Fast telemetry refresh
+      setInterval(renderAll, 1200);
+    });
+  </script>
+</body>
+</html>

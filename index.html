@@ -208,6 +208,11 @@
         <span class="tip">FACTURATION & REÇUS</span>
       </a>
 
+      <a href="driver.html" class="nav-btn" title="Terminal Mobile Chauffeur MDT">
+        <i data-lucide="smartphone" class="w-5 h-5"></i>
+        <span class="tip">TERMINAL CHAUFFEUR [F6]</span>
+      </a>
+
       <div class="flex-1"></div>
 
       <button onclick="PulseState.resetDemoData(); location.reload();" class="nav-btn" title="Réinitialiser données système">
@@ -572,6 +577,7 @@
       if (e.key === 'F3') { e.preventDefault(); window.location.href = 'queue.html'; }
       if (e.key === 'F4') { e.preventDefault(); window.location.href = 'map.html'; }
       if (e.key === 'F5') { e.preventDefault(); window.location.href = 'messages.html'; }
+      if (e.key === 'F6') { e.preventDefault(); window.location.href = 'driver.html'; }
       if (e.key === 'Escape') { closeShareModal(); }
     });
 
