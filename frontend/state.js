@@ -754,3 +754,129 @@ class PulseState {
 
 PulseState.init();
 window.PulseState = PulseState;
+
+// =========================================================================
+// ACTIVE PUBLIC HTTPS TUNNEL & SHARE SYNCHRONIZER
+// =========================================================================
+const PULSE_TUNNEL_URL = 'https://d459b01192e48d.lhr.life';
+
+function getEffectiveOrigin() {
+  const origin = window.location.origin;
+  if (origin && origin !== 'null' && !origin.startsWith('file:') && origin !== 'about:blank') {
+    return origin;
+  }
+  return PULSE_TUNNEL_URL;
+}
+
+function openShareModal() {
+  const modal = document.getElementById('share-modal');
+  if (!modal) return;
+
+  const base = getEffectiveOrigin();
+  const hostDisplay = document.getElementById('share-modal-base-host');
+  if (hostDisplay) hostDisplay.textContent = base;
+
+  const cards = modal.querySelectorAll('.share-option-card');
+  cards.forEach(card => {
+    const label = card.querySelector('.share-url-label');
+    const openLink = card.querySelector('.share-open-link');
+    if (label) {
+      const relPath = label.getAttribute('data-path') || '';
+      const fullUrl = base + relPath;
+      label.textContent = fullUrl;
+      if (openLink) {
+        openLink.href = fullUrl;
+      }
+    }
+  });
+
+  modal.style.display = 'flex';
+  if (window.lucide && typeof lucide.createIcons === 'function') {
+    lucide.createIcons();
+  }
+}
+
+function closeShareModal() {
+  const modal = document.getElementById('share-modal');
+  if (modal) modal.style.display = 'none';
+}
+
+function closeShareModalOnBg(e) {
+  if (e.target === document.getElementById('share-modal')) {
+    closeShareModal();
+  }
+}
+
+function copyShareOption(btn, path) {
+  const base = getEffectiveOrigin();
+  const fullUrl = base + path;
+  
+  const originalHTML = btn.innerHTML;
+  
+  const doCopy = () => {
+    btn.innerHTML = `<i data-lucide="check" class="w-3.5 h-3.5 inline"></i> <span class="font-bold">Copié !</span>`;
+    btn.className = 'copy-btn px-3 py-1.5 rounded-lg bg-emerald-500/20 text-emerald-400 border border-emerald-500/40 text-xs font-bold flex items-center gap-1.5 transition-all cursor-pointer';
+    if (window.lucide && typeof lucide.createIcons === 'function') {
+      lucide.createIcons();
+    }
+    setTimeout(() => {
+      btn.innerHTML = originalHTML;
+      btn.className = 'copy-btn px-3 py-1.5 rounded-lg bg-white/10 hover:bg-white/20 text-zinc-200 font-semibold text-xs flex items-center gap-1.5 transition-colors cursor-pointer';
+      if (window.lucide && typeof lucide.createIcons === 'function') {
+        lucide.createIcons();
+      }
+    }, 2000);
+  };
+
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(fullUrl).then(doCopy).catch(() => {
+      fallbackCopyText(fullUrl);
+      doCopy();
+    });
+  } else {
+    fallbackCopyText(fullUrl);
+    doCopy();
+  }
+}
+
+function fallbackCopyText(text) {
+  const textArea = document.createElement("textarea");
+  textArea.value = text;
+  textArea.style.top = "0";
+  textArea.style.left = "0";
+  textArea.style.position = "fixed";
+  document.body.appendChild(textArea);
+  textArea.focus();
+  textArea.select();
+  try {
+    document.execCommand('copy');
+  } catch (err) {}
+  document.body.removeChild(textArea);
+}
+
+// Global Keyboard Shortcuts
+window.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape') {
+    closeShareModal();
+    return;
+  }
+  const activeTag = document.activeElement ? document.activeElement.tagName.toLowerCase() : '';
+  const isInput = activeTag === 'input' || activeTag === 'textarea';
+
+  if (!isInput) {
+    if (e.key === 'F1') { e.preventDefault(); window.location.href = 'index.html'; }
+    if (e.key === 'F2') { e.preventDefault(); window.location.href = 'dispatch.html'; }
+    if (e.key === 'F3') { e.preventDefault(); window.location.href = 'queue.html'; }
+    if (e.key === 'F4') { e.preventDefault(); window.location.href = 'map.html'; }
+    if (e.key === 'F5') { e.preventDefault(); window.location.href = 'messages.html'; }
+    if (e.key === 'F6') { e.preventDefault(); window.location.href = 'driver.html'; }
+  }
+});
+
+window.PULSE_TUNNEL_URL = PULSE_TUNNEL_URL;
+window.getEffectiveOrigin = getEffectiveOrigin;
+window.openShareModal = openShareModal;
+window.closeShareModal = closeShareModal;
+window.closeShareModalOnBg = closeShareModalOnBg;
+window.copyShareOption = copyShareOption;
+
