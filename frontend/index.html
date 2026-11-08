@@ -810,7 +810,7 @@
           <span class="text-[10px] text-neutral-400">ACCÈS NAVIGATEUR</span>
         </div>
         <div class="flex gap-2">
-          <input id="share-url-public" type="text" readonly value="https://f3dfe920cfc829.lhr.life/index.html" class="flex-1 bg-white border border-neutral-300 rounded-lg px-2.5 py-1.5 text-xs text-neutral-800 font-mono" />
+          <input id="share-url-public" type="text" readonly value="https://bc8b85ebe510c4.lhr.life/index.html" class="flex-1 bg-white border border-neutral-300 rounded-lg px-2.5 py-1.5 text-xs text-neutral-800 font-mono" />
           <button onclick="copyPublicUrl()" class="bg-neutral-900 text-white px-3 py-1.5 rounded-lg text-xs font-semibold hover:bg-neutral-800 transition-colors">COPIER</button>
         </div>
       </div>
@@ -923,7 +923,7 @@
 
     // Share Modal
     function openShareModal() {
-      const currentOrigin = window.location.origin.includes('lhr.life') ? window.location.origin : 'https://f3dfe920cfc829.lhr.life';
+      const currentOrigin = window.location.origin.includes('lhr.life') ? window.location.origin : 'https://bc8b85ebe510c4.lhr.life';
       const page = window.location.pathname.split('/').pop() || 'index.html';
       const pubInput = document.getElementById('share-url-public');
       if (pubInput) pubInput.value = `${currentOrigin}/${page}`;
