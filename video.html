@@ -1,0 +1,1275 @@
+<!DOCTYPE html>
+<html lang="fr-CA" class="h-full">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>PULSE CAD — Showcase Vidéo 30s Démo Officielle</title>
+
+  <!-- High-Readability Sculptural Typography -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600;700&display=swap" rel="stylesheet" />
+
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <script src="state.js"></script>
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['"Plus Jakarta Sans"', '-apple-system', 'BlinkMacSystemFont', 'sans-serif'],
+            mono: ['"IBM Plex Mono"', 'monospace'],
+          },
+          colors: {
+            royal: {
+              950: '#0e1013',
+              900: '#14171c',
+              850: '#1a1d24',
+              800: '#22262f',
+              700: '#2d333f',
+              600: '#3d4453',
+            }
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      font-family: 'Plus Jakarta Sans', -apple-system, sans-serif;
+      background: radial-gradient(130% 130% at 50% 0%, #2b303a 0%, #1b1e25 45%, #101216 100%);
+      color: #f4f4f6;
+      margin: 0;
+      height: 100vh;
+      overflow: hidden;
+      display: flex;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    ::-webkit-scrollbar { width: 5px; height: 5px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: #3d4453; border-radius: 4px; }
+    ::-webkit-scrollbar-thumb:hover { background: #525b6e; }
+
+    /* Outer Floating Dock */
+    .dock-pill {
+      background: rgba(18, 20, 24, 0.92);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border-radius: 26px;
+      padding: 10px 8px;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .dock-btn {
+      width: 38px;
+      height: 38px;
+      border-radius: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #9499a5;
+      transition: all 0.18s cubic-bezier(0.16, 1, 0.3, 1);
+      position: relative;
+    }
+    .dock-btn:hover {
+      background: rgba(255, 255, 255, 0.1);
+      color: #ffffff;
+      transform: scale(1.05);
+    }
+    .dock-btn.active {
+      background: #ffffff;
+      color: #111317;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
+    }
+    .dock-btn .tip {
+      position: absolute;
+      left: 54px;
+      background: #14171c;
+      color: #ffffff;
+      font-size: 11px;
+      font-weight: 600;
+      padding: 6px 12px;
+      border-radius: 8px;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      white-space: nowrap;
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 0.15s ease;
+      z-index: 100;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+    }
+    .dock-btn:hover .tip { opacity: 1; }
+
+    /* Main Window Chassis */
+    .window-chassis {
+      background: linear-gradient(170deg, rgba(28, 31, 38, 0.95) 0%, rgba(18, 20, 25, 0.97) 100%);
+      border-radius: 28px;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      box-shadow: 0 30px 80px -15px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+      overflow: hidden;
+      display: flex;
+      flex: 1;
+      height: calc(100vh - 2rem);
+      margin: 1rem 1rem 1rem 0;
+    }
+
+    .nav-frosted-active {
+      background: linear-gradient(135deg, rgba(255, 255, 255, 0.12) 0%, rgba(255, 255, 255, 0.06) 100%);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border-radius: 14px;
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.2);
+      color: #ffffff;
+      font-weight: 600;
+    }
+
+    .nav-frosted-inactive {
+      color: #9499a5;
+      border-radius: 12px;
+      transition: all 0.15s ease;
+    }
+    .nav-frosted-inactive:hover {
+      background: rgba(255, 255, 255, 0.05);
+      color: #ffffff;
+    }
+
+    .glass-card {
+      background: linear-gradient(135deg, rgba(255, 255, 255, 0.04) 0%, rgba(255, 255, 255, 0.015) 100%);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border-radius: 20px;
+      border: 1px solid rgba(255, 255, 255, 0.07);
+      box-shadow: 0 8px 30px -4px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.06);
+      transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .glass-card:hover {
+      border-color: rgba(255, 255, 255, 0.15);
+      box-shadow: 0 16px 40px -6px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.12);
+    }
+
+    /* Chapter Card Styling */
+    .chapter-card {
+      position: relative;
+      background: rgba(20, 23, 29, 0.7);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 16px;
+      padding: 14px 16px;
+      cursor: pointer;
+      transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+      overflow: hidden;
+    }
+    .chapter-card:hover {
+      transform: translateY(-2px);
+      border-color: rgba(255, 255, 255, 0.2);
+      background: rgba(28, 32, 40, 0.85);
+    }
+    .chapter-card.active {
+      border-color: rgba(16, 185, 129, 0.8);
+      background: linear-gradient(135deg, rgba(16, 185, 129, 0.15) 0%, rgba(20, 23, 29, 0.9) 100%);
+      box-shadow: 0 10px 25px -5px rgba(16, 185, 129, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.2);
+    }
+    .chapter-progress {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      height: 3px;
+      background: #10b981;
+      width: 0%;
+      transition: width 0.1s linear;
+    }
+
+    /* Titanium Bezel for Video Player */
+    .titanium-player-frame {
+      background: linear-gradient(145deg, #1f232b 0%, #121418 100%);
+      border-radius: 24px;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      box-shadow: 0 25px 60px -10px rgba(0, 0, 0, 0.7), inset 0 1px 0 rgba(255, 255, 255, 0.15);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .vertical-label {
+      writing-mode: vertical-lr;
+      text-orientation: mixed;
+      transform: rotate(180deg);
+      letter-spacing: 0.15em;
+    }
+
+    /* Video scrub input styling */
+    input[type=range].scrub-slider {
+      -webkit-appearance: none;
+      background: transparent;
+    }
+    input[type=range].scrub-slider::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      height: 14px;
+      width: 14px;
+      border-radius: 50%;
+      background: #10b981;
+      box-shadow: 0 0 10px rgba(16, 185, 129, 0.8);
+      cursor: pointer;
+      margin-top: -4px;
+    }
+    input[type=range].scrub-slider::-webkit-slider-runnable-track {
+      height: 6px;
+      border-radius: 3px;
+      background: rgba(255, 255, 255, 0.15);
+    }
+  </style>
+</head>
+<body class="flex items-center p-3 select-none">
+
+  <!-- ========================================================================= -->
+  <!-- 1. LEFT FLOATING ROYAL BLACK DOCK                                         -->
+  <!-- ========================================================================= -->
+  <aside class="w-16 flex flex-col items-center justify-between h-[calc(100vh-2rem)] py-2 z-40 flex-shrink-0">
+    
+    <div class="dock-pill">
+      <!-- Star Logo -->
+      <a href="index.html" class="w-9 h-9 rounded-full bg-white/10 flex items-center justify-center text-white hover:bg-white/20 transition-colors mb-1">
+        <i data-lucide="sparkles" class="w-4 h-4 text-emerald-400"></i>
+      </a>
+
+      <!-- Synchronized Navigation Icons -->
+      <a href="index.html" class="dock-btn" title="Tableau de bord">
+        <i data-lucide="home" class="w-4 h-4"></i>
+        <span class="tip">Tableau de Bord [F1]</span>
+      </a>
+
+      <a href="dispatch.html" class="dock-btn" title="Prise d'Appel CAD">
+        <i data-lucide="radio" class="w-4 h-4"></i>
+        <span class="tip">Prise d'Appel CAD [F2]</span>
+      </a>
+
+      <a href="queue.html" class="dock-btn" title="File des missions">
+        <i data-lucide="list-ordered" class="w-4 h-4"></i>
+        <span class="tip">File des Missions [F3]</span>
+      </a>
+
+      <a href="map.html" class="dock-btn" title="Carte Flotte AVL & Waze">
+        <i data-lucide="globe" class="w-4 h-4"></i>
+        <span class="tip">Carte AVL & Waze [F4]</span>
+      </a>
+
+      <a href="messages.html" class="dock-btn" title="Radio MDT Direct">
+        <i data-lucide="message-square" class="w-4 h-4"></i>
+        <span class="tip">Radio MDT Direct [F5]</span>
+      </a>
+
+      <a href="driver.html" class="dock-btn" title="Cockpit Chauffeur Mobile">
+        <i data-lucide="smartphone" class="w-4 h-4"></i>
+        <span class="tip">Cockpit Chauffeur [F6]</span>
+      </a>
+
+      <a href="receipt.html" class="dock-btn" title="Facturation & Reçus">
+        <i data-lucide="receipt" class="w-4 h-4"></i>
+        <span class="tip">Factures & Taxes QC</span>
+      </a>
+
+      <a href="video.html" class="dock-btn active" title="Showcase Vidéo 30s">
+        <i data-lucide="play-circle" class="w-4 h-4"></i>
+        <span class="tip">Showcase Vidéo 30s [F7]</span>
+      </a>
+    </div>
+
+    <!-- Micro watermark -->
+    <div class="text-[9px] font-mono text-zinc-500 font-bold uppercase vertical-label tracking-widest my-auto opacity-70">
+      PULSE 2026 CAD
+    </div>
+
+    <!-- Settings Capsule -->
+    <div class="flex flex-col items-center gap-2">
+      <button onclick="PulseState.resetDemoData(); location.reload();" class="w-11 h-11 bg-royal-900/90 hover:bg-royal-800 text-zinc-400 hover:text-white rounded-[16px] border border-white/10 flex items-center justify-center shadow-lg transition-transform hover:scale-105" title="Réinitialiser données système">
+        <i data-lucide="settings" class="w-4 h-4"></i>
+      </button>
+    </div>
+
+  </aside>
+
+  <!-- ========================================================================= -->
+  <!-- 2. MAIN WINDOW CONTAINER (GRIS ROI DÉGRADÉ & TITANIUM CHÂSSIS)            -->
+  <!-- ========================================================================= -->
+  <div class="window-chassis">
+
+    <!-- ======================================================================= -->
+    <!-- 2A. LEFT SUB-SIDEBAR (NAVIGATION & CHAPTER QUICK JUMP)                   -->
+    <!-- ======================================================================= -->
+    <div class="w-72 bg-royal-950/70 border-r border-white/5 flex flex-col p-5 overflow-y-auto flex-shrink-0">
+      
+      <!-- macOS Window Controls & Title -->
+      <div class="flex items-center justify-between pb-5 mb-5 border-b border-white/5">
+        <div class="flex items-center gap-2">
+          <span class="w-3 h-3 rounded-full bg-[#ff5f57] border border-[#e0443e]"></span>
+          <span class="w-3 h-3 rounded-full bg-[#febc2e] border border-[#d89e24]"></span>
+          <span class="w-3 h-3 rounded-full bg-[#28c840] border border-[#1aab29]"></span>
+        </div>
+        <span class="text-[10px] font-mono font-bold uppercase text-zinc-400 tracking-wider">
+          PULSE // CAD v2.6
+        </span>
+      </div>
+
+      <!-- User Profile -->
+      <div class="flex items-center gap-3 p-2 rounded-xl hover:bg-white/5 transition-colors cursor-pointer mb-6 border border-white/5 bg-white/[0.02]">
+        <div class="w-9 h-9 rounded-full bg-gradient-to-tr from-emerald-500 to-teal-400 text-royal-950 font-mono text-xs font-black flex items-center justify-center shadow-sm">
+          A1
+        </div>
+        <div class="flex-1 min-w-0">
+          <div class="flex items-center gap-1.5">
+            <span class="text-xs font-bold text-white truncate">Agent-01 (Dispatch)</span>
+            <i data-lucide="chevron-down" class="w-3 h-3 text-zinc-400"></i>
+          </div>
+          <div class="text-[11px] text-zinc-400 font-medium truncate">central@pulsecad.ca</div>
+        </div>
+      </div>
+
+      <!-- SYNCHRONIZED NAVIGATION MENU -->
+      <div class="mb-6">
+        <div class="text-[11px] font-semibold text-zinc-400 uppercase tracking-wider px-3 mb-2">
+          Opérations Flotte
+        </div>
+        <nav class="space-y-1 text-xs">
+          
+          <a href="index.html" class="nav-frosted-inactive px-3 py-2 flex items-center justify-between no-underline">
+            <div class="flex items-center gap-2.5">
+              <i data-lucide="layout-grid" class="w-4 h-4 text-zinc-400"></i>
+              <span>Tableau de Bord</span>
+            </div>
+            <span class="text-[10px] font-mono text-zinc-400 font-bold">[F1]</span>
+          </a>
+
+          <a href="dispatch.html" class="nav-frosted-inactive px-3 py-2 flex items-center justify-between no-underline">
+            <div class="flex items-center gap-2.5">
+              <i data-lucide="phone-call" class="w-4 h-4 text-zinc-400"></i>
+              <span>Prise d'Appel CAD</span>
+            </div>
+            <span class="text-[10px] font-mono text-zinc-400 font-bold">[F2]</span>
+          </a>
+
+          <a href="queue.html" class="nav-frosted-inactive px-3 py-2 flex items-center justify-between no-underline">
+            <div class="flex items-center gap-2.5">
+              <i data-lucide="list-ordered" class="w-4 h-4 text-zinc-400"></i>
+              <span>File des Missions</span>
+            </div>
+            <span class="text-[10px] font-mono font-bold bg-white/10 text-zinc-300 px-2 py-0.5 rounded-full" id="side-queue-count">
+              5
+            </span>
+          </a>
+
+          <a href="map.html" class="nav-frosted-inactive px-3 py-2 flex items-center justify-between no-underline">
+            <div class="flex items-center gap-2.5">
+              <i data-lucide="map" class="w-4 h-4 text-zinc-400"></i>
+              <span>Carte AVL & Waze</span>
+            </div>
+            <span class="text-[10px] font-mono font-bold text-emerald-400 flex items-center gap-1">
+              <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span> 12
+            </span>
+          </a>
+
+          <a href="messages.html" class="nav-frosted-inactive px-3 py-2 flex items-center justify-between no-underline">
+            <div class="flex items-center gap-2.5">
+              <i data-lucide="radio" class="w-4 h-4 text-zinc-400"></i>
+              <span>Radio MDT Direct</span>
+            </div>
+            <span class="text-[10px] font-mono font-bold text-zinc-400" id="side-msg-count">0</span>
+          </a>
+
+          <a href="driver.html" class="nav-frosted-inactive px-3 py-2 flex items-center justify-between no-underline">
+            <div class="flex items-center gap-2.5">
+              <i data-lucide="smartphone" class="w-4 h-4 text-emerald-400"></i>
+              <span class="font-semibold text-zinc-200">Cockpit Chauffeur</span>
+            </div>
+            <span class="text-[9px] font-mono font-bold bg-emerald-950/80 text-emerald-300 px-1.5 py-0.2 rounded border border-emerald-800/80">MOBILE</span>
+          </a>
+
+          <a href="receipt.html" class="nav-frosted-inactive px-3 py-2 flex items-center justify-between no-underline">
+            <div class="flex items-center gap-2.5">
+              <i data-lucide="receipt" class="w-4 h-4 text-zinc-400"></i>
+              <span>Factures & Reçus</span>
+            </div>
+            <span class="text-[10px] font-mono text-zinc-400 font-bold">TPS/TVQ</span>
+          </a>
+
+          <a href="video.html" class="nav-frosted-active px-3 py-2.5 flex items-center justify-between no-underline">
+            <div class="flex items-center gap-2.5">
+              <i data-lucide="play-circle" class="w-4 h-4 text-emerald-400"></i>
+              <span>Showcase Vidéo 30s</span>
+            </div>
+            <span class="text-[10px] font-mono font-bold bg-white/10 text-emerald-300 px-2 py-0.5 rounded-full border border-white/10">
+              ACTIF
+            </span>
+          </a>
+
+        </nav>
+      </div>
+
+      <!-- CHAPTERS QUICK LIST -->
+      <div class="mb-4">
+        <div class="text-[11px] font-semibold text-zinc-400 uppercase tracking-wider px-3 mb-2 flex items-center justify-between">
+          <span>Chapitres Vidéo</span>
+          <span class="text-[10px] font-mono text-emerald-400">30s 4K</span>
+        </div>
+        <div class="space-y-1 text-xs">
+          <div onclick="jumpToChapter(0)" class="p-2 rounded-lg hover:bg-white/5 cursor-pointer flex items-center justify-between text-zinc-300 side-chap-item" id="side-chap-0">
+            <div class="flex items-center gap-2 truncate">
+              <span class="font-mono text-[10px] text-zinc-500 font-bold">00:00</span>
+              <span class="truncate">Intro Aérospatiale</span>
+            </div>
+            <i data-lucide="chevron-right" class="w-3.5 h-3.5 text-zinc-500"></i>
+          </div>
+          <div onclick="jumpToChapter(5)" class="p-2 rounded-lg hover:bg-white/5 cursor-pointer flex items-center justify-between text-zinc-300 side-chap-item" id="side-chap-1">
+            <div class="flex items-center gap-2 truncate">
+              <span class="font-mono text-[10px] text-zinc-500 font-bold">00:05</span>
+              <span class="truncate">Télémétrie OBD-II</span>
+            </div>
+            <i data-lucide="chevron-right" class="w-3.5 h-3.5 text-zinc-500"></i>
+          </div>
+          <div onclick="jumpToChapter(10)" class="p-2 rounded-lg hover:bg-white/5 cursor-pointer flex items-center justify-between text-zinc-300 side-chap-item" id="side-chap-2">
+            <div class="flex items-center gap-2 truncate">
+              <span class="font-mono text-[10px] text-zinc-500 font-bold">00:10</span>
+              <span class="truncate">Trafic & Waze</span>
+            </div>
+            <i data-lucide="chevron-right" class="w-3.5 h-3.5 text-zinc-500"></i>
+          </div>
+          <div onclick="jumpToChapter(15)" class="p-2 rounded-lg hover:bg-white/5 cursor-pointer flex items-center justify-between text-zinc-300 side-chap-item" id="side-chap-3">
+            <div class="flex items-center gap-2 truncate">
+              <span class="font-mono text-[10px] text-zinc-500 font-bold">00:15</span>
+              <span class="truncate">Cockpit Chauffeur</span>
+            </div>
+            <i data-lucide="chevron-right" class="w-3.5 h-3.5 text-zinc-500"></i>
+          </div>
+          <div onclick="jumpToChapter(20)" class="p-2 rounded-lg hover:bg-white/5 cursor-pointer flex items-center justify-between text-zinc-300 side-chap-item" id="side-chap-4">
+            <div class="flex items-center gap-2 truncate">
+              <span class="font-mono text-[10px] text-zinc-500 font-bold">00:20</span>
+              <span class="truncate">Reçus & MEV Fiscal</span>
+            </div>
+            <i data-lucide="chevron-right" class="w-3.5 h-3.5 text-zinc-500"></i>
+          </div>
+          <div onclick="jumpToChapter(25)" class="p-2 rounded-lg hover:bg-white/5 cursor-pointer flex items-center justify-between text-zinc-300 side-chap-item" id="side-chap-5">
+            <div class="flex items-center gap-2 truncate">
+              <span class="font-mono text-[10px] text-zinc-500 font-bold">00:25</span>
+              <span class="truncate">Métriques ROI (+204%)</span>
+            </div>
+            <i data-lucide="chevron-right" class="w-3.5 h-3.5 text-zinc-500"></i>
+          </div>
+        </div>
+      </div>
+
+      <!-- VIDEO SPECIFICATIONS BOX -->
+      <div class="mt-auto bg-black/30 p-3 rounded-xl border border-white/5 text-[11px] space-y-1.5 text-zinc-400">
+        <div class="flex justify-between items-center text-zinc-300 font-semibold mb-1">
+          <span>Spécifications Vidéo</span>
+          <span class="text-emerald-400 font-mono text-[10px]">60 FPS</span>
+        </div>
+        <div class="flex justify-between">
+          <span>Format :</span>
+          <span class="text-white font-mono">MP4 / H.264</span>
+        </div>
+        <div class="flex justify-between">
+          <span>Résolution :</span>
+          <span class="text-white font-mono">1280x720 HD</span>
+        </div>
+        <div class="flex justify-between">
+          <span>Durée calibrée :</span>
+          <span class="text-white font-mono">30.00 secondes</span>
+        </div>
+        <div class="flex justify-between">
+          <span>Audio mix :</span>
+          <span class="text-white font-mono">Hi-Fi Stéréo</span>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- ======================================================================= -->
+    <!-- 2B. MAIN WORKSPACE CONTENT (ROYAL GREY PALETTE - ZERO EYE STRAIN)       -->
+    <!-- ======================================================================= -->
+    <main class="flex-1 flex flex-col overflow-y-auto p-6 lg:p-8">
+      
+      <!-- Top Bar: Title, Action Buttons, Clock -->
+      <div class="flex flex-col md:flex-row md:items-center justify-between pb-6 mb-6 border-b border-white/5 gap-4">
+        <div>
+          <div class="flex items-center gap-2 mb-1.5">
+            <span class="text-[10px] font-mono font-bold bg-emerald-950/80 text-emerald-300 px-2 py-0.5 rounded-full border border-emerald-800 flex items-center gap-1">
+              <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span> DÉMO OFFICIELLE 30S
+            </span>
+            <span class="text-xs text-zinc-400">PULSE CAD Architecture 2026</span>
+          </div>
+          <h1 class="text-2xl lg:text-3xl font-sans font-bold text-white tracking-tight">
+            Showcase Vidéo & Démonstration Live
+          </h1>
+          <p class="text-xs text-zinc-400 font-medium mt-1">
+            Découvrez en 30 secondes les 5 piliers de puissance opérationnelle : Télémétrie CAN bus, Trafic Waze, Cockpit Chauffeur, Reçus Fiscaux & ROI Hormozi.
+          </p>
+        </div>
+
+        <div class="flex items-center gap-2.5 flex-wrap">
+          <!-- Copy Link -->
+          <button onclick="copyVideoLink()" class="bg-white/10 hover:bg-white/15 text-white text-xs font-semibold px-3.5 py-2 rounded-xl border border-white/10 flex items-center gap-2 transition-colors" title="Copier le lien direct avec minutage">
+            <i data-lucide="link" class="w-3.5 h-3.5 text-zinc-300"></i>
+            <span>Copier le Lien</span>
+          </button>
+
+          <!-- Download MP4 -->
+          <a id="btn-download" href="/pulse_dispatch_30s_showcase.mp4" download="pulse_dispatch_30s_showcase.mp4" class="bg-emerald-500 hover:bg-emerald-400 text-royal-950 text-xs font-bold px-4 py-2 rounded-xl flex items-center gap-2 shadow-lg transition-transform hover:scale-105 no-underline">
+            <i data-lucide="download" class="w-3.5 h-3.5 text-royal-950"></i>
+            <span>Télécharger MP4 (HD)</span>
+          </a>
+
+          <!-- Share modal button -->
+          <button onclick="openShareModal()" class="bg-white/10 hover:bg-white/15 text-white text-xs font-semibold px-3 py-2 rounded-xl border border-white/10 flex items-center gap-2 transition-colors">
+            <i data-lucide="share-2" class="w-3.5 h-3.5 text-emerald-400"></i>
+          </button>
+
+          <!-- Clock Pill -->
+          <div class="flex items-center gap-2 bg-white/[0.04] border border-white/10 px-3 py-2 rounded-xl shadow-xs">
+            <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+            <span id="clock" class="font-mono text-xs font-semibold text-zinc-200">--:--:--</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===================================================================== -->
+      <!-- MAIN VIDEO THEATER / PLAYER CONTAINER                                -->
+      <!-- ===================================================================== -->
+      <div class="titanium-player-frame mb-6 p-2 lg:p-3">
+        
+        <!-- Video Header Pill Inside Theater -->
+        <div class="flex items-center justify-between px-3 py-2 mb-2 text-xs text-zinc-400 border-b border-white/5">
+          <div class="flex items-center gap-2">
+            <span class="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-ping"></span>
+            <span class="font-mono text-[11px] text-white font-bold tracking-wider uppercase">PULSE // 30s CAD SHOWCASE STREAM</span>
+          </div>
+          <div class="flex items-center gap-3">
+            <span id="current-chapter-chip" class="text-[10px] font-mono font-bold bg-white/10 text-emerald-300 px-2.5 py-0.5 rounded border border-white/10">
+              00:00 · INTRODUCTION AÉROSPATIALE
+            </span>
+            <span class="font-mono text-[11px] text-zinc-400" id="theater-timer">00:00 / 00:30</span>
+          </div>
+        </div>
+
+        <!-- Video Element Container with 16:9 Aspect Ratio -->
+        <div class="relative w-full aspect-video rounded-xl overflow-hidden bg-black flex items-center justify-center group shadow-2xl">
+          
+          <video
+            id="showcase-video"
+            class="w-full h-full object-contain cursor-pointer"
+            playsinline
+            preload="auto"
+            poster="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='1280' height='720' viewBox='0 0 1280 720'><rect width='1280' height='720' fill='%2312151b'/><circle cx='640' cy='360' r='280' fill='none' stroke='%231f242e' stroke-width='2'/><circle cx='640' cy='360' r='180' fill='none' stroke='%232a313e' stroke-width='1.5' stroke-dasharray='8 8'/><path d='M300 360 L980 360' stroke='%231f242e' stroke-width='1'/><path d='M640 100 L640 620' stroke='%231f242e' stroke-width='1'/><circle cx='640' cy='360' r='60' fill='%2310b981' fill-opacity='0.15' stroke='%2310b981' stroke-width='3'/><polygon points='630,340 660,360 630,380' fill='%23ffffff'/><text x='640' y='460' font-family='sans-serif' font-weight='bold' font-size='28' fill='%23ffffff' text-anchor='middle' letter-spacing='2'>PULSE FLEET DISPATCH</text><text x='640' y='500' font-family='monospace' font-weight='bold' font-size='16' fill='%2310b981' text-anchor='middle' letter-spacing='3'>SHOWCASE 30s // CAD ARCHITECTURE 2026</text></svg>"
+          >
+            <source src="/pulse_dispatch_30s_showcase.mp4" type="video/mp4" />
+            <source src="pulse_dispatch_30s_showcase.mp4" type="video/mp4" />
+            <source src="../pulse_dispatch_30s_showcase.mp4" type="video/mp4" />
+            Votre navigateur ne supporte pas la balise vidéo HTML5.
+          </video>
+
+          <!-- Large Play Button Overlay (Centered) -->
+          <div id="play-overlay" onclick="togglePlay()" class="absolute inset-0 flex items-center justify-center bg-black/30 hover:bg-black/20 transition-all cursor-pointer backdrop-blur-[1px]">
+            <div class="w-20 h-20 rounded-full bg-emerald-500/90 hover:bg-emerald-400 text-royal-950 flex items-center justify-center shadow-2xl transition-transform transform group-hover:scale-110">
+              <i data-lucide="play" class="w-9 h-9 fill-royal-950 translate-x-0.5"></i>
+            </div>
+          </div>
+
+          <!-- Video Fallback Banner if video file not yet on disk -->
+          <div id="video-missing-notice" class="hidden absolute top-4 left-4 right-4 bg-amber-950/90 border border-amber-500/40 text-amber-200 px-4 py-3 rounded-xl text-xs flex items-center justify-between shadow-xl backdrop-blur-md">
+            <div class="flex items-center gap-2">
+              <i data-lucide="info" class="w-4 h-4 text-amber-400"></i>
+              <span>Génération du flux MP4 en cours ou fichier en attente de synchro. Vous pouvez prévisualiser tous les 6 chapitres ci-dessous !</span>
+            </div>
+            <button onclick="document.getElementById('video-missing-notice').remove()" class="text-amber-300 font-bold hover:text-white">✕</button>
+          </div>
+
+        </div>
+
+        <!-- Custom Dark Titanium Video Controller Bar -->
+        <div class="mt-3 px-3 py-2 bg-royal-950/80 rounded-xl border border-white/5 flex flex-col gap-2">
+          
+          <!-- Scrubber Progress Bar -->
+          <div class="relative w-full flex items-center">
+            <input
+              type="range"
+              id="video-scrubber"
+              min="0"
+              max="30"
+              step="0.1"
+              value="0"
+              oninput="onScrub(this.value)"
+              class="scrub-slider w-full cursor-pointer z-10"
+            />
+            <!-- Visual Chapter Marks on the Scrub Bar -->
+            <div class="absolute inset-0 flex justify-between pointer-events-none px-1">
+              <span class="w-1.5 h-1.5 rounded-full bg-white/40 mt-2" title="00:00 Intro"></span>
+              <span class="w-1.5 h-1.5 rounded-full bg-white/40 mt-2" title="00:05 OBD-II"></span>
+              <span class="w-1.5 h-1.5 rounded-full bg-white/40 mt-2" title="00:10 Waze"></span>
+              <span class="w-1.5 h-1.5 rounded-full bg-white/40 mt-2" title="00:15 Chauffeur"></span>
+              <span class="w-1.5 h-1.5 rounded-full bg-white/40 mt-2" title="00:20 Reçus"></span>
+              <span class="w-1.5 h-1.5 rounded-full bg-white/40 mt-2" title="00:25 ROI"></span>
+            </div>
+          </div>
+
+          <!-- Bottom Control Elements -->
+          <div class="flex items-center justify-between text-xs text-zinc-300 flex-wrap gap-2 pt-1">
+            
+            <div class="flex items-center gap-2">
+              <!-- Play / Pause -->
+              <button onclick="togglePlay()" id="btn-play-pause" class="w-8 h-8 rounded-lg bg-white/10 hover:bg-white/20 text-white flex items-center justify-center transition-colors" title="Lecture / Pause (Espace)">
+                <i data-lucide="play" class="w-4 h-4 fill-white" id="icon-play-state"></i>
+              </button>
+
+              <!-- Skip -5s -->
+              <button onclick="skipSeconds(-5)" class="w-8 h-8 rounded-lg bg-white/5 hover:bg-white/10 text-zinc-300 flex items-center justify-center transition-colors" title="Reculer de 5s">
+                <i data-lucide="rotate-ccw" class="w-3.5 h-3.5"></i>
+              </button>
+
+              <!-- Skip +5s -->
+              <button onclick="skipSeconds(5)" class="w-8 h-8 rounded-lg bg-white/5 hover:bg-white/10 text-zinc-300 flex items-center justify-center transition-colors" title="Avancer de 5s">
+                <i data-lucide="rotate-cw" class="w-3.5 h-3.5"></i>
+              </button>
+
+              <!-- Timer Display -->
+              <span id="video-time-display" class="font-mono text-xs text-white font-medium ml-2">
+                00:00 / 00:30
+              </span>
+            </div>
+
+            <!-- Middle Quick Active Chapter Indicator -->
+            <div class="hidden md:flex items-center gap-2 text-zinc-400 text-[11px]">
+              <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
+              <span id="status-chapter-label" class="text-zinc-200 font-semibold">Intro Aérospatiale CAD</span>
+            </div>
+
+            <div class="flex items-center gap-2">
+              <!-- Volume / Mute -->
+              <button onclick="toggleMute()" id="btn-mute" class="w-8 h-8 rounded-lg bg-white/5 hover:bg-white/10 text-zinc-300 flex items-center justify-center transition-colors" title="Muet (M)">
+                <i data-lucide="volume-2" class="w-4 h-4" id="icon-volume"></i>
+              </button>
+
+              <!-- Playback Speed -->
+              <select onchange="changeSpeed(this.value)" class="bg-white/5 hover:bg-white/10 border border-white/10 text-zinc-200 rounded-lg px-2 py-1 text-xs outline-none cursor-pointer">
+                <option value="1" selected class="bg-royal-900 text-white">1.0x</option>
+                <option value="1.25" class="bg-royal-900 text-white">1.25x</option>
+                <option value="1.5" class="bg-royal-900 text-white">1.5x</option>
+                <option value="2" class="bg-royal-900 text-white">2.0x</option>
+              </select>
+
+              <!-- Loop Toggle Button -->
+              <button onclick="toggleLoop()" id="btn-loop" class="px-2.5 py-1 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 text-zinc-400 text-xs font-mono font-semibold transition-colors flex items-center gap-1.5" title="Boucle automatique">
+                <i data-lucide="repeat" class="w-3.5 h-3.5"></i>
+                <span id="loop-state-text">BOUCLE : OFF</span>
+              </button>
+
+              <!-- Fullscreen -->
+              <button onclick="toggleFullscreen()" class="w-8 h-8 rounded-lg bg-white/5 hover:bg-white/10 text-zinc-300 flex items-center justify-center transition-colors" title="Plein Écran (F)">
+                <i data-lucide="maximize" class="w-4 h-4"></i>
+              </button>
+            </div>
+
+          </div>
+
+        </div>
+
+      </div>
+
+      <!-- ===================================================================== -->
+      <!-- 6 INTERACTIVE CHAPTER JUMP CARDS (00:00, 00:05, 00:10, 00:15, 00:20, 00:25) -->
+      <!-- ===================================================================== -->
+      <div class="mb-6">
+        <div class="flex items-center justify-between mb-3 px-1">
+          <div class="flex items-center gap-2">
+            <i data-lucide="layers" class="w-4 h-4 text-emerald-400"></i>
+            <h2 class="text-sm font-bold text-white uppercase tracking-wider">
+              Chapitres & Paliers Technologiques
+            </h2>
+          </div>
+          <span class="text-xs text-zinc-400">Cliquez sur un palier pour sauter instantanément au passage</span>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          
+          <!-- Chapter 0: 00:00 Intro CAD -->
+          <div onclick="jumpToChapter(0)" class="chapter-card active" id="card-chap-0">
+            <div class="flex items-center justify-between mb-2">
+              <span class="text-[10px] font-mono font-bold bg-white/10 text-emerald-300 px-2 py-0.5 rounded border border-white/10">
+                00:00 · INTRO
+              </span>
+              <span class="text-[10px] text-zinc-500 font-mono">0s - 5s</span>
+            </div>
+            <div class="flex items-start gap-3">
+              <div class="w-8 h-8 rounded-lg bg-emerald-950/80 border border-emerald-800/80 text-emerald-400 flex items-center justify-center flex-shrink-0">
+                <i data-lucide="sparkles" class="w-4 h-4"></i>
+              </div>
+              <div>
+                <h3 class="text-xs font-bold text-white">Introduction Aérospatiale CAD</h3>
+                <p class="text-[11px] text-zinc-400 mt-0.5 leading-snug">
+                  Palette Royal Grey zéro fatigue oculaire, dock flottant Apple & synchronisation multi-onglets ultra-faible latence.
+                </p>
+              </div>
+            </div>
+            <div class="chapter-progress" id="progress-chap-0"></div>
+          </div>
+
+          <!-- Chapter 1: 00:05 Power #1 OBD-II -->
+          <div onclick="jumpToChapter(5)" class="chapter-card" id="card-chap-1">
+            <div class="flex items-center justify-between mb-2">
+              <span class="text-[10px] font-mono font-bold bg-white/10 text-cyan-300 px-2 py-0.5 rounded border border-white/10">
+                00:05 · POWER #1
+              </span>
+              <span class="text-[10px] text-zinc-500 font-mono">5s - 10s</span>
+            </div>
+            <div class="flex items-start gap-3">
+              <div class="w-8 h-8 rounded-lg bg-cyan-950/80 border border-cyan-800/80 text-cyan-400 flex items-center justify-center flex-shrink-0">
+                <i data-lucide="gauge" class="w-4 h-4"></i>
+              </div>
+              <div>
+                <h3 class="text-xs font-bold text-white">Télémétrie OBD-II Directe</h3>
+                <p class="text-[11px] text-zinc-400 mt-0.5 leading-snug">
+                  Bus CAN natif, flux de trames hexadécimales, jauges tachymètre & compte-tours en direct à 10 Hz.
+                </p>
+              </div>
+            </div>
+            <div class="chapter-progress" id="progress-chap-1"></div>
+          </div>
+
+          <!-- Chapter 2: 00:10 Power #2 Waze & Reroutage -->
+          <div onclick="jumpToChapter(10)" class="chapter-card" id="card-chap-2">
+            <div class="flex items-center justify-between mb-2">
+              <span class="text-[10px] font-mono font-bold bg-white/10 text-amber-300 px-2 py-0.5 rounded border border-white/10">
+                00:10 · POWER #2
+              </span>
+              <span class="text-[10px] text-zinc-500 font-mono">10s - 15s</span>
+            </div>
+            <div class="flex items-start gap-3">
+              <div class="w-8 h-8 rounded-lg bg-amber-950/80 border border-amber-800/80 text-amber-400 flex items-center justify-center flex-shrink-0">
+                <i data-lucide="compass" class="w-4 h-4"></i>
+              </div>
+              <div>
+                <h3 class="text-xs font-bold text-white">Trafic Waze & Reroutage</h3>
+                <p class="text-[11px] text-zinc-400 mt-0.5 leading-snug">
+                  Détection des zones de congestion Montréal Métro, recalcul d'itinéraire vectoriel et gain de 18 min par course.
+                </p>
+              </div>
+            </div>
+            <div class="chapter-progress" id="progress-chap-2"></div>
+          </div>
+
+          <!-- Chapter 3: 00:15 Power #3 Cockpit Chauffeur -->
+          <div onclick="jumpToChapter(15)" class="chapter-card" id="card-chap-3">
+            <div class="flex items-center justify-between mb-2">
+              <span class="text-[10px] font-mono font-bold bg-white/10 text-emerald-300 px-2 py-0.5 rounded border border-white/10">
+                00:15 · POWER #3
+              </span>
+              <span class="text-[10px] text-zinc-500 font-mono">15s - 20s</span>
+            </div>
+            <div class="flex items-start gap-3">
+              <div class="w-8 h-8 rounded-lg bg-emerald-950/80 border border-emerald-800/80 text-emerald-400 flex items-center justify-center flex-shrink-0">
+                <i data-lucide="smartphone" class="w-4 h-4"></i>
+              </div>
+              <div>
+                <h3 class="text-xs font-bold text-white">Cockpit Chauffeur & Quick ACK</h3>
+                <p class="text-[11px] text-zinc-400 mt-0.5 leading-snug">
+                  Alerte sonore dispatch, décompte 20s avec validation 1-touch, guidage GPS Waze et synchro MDT immédiate.
+                </p>
+              </div>
+            </div>
+            <div class="chapter-progress" id="progress-chap-3"></div>
+          </div>
+
+          <!-- Chapter 4: 00:20 Power #4 Reçus Thermiques & MEV -->
+          <div onclick="jumpToChapter(20)" class="chapter-card" id="card-chap-4">
+            <div class="flex items-center justify-between mb-2">
+              <span class="text-[10px] font-mono font-bold bg-white/10 text-purple-300 px-2 py-0.5 rounded border border-white/10">
+                00:20 · POWER #4
+              </span>
+              <span class="text-[10px] text-zinc-500 font-mono">20s - 25s</span>
+            </div>
+            <div class="flex items-start gap-3">
+              <div class="w-8 h-8 rounded-lg bg-purple-950/80 border border-purple-800/80 text-purple-400 flex items-center justify-center flex-shrink-0">
+                <i data-lucide="receipt" class="w-4 h-4"></i>
+              </div>
+              <div>
+                <h3 class="text-xs font-bold text-white">Reçus Thermiques & MEV Fiscal</h3>
+                <p class="text-[11px] text-zinc-400 mt-0.5 leading-snug">
+                  Conformité Revenu Québec, double taxe TPS 5% + TVQ 9.975%, QR code sécurisé et simulation thermique 58mm.
+                </p>
+              </div>
+            </div>
+            <div class="chapter-progress" id="progress-chap-4"></div>
+          </div>
+
+          <!-- Chapter 5: 00:25 Power #5 ROI Hormozi (+204%) -->
+          <div onclick="jumpToChapter(25)" class="chapter-card" id="card-chap-5">
+            <div class="flex items-center justify-between mb-2">
+              <span class="text-[10px] font-mono font-bold bg-white/10 text-emerald-300 px-2 py-0.5 rounded border border-white/10">
+                00:25 · POWER #5
+              </span>
+              <span class="text-[10px] text-zinc-500 font-mono">25s - 30s</span>
+            </div>
+            <div class="flex items-start gap-3">
+              <div class="w-8 h-8 rounded-lg bg-emerald-950/80 border border-emerald-800/80 text-emerald-400 flex items-center justify-center flex-shrink-0">
+                <i data-lucide="trending-up" class="w-4 h-4"></i>
+              </div>
+              <div>
+                <h3 class="text-xs font-bold text-white">Métriques ROI Hormozi (+204%)</h3>
+                <p class="text-[11px] text-zinc-400 mt-0.5 leading-snug">
+                  Moteur de valeur Alex Hormozi : +25 courses par jour par flotte, +26,250 $ CAD net mensuel et gains mesurables.
+                </p>
+              </div>
+            </div>
+            <div class="chapter-progress" id="progress-chap-5"></div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- ===================================================================== -->
+      <!-- BOTTOM EXECUTIVE ARCHITECTURE SUMMARY                                 -->
+      <!-- ===================================================================== -->
+      <div class="glass-card p-6 border-white/10 flex flex-col md:flex-row items-center justify-between gap-6">
+        <div>
+          <div class="flex items-center gap-2 mb-1">
+            <span class="text-[10px] font-mono font-bold bg-emerald-950/80 text-emerald-300 px-2 py-0.5 rounded border border-emerald-800">
+              PRÊT POUR PRODUCTION
+            </span>
+            <span class="text-xs text-zinc-400">Infrastructure Modulaire CAD</span>
+          </div>
+          <h3 class="text-base font-bold text-white">
+            Passez de la Démo Vidéo aux Modules Interactifs en Direct
+          </h3>
+          <p class="text-xs text-zinc-400 mt-1 max-w-2xl leading-relaxed">
+            Chaque fonctionnalité présentée dans cette vidéo 30s est entièrement interactive et connectée en temps réel au moteur central de dispatching et d'AVL.
+          </p>
+        </div>
+
+        <div class="flex items-center gap-3 flex-shrink-0">
+          <a href="driver.html" class="bg-white/10 hover:bg-white/15 text-white text-xs font-semibold px-4 py-2.5 rounded-xl border border-white/10 flex items-center gap-2 transition-colors no-underline">
+            <i data-lucide="smartphone" class="w-4 h-4 text-emerald-400"></i>
+            <span>Tester Cockpit Mobile</span>
+          </a>
+          <a href="map.html" class="bg-emerald-500 hover:bg-emerald-400 text-royal-950 text-xs font-bold px-4 py-2.5 rounded-xl flex items-center gap-2 shadow-lg transition-transform hover:scale-105 no-underline">
+            <i data-lucide="globe" class="w-4 h-4 text-royal-950"></i>
+            <span>Ouvrir Carte Flotte Live</span>
+          </a>
+        </div>
+      </div>
+
+    </main>
+
+  </div>
+
+  <!-- COLLABORATIVE SHARE MODAL -->
+  <div id="share-modal" class="fixed inset-0 bg-black/70 backdrop-blur-md z-50 flex items-center justify-center p-4" style="display: none;" onclick="closeShareModalOnBg(event)">
+    <div class="bg-royal-900 border border-white/10 rounded-2xl max-w-lg w-full p-6 shadow-2xl select-none text-white">
+      
+      <div class="flex items-center justify-between pb-3 border-b border-white/10 mb-4">
+        <div class="flex items-center gap-2">
+          <i data-lucide="share-2" class="w-5 h-5 text-emerald-400"></i>
+          <h3 class="font-bold text-base text-white">Partager le Showcase Vidéo 30s</h3>
+        </div>
+        <button onclick="closeShareModal()" class="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 text-zinc-300 flex items-center justify-center font-bold text-sm transition-colors">✕</button>
+      </div>
+
+      <p class="text-xs text-zinc-400 mb-4 leading-relaxed">
+        Partagez cette démonstration vidéo officielle avec vos parties prenantes et clients. Accès direct avec chapitres interactifs :
+      </p>
+
+      <!-- Public Web URL -->
+      <div class="bg-black/40 p-3.5 rounded-xl border border-white/10 mb-3 text-xs">
+        <div class="flex items-center justify-between mb-1.5">
+          <span class="font-bold text-emerald-400 flex items-center gap-1.5">
+            <span class="w-2 h-2 rounded-full bg-emerald-400 inline-block animate-pulse"></span> LIEN PUBLIC MONDIAL (HTTPS)
+          </span>
+          <span class="text-[10px] text-zinc-500 font-mono">DÉMO VIDÉO</span>
+        </div>
+        <div class="flex gap-2">
+          <input id="share-url-public" type="text" readonly value="https://bc8b85ebe510c4.lhr.life/video.html" class="flex-1 bg-royal-950 border border-white/10 rounded-lg px-2.5 py-1.5 text-xs text-zinc-200 font-mono" />
+          <button onclick="copyPublicUrl()" class="bg-emerald-500 hover:bg-emerald-600 text-royal-950 px-3 py-1.5 rounded-lg text-xs font-bold transition-colors">COPIER</button>
+        </div>
+      </div>
+
+      <!-- Local Network URL -->
+      <div class="bg-black/40 p-3.5 rounded-xl border border-white/10 mb-4 text-xs">
+        <div class="flex items-center justify-between mb-1.5">
+          <span class="font-bold text-zinc-300">RÉSEAU LOCAL (WI-FI)</span>
+          <span class="text-[10px] text-zinc-500 font-mono">PORT 8091</span>
+        </div>
+        <div class="flex gap-2">
+          <input id="share-url-input" type="text" readonly value="http://localhost:8091/video.html" class="flex-1 bg-royal-950 border border-white/10 rounded-lg px-2.5 py-1.5 text-xs text-zinc-200 font-mono" />
+          <button onclick="copyShareUrl()" class="bg-white/10 hover:bg-white/20 text-white px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors">COPIER</button>
+        </div>
+      </div>
+
+      <div class="bg-emerald-950/40 border border-emerald-500/20 p-3 rounded-xl text-xs text-emerald-300 leading-snug">
+        💡 <strong>Lecture instantanée :</strong> Ce lien ouvre le lecteur vidéo dark titanium optimisé, synchronisé avec les 6 chapitres interactifs.
+      </div>
+    </div>
+  </div>
+
+  <!-- TOAST NOTIFICATION CONTAINER -->
+  <div id="toast-pill" class="fixed bottom-6 right-6 bg-emerald-950 border border-emerald-500/50 text-white px-4 py-2.5 rounded-xl text-xs font-bold shadow-2xl flex items-center gap-2 transform translate-y-20 opacity-0 transition-all duration-300 z-50">
+    <i data-lucide="check-circle" class="w-4 h-4 text-emerald-400"></i>
+    <span id="toast-message">Lien copié avec succès !</span>
+  </div>
+
+  <script>
+    lucide.createIcons();
+
+    // Clock
+    function updateClock() {
+      const now = new Date();
+      const el = document.getElementById('clock');
+      if (el) el.textContent = now.toLocaleTimeString('fr-CA', { hour12: false });
+    }
+    setInterval(updateClock, 1000);
+    updateClock();
+
+    // Video Player Controller Logic
+    const video = document.getElementById('showcase-video');
+    const playOverlay = document.getElementById('play-overlay');
+    const scrubber = document.getElementById('video-scrubber');
+    const timeDisplay = document.getElementById('video-time-display');
+    const theaterTimer = document.getElementById('theater-timer');
+    const iconPlayState = document.getElementById('icon-play-state');
+    const currentChapterChip = document.getElementById('current-chapter-chip');
+    const statusChapterLabel = document.getElementById('status-chapter-label');
+    const loopBtn = document.getElementById('btn-loop');
+    const loopStateText = document.getElementById('loop-state-text');
+    const iconVolume = document.getElementById('icon-volume');
+
+    const CHAPTERS = [
+      { start: 0, end: 5, id: 0, name: "Introduction Aérospatiale CAD", chip: "00:00 · INTRODUCTION AÉROSPATIALE" },
+      { start: 5, end: 10, id: 1, name: "Power #1: Télémétrie OBD-II Directe", chip: "00:05 · TÉLÉMÉTRIE OBD-II" },
+      { start: 10, end: 15, id: 2, name: "Power #2: Trafic Waze & Reroutage", chip: "00:10 · TRAFIC WAZE & REROUTAGE" },
+      { start: 15, end: 20, id: 3, name: "Power #3: Cockpit Chauffeur & Quick ACK", chip: "00:15 · COCKPIT CHAUFFEUR" },
+      { start: 20, end: 25, id: 4, name: "Power #4: Reçus Thermiques & MEV Fiscal", chip: "00:20 · REÇUS & MEV FISCAL" },
+      { start: 25, end: 30, id: 5, name: "Power #5: Métriques ROI Hormozi (+204%)", chip: "00:25 · ROI HORMOZI (+204%)" }
+    ];
+
+    let isVideoLooping = false;
+
+    // Format time helpers (e.g. 00:05)
+    function formatTime(seconds) {
+      if (isNaN(seconds)) return "00:00";
+      const m = Math.floor(seconds / 60);
+      const s = Math.floor(seconds % 60);
+      return `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
+    }
+
+    // Toggle Play / Pause
+    function togglePlay() {
+      if (video.paused || video.ended) {
+        video.play().then(() => {
+          updatePlayUI(true);
+        }).catch(err => {
+          console.warn("Autoplay block or missing video file:", err);
+          updatePlayUI(false);
+          const notice = document.getElementById('video-missing-notice');
+          if (notice) notice.classList.remove('hidden');
+        });
+      } else {
+        video.pause();
+        updatePlayUI(false);
+      }
+    }
+
+    function updatePlayUI(isPlaying) {
+      if (isPlaying) {
+        playOverlay.classList.add('opacity-0', 'pointer-events-none');
+        iconPlayState.setAttribute('data-lucide', 'pause');
+      } else {
+        playOverlay.classList.remove('opacity-0', 'pointer-events-none');
+        iconPlayState.setAttribute('data-lucide', 'play');
+      }
+      lucide.createIcons();
+    }
+
+    // Click on video directly to play/pause
+    video.addEventListener('click', togglePlay);
+
+    // Skip seconds (+/- 5s)
+    function skipSeconds(sec) {
+      video.currentTime = Math.max(0, Math.min(30, video.currentTime + sec));
+      if (video.paused) togglePlay();
+    }
+
+    // Scrubbing
+    function onScrub(val) {
+      video.currentTime = parseFloat(val);
+      syncTimeUI(video.currentTime);
+    }
+
+    // Jump to chapter
+    function jumpToChapter(seconds) {
+      video.currentTime = seconds;
+      video.play().then(() => {
+        updatePlayUI(true);
+      }).catch(err => {
+        console.warn("Could not play on jump:", err);
+        updatePlayUI(false);
+      });
+      syncActiveChapter(seconds);
+      showToast(`Saut au chapitre : ${formatTime(seconds)}`);
+    }
+
+    // Sync Active Chapter Cards and Progress Bars
+    function syncActiveChapter(currentTime) {
+      let currentChap = CHAPTERS.find(c => currentTime >= c.start && currentTime < c.end);
+      if (!currentChap && currentTime >= 25) currentChap = CHAPTERS[5];
+      if (!currentChap) currentChap = CHAPTERS[0];
+
+      // Update text indicators
+      if (currentChapterChip) currentChapterChip.textContent = currentChap.chip;
+      if (statusChapterLabel) statusChapterLabel.textContent = currentChap.name;
+
+      // Update cards highlighting
+      CHAPTERS.forEach((c) => {
+        const card = document.getElementById(`card-chap-${c.id}`);
+        const sideChap = document.getElementById(`side-chap-${c.id}`);
+        const progressBar = document.getElementById(`progress-chap-${c.id}`);
+
+        if (card) {
+          if (c.id === currentChap.id) {
+            card.classList.add('active');
+          } else {
+            card.classList.remove('active');
+          }
+        }
+
+        if (sideChap) {
+          if (c.id === currentChap.id) {
+            sideChap.classList.add('bg-white/10', 'text-white', 'font-semibold');
+          } else {
+            sideChap.classList.remove('bg-white/10', 'text-white', 'font-semibold');
+          }
+        }
+
+        // Fill progress bar for this chapter
+        if (progressBar) {
+          if (currentTime >= c.end) {
+            progressBar.style.width = '100%';
+          } else if (currentTime < c.start) {
+            progressBar.style.width = '0%';
+          } else {
+            const pct = ((currentTime - c.start) / (c.end - c.start)) * 100;
+            progressBar.style.width = `${Math.min(100, Math.max(0, pct))}%`;
+          }
+        }
+      });
+    }
+
+    // Time update listener
+    video.addEventListener('timeupdate', () => {
+      syncTimeUI(video.currentTime);
+      syncActiveChapter(video.currentTime);
+    });
+
+    function syncTimeUI(cur) {
+      const dur = video.duration || 30;
+      scrubber.value = cur;
+      scrubber.max = dur;
+      const str = `${formatTime(cur)} / ${formatTime(dur)}`;
+      if (timeDisplay) timeDisplay.textContent = str;
+      if (theaterTimer) theaterTimer.textContent = str;
+    }
+
+    video.addEventListener('ended', () => {
+      if (isVideoLooping) {
+        video.currentTime = 0;
+        video.play();
+      } else {
+        updatePlayUI(false);
+      }
+    });
+
+    // Mute toggle
+    function toggleMute() {
+      video.muted = !video.muted;
+      if (video.muted) {
+        iconVolume.setAttribute('data-lucide', 'volume-x');
+      } else {
+        iconVolume.setAttribute('data-lucide', 'volume-2');
+      }
+      lucide.createIcons();
+      showToast(video.muted ? "Audio en sourdine" : "Audio activé");
+    }
+
+    // Playback Speed
+    function changeSpeed(val) {
+      video.playbackRate = parseFloat(val);
+      showToast(`Vitesse de lecture : ${val}x`);
+    }
+
+    // Loop Toggle
+    function toggleLoop() {
+      isVideoLooping = !isVideoLooping;
+      video.loop = isVideoLooping;
+      if (isVideoLooping) {
+        loopBtn.classList.add('border-emerald-500/50', 'text-emerald-300', 'bg-emerald-950/60');
+        loopStateText.textContent = "BOUCLE : ON";
+        showToast("Boucle automatique activée");
+      } else {
+        loopBtn.classList.remove('border-emerald-500/50', 'text-emerald-300', 'bg-emerald-950/60');
+        loopStateText.textContent = "BOUCLE : OFF";
+        showToast("Boucle automatique désactivée");
+      }
+    }
+
+    // Fullscreen toggle
+    function toggleFullscreen() {
+      const playerFrame = document.querySelector('.titanium-player-frame');
+      if (!document.fullscreenElement) {
+        if (playerFrame.requestFullscreen) {
+          playerFrame.requestFullscreen();
+        } else if (video.requestFullscreen) {
+          video.requestFullscreen();
+        }
+      } else {
+        if (document.exitFullscreen) {
+          document.exitFullscreen();
+        }
+      }
+    }
+
+    // Copy video link with current timestamp
+    function copyVideoLink() {
+      const origin = window.location.origin.includes('lhr.life') ? window.location.origin : 'https://bc8b85ebe510c4.lhr.life';
+      const curSec = Math.floor(video.currentTime || 0);
+      const url = `${origin}/video.html#t=${curSec}`;
+      navigator.clipboard.writeText(url).then(() => {
+        showToast(`Lien copié avec minutage (${formatTime(curSec)}) !`);
+      }).catch(() => {
+        showToast("Lien copié dans le presse-papier !");
+      });
+    }
+
+    // Toast Notification helper
+    function showToast(message) {
+      const toast = document.getElementById('toast-pill');
+      const msgEl = document.getElementById('toast-message');
+      if (!toast || !msgEl) return;
+      msgEl.textContent = message;
+      toast.classList.remove('translate-y-20', 'opacity-0');
+      toast.classList.add('translate-y-0', 'opacity-100');
+      clearTimeout(window.__toastTimeout);
+      window.__toastTimeout = setTimeout(() => {
+        toast.classList.remove('translate-y-0', 'opacity-100');
+        toast.classList.add('translate-y-20', 'opacity-0');
+      }, 2500);
+    }
+
+    // Parse URL Hash on Load (e.g. #t=15)
+    window.addEventListener('DOMContentLoaded', () => {
+      const hash = window.location.hash;
+      if (hash && hash.startsWith('#t=')) {
+        const sec = parseFloat(hash.replace('#t=', ''));
+        if (!isNaN(sec) && sec >= 0 && sec <= 30) {
+          jumpToChapter(sec);
+        }
+      }
+    });
+
+    // Keyboard Shortcuts
+    window.addEventListener('keydown', (e) => {
+      if (e.target.tagName === 'INPUT' || e.target.tagName === 'SELECT') return;
+
+      if (e.code === 'Space') {
+        e.preventDefault();
+        togglePlay();
+      } else if (e.key === 'm' || e.key === 'M') {
+        e.preventDefault();
+        toggleMute();
+      } else if (e.key === 'f' || e.key === 'F') {
+        e.preventDefault();
+        toggleFullscreen();
+      } else if (e.key === 'ArrowLeft') {
+        e.preventDefault();
+        skipSeconds(-5);
+      } else if (e.key === 'ArrowRight') {
+        e.preventDefault();
+        skipSeconds(5);
+      } else if (e.key === '0') {
+        jumpToChapter(0);
+      } else if (e.key === '1') {
+        jumpToChapter(5);
+      } else if (e.key === '2') {
+        jumpToChapter(10);
+      } else if (e.key === '3') {
+        jumpToChapter(15);
+      } else if (e.key === '4') {
+        jumpToChapter(20);
+      } else if (e.key === '5') {
+        jumpToChapter(25);
+      } else if (e.key === 'F1') { e.preventDefault(); window.location.href = 'index.html'; }
+      else if (e.key === 'F2') { e.preventDefault(); window.location.href = 'dispatch.html'; }
+      else if (e.key === 'F3') { e.preventDefault(); window.location.href = 'queue.html'; }
+      else if (e.key === 'F4') { e.preventDefault(); window.location.href = 'map.html'; }
+      else if (e.key === 'F5') { e.preventDefault(); window.location.href = 'messages.html'; }
+      else if (e.key === 'F6') { e.preventDefault(); window.location.href = 'driver.html'; }
+      else if (e.key === 'F7') { e.preventDefault(); window.location.href = 'video.html'; }
+      else if (e.key === 'Escape') { closeShareModal(); }
+    });
+
+    // Share Modal
+    function openShareModal() {
+      const currentOrigin = window.location.origin.includes('lhr.life') ? window.location.origin : 'https://bc8b85ebe510c4.lhr.life';
+      const curSec = Math.floor(video.currentTime || 0);
+      const suffix = curSec > 0 ? `#t=${curSec}` : '';
+      const pubInput = document.getElementById('share-url-public');
+      if (pubInput) pubInput.value = `${currentOrigin}/video.html${suffix}`;
+      const locInput = document.getElementById('share-url-input');
+      if (locInput) locInput.value = `http://localhost:8091/video.html${suffix}`;
+      document.getElementById('share-modal').style.display = 'flex';
+    }
+    function closeShareModal() {
+      document.getElementById('share-modal').style.display = 'none';
+    }
+    function closeShareModalOnBg(e) {
+      if (e.target === document.getElementById('share-modal')) closeShareModal();
+    }
+    function copyShareUrl() {
+      const input = document.getElementById('share-url-input');
+      input.select();
+      navigator.clipboard.writeText(input.value);
+      showToast("Lien local copié dans le presse-papier !");
+    }
+    function copyPublicUrl() {
+      const input = document.getElementById('share-url-public');
+      input.select();
+      navigator.clipboard.writeText(input.value);
+      showToast("Lien public mondial copié !");
+    }
+
+    // Telemetry Sync with PulseState
+    function updateTelemetryFromState() {
+      if (typeof PulseState === 'undefined') return;
+      const vehs = PulseState.getVehicles();
+      const calls = PulseState.getCalls();
+      const msgs = PulseState.getMessages();
+
+      const pendingCalls = calls.filter(c => c.status === 'EN_ATTENTE').length;
+      const unreadMsgs = msgs.filter(m => m.unread).length;
+
+      const sideQueue = document.getElementById('side-queue-count');
+      if (sideQueue) sideQueue.textContent = pendingCalls;
+      const sideMsg = document.getElementById('side-msg-count');
+      if (sideMsg) sideMsg.textContent = unreadMsgs;
+    }
+
+    updateTelemetryFromState();
+    if (typeof PULSE_CHANNEL !== 'undefined') {
+      PULSE_CHANNEL.onmessage = () => {
+        updateTelemetryFromState();
+      };
+    }
+  </script>
+</body>
+</html>
