@@ -626,20 +626,220 @@
       </div>
     </div>
 
-    <!-- Share Modal -->
-    <div id="share-modal" class="fixed inset-0 bg-black/70 backdrop-blur-md z-50 flex items-center justify-center p-4 hidden" onclick="closeShareModalOnBg(event)">
-      <div class="bg-royal-900 border border-white/10 rounded-2xl max-w-sm w-full p-6 shadow-2xl text-white">
-        <div class="flex items-center justify-between pb-3 mb-3 border-b border-white/5">
-          <h3 class="font-bold text-sm text-white">Partager le Cockpit Chauffeur</h3>
-          <button onclick="closeShareModal()" class="w-7 h-7 rounded-full bg-white/10 hover:bg-white/20 text-zinc-400 flex items-center justify-center text-xs font-bold">✕</button>
+    <!-- UNIFIED MULTI-OPTION COLLABORATIVE SHARE MODAL (ROYAL GREY PALETTE) -->
+    <div id="share-modal" class="fixed inset-0 bg-black/75 backdrop-blur-md z-50 flex items-center justify-center p-4" style="display: none;" onclick="closeShareModalOnBg(event)">
+      <div class="bg-royal-900 border border-white/10 rounded-2xl max-w-2xl w-full p-6 shadow-2xl select-none text-white max-h-[90vh] flex flex-col" onclick="event.stopPropagation()">
+        
+        <!-- Header -->
+        <div class="flex items-center justify-between pb-4 border-b border-white/10 mb-4 flex-shrink-0">
+          <div class="flex items-center gap-3">
+            <div class="w-9 h-9 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400">
+              <i data-lucide="share-2" class="w-5 h-5"></i>
+            </div>
+            <div>
+              <div class="flex items-center gap-2">
+                <h3 class="font-bold text-base text-white">Partage Multi-Modules CAD & Flotte</h3>
+                <span class="px-2 py-0.5 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-[10px] font-mono font-bold flex items-center gap-1">
+                  <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>TUNNEL ACTIF
+                </span>
+              </div>
+              <p class="text-xs text-zinc-400 mt-0.5">Accès public chiffré SSL en temps réel. Partagez n'importe quel module avec votre équipe :</p>
+            </div>
+          </div>
+          <button onclick="closeShareModal()" class="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 text-zinc-300 flex items-center justify-center font-bold text-sm transition-colors cursor-pointer" title="Fermer (Échap)">✕</button>
         </div>
-        <p class="text-xs text-zinc-400 mb-4">
-          Ouvrez ce cockpit chauffeur directement sur smartphone pour tester l'alerte d'assignation en direct :
-        </p>
-        <div class="flex gap-2 mb-3">
-          <input id="share-url-public" type="text" readonly class="flex-1 bg-black/40 border border-white/10 rounded-lg px-2.5 py-1.5 text-xs font-mono text-zinc-200" />
-          <button onclick="copyPublicUrl()" class="btn-noir-primary px-3 py-1.5 text-xs font-bold">COPIER</button>
+
+        <!-- Tunnel Status Banner -->
+        <div class="bg-black/40 border border-white/10 rounded-xl p-3 mb-4 flex items-center justify-between flex-shrink-0">
+          <div class="flex items-center gap-2.5 overflow-hidden mr-2">
+            <i data-lucide="shield-check" class="w-4 h-4 text-emerald-400 flex-shrink-0"></i>
+            <div class="truncate">
+              <div class="text-[10px] font-mono text-zinc-500 uppercase tracking-wider">Hôte Actif / Passerelle SSL</div>
+              <div id="share-modal-base-host" class="text-xs font-mono font-bold text-zinc-200 truncate">https://d459b01192e48d.lhr.life</div>
+            </div>
+          </div>
+          <div class="text-[11px] font-mono text-emerald-400 font-semibold bg-emerald-950/60 border border-emerald-500/20 px-2.5 py-1 rounded-lg whitespace-nowrap">
+            7 MODULES DISPONIBLES
+          </div>
         </div>
+
+        <!-- Modules List -->
+        <div class="space-y-2 overflow-y-auto pr-1 flex-1 text-xs">
+          
+          <!-- 1. Dashboard Exécutif -->
+          <div class="share-option-card bg-royal-950/80 hover:bg-royal-950 border border-white/5 hover:border-white/15 rounded-xl p-3 flex items-center justify-between gap-3 transition-colors">
+            <div class="flex items-center gap-3 min-w-0">
+              <div class="w-8 h-8 rounded-lg bg-blue-500/10 border border-blue-500/20 text-blue-400 flex items-center justify-center flex-shrink-0">
+                <i data-lucide="layout-dashboard" class="w-4 h-4"></i>
+              </div>
+              <div class="min-w-0">
+                <div class="font-bold text-white text-xs truncate">1. Dashboard Exécutif</div>
+                <div class="text-[11px] font-mono text-zinc-400 truncate share-url-label" data-path="/index.html">https://d459b01192e48d.lhr.life/index.html</div>
+              </div>
+            </div>
+            <div class="flex items-center gap-2 flex-shrink-0">
+              <button onclick="copyShareOption(this, '/index.html')" class="copy-btn px-3 py-1.5 rounded-lg bg-white/10 hover:bg-white/20 text-zinc-200 font-semibold text-xs flex items-center gap-1.5 transition-colors cursor-pointer">
+                <i data-lucide="copy" class="w-3.5 h-3.5"></i>
+                <span>Copier</span>
+              </button>
+              <a href="https://d459b01192e48d.lhr.life/index.html" target="_blank" rel="noopener noreferrer" class="share-open-link px-3 py-1.5 rounded-lg bg-emerald-500 hover:bg-emerald-600 text-royal-950 font-bold text-xs flex items-center gap-1.5 transition-colors no-underline">
+                <span>Ouvrir</span>
+                <i data-lucide="external-link" class="w-3.5 h-3.5"></i>
+              </a>
+            </div>
+          </div>
+
+          <!-- 2. Carte AVL & Waze -->
+          <div class="share-option-card bg-royal-950/80 hover:bg-royal-950 border border-white/5 hover:border-white/15 rounded-xl p-3 flex items-center justify-between gap-3 transition-colors">
+            <div class="flex items-center gap-3 min-w-0">
+              <div class="w-8 h-8 rounded-lg bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 flex items-center justify-center flex-shrink-0">
+                <i data-lucide="globe" class="w-4 h-4"></i>
+              </div>
+              <div class="min-w-0">
+                <div class="font-bold text-white text-xs truncate">2. Carte AVL & Waze</div>
+                <div class="text-[11px] font-mono text-zinc-400 truncate share-url-label" data-path="/map.html">https://d459b01192e48d.lhr.life/map.html</div>
+              </div>
+            </div>
+            <div class="flex items-center gap-2 flex-shrink-0">
+              <button onclick="copyShareOption(this, '/map.html')" class="copy-btn px-3 py-1.5 rounded-lg bg-white/10 hover:bg-white/20 text-zinc-200 font-semibold text-xs flex items-center gap-1.5 transition-colors cursor-pointer">
+                <i data-lucide="copy" class="w-3.5 h-3.5"></i>
+                <span>Copier</span>
+              </button>
+              <a href="https://d459b01192e48d.lhr.life/map.html" target="_blank" rel="noopener noreferrer" class="share-open-link px-3 py-1.5 rounded-lg bg-emerald-500 hover:bg-emerald-600 text-royal-950 font-bold text-xs flex items-center gap-1.5 transition-colors no-underline">
+                <span>Ouvrir</span>
+                <i data-lucide="external-link" class="w-3.5 h-3.5"></i>
+              </a>
+            </div>
+          </div>
+
+          <!-- 3. Cockpit Chauffeur -->
+          <div class="share-option-card bg-royal-950/80 hover:bg-royal-950 border border-white/5 hover:border-white/15 rounded-xl p-3 flex items-center justify-between gap-3 transition-colors">
+            <div class="flex items-center gap-3 min-w-0">
+              <div class="w-8 h-8 rounded-lg bg-amber-500/10 border border-amber-500/20 text-amber-400 flex items-center justify-center flex-shrink-0">
+                <i data-lucide="smartphone" class="w-4 h-4"></i>
+              </div>
+              <div class="min-w-0">
+                <div class="font-bold text-white text-xs truncate">3. Cockpit Chauffeur</div>
+                <div class="text-[11px] font-mono text-zinc-400 truncate share-url-label" data-path="/driver.html">https://d459b01192e48d.lhr.life/driver.html</div>
+              </div>
+            </div>
+            <div class="flex items-center gap-2 flex-shrink-0">
+              <button onclick="copyShareOption(this, '/driver.html')" class="copy-btn px-3 py-1.5 rounded-lg bg-white/10 hover:bg-white/20 text-zinc-200 font-semibold text-xs flex items-center gap-1.5 transition-colors cursor-pointer">
+                <i data-lucide="copy" class="w-3.5 h-3.5"></i>
+                <span>Copier</span>
+              </button>
+              <a href="https://d459b01192e48d.lhr.life/driver.html" target="_blank" rel="noopener noreferrer" class="share-open-link px-3 py-1.5 rounded-lg bg-emerald-500 hover:bg-emerald-600 text-royal-950 font-bold text-xs flex items-center gap-1.5 transition-colors no-underline">
+                <span>Ouvrir</span>
+                <i data-lucide="external-link" class="w-3.5 h-3.5"></i>
+              </a>
+            </div>
+          </div>
+
+          <!-- 4. File CAD & Audit -->
+          <div class="share-option-card bg-royal-950/80 hover:bg-royal-950 border border-white/5 hover:border-white/15 rounded-xl p-3 flex items-center justify-between gap-3 transition-colors">
+            <div class="flex items-center gap-3 min-w-0">
+              <div class="w-8 h-8 rounded-lg bg-purple-500/10 border border-purple-500/20 text-purple-400 flex items-center justify-center flex-shrink-0">
+                <i data-lucide="list-ordered" class="w-4 h-4"></i>
+              </div>
+              <div class="min-w-0">
+                <div class="font-bold text-white text-xs truncate">4. File CAD & Audit</div>
+                <div class="text-[11px] font-mono text-zinc-400 truncate share-url-label" data-path="/queue.html">https://d459b01192e48d.lhr.life/queue.html</div>
+              </div>
+            </div>
+            <div class="flex items-center gap-2 flex-shrink-0">
+              <button onclick="copyShareOption(this, '/queue.html')" class="copy-btn px-3 py-1.5 rounded-lg bg-white/10 hover:bg-white/20 text-zinc-200 font-semibold text-xs flex items-center gap-1.5 transition-colors cursor-pointer">
+                <i data-lucide="copy" class="w-3.5 h-3.5"></i>
+                <span>Copier</span>
+              </button>
+              <a href="https://d459b01192e48d.lhr.life/queue.html" target="_blank" rel="noopener noreferrer" class="share-open-link px-3 py-1.5 rounded-lg bg-emerald-500 hover:bg-emerald-600 text-royal-950 font-bold text-xs flex items-center gap-1.5 transition-colors no-underline">
+                <span>Ouvrir</span>
+                <i data-lucide="external-link" class="w-3.5 h-3.5"></i>
+              </a>
+            </div>
+          </div>
+
+          <!-- 5. Prise d'Appel CAD -->
+          <div class="share-option-card bg-royal-950/80 hover:bg-royal-950 border border-white/5 hover:border-white/15 rounded-xl p-3 flex items-center justify-between gap-3 transition-colors">
+            <div class="flex items-center gap-3 min-w-0">
+              <div class="w-8 h-8 rounded-lg bg-cyan-500/10 border border-cyan-500/20 text-cyan-400 flex items-center justify-center flex-shrink-0">
+                <i data-lucide="radio" class="w-4 h-4"></i>
+              </div>
+              <div class="min-w-0">
+                <div class="font-bold text-white text-xs truncate">5. Prise d'Appel CAD</div>
+                <div class="text-[11px] font-mono text-zinc-400 truncate share-url-label" data-path="/dispatch.html">https://d459b01192e48d.lhr.life/dispatch.html</div>
+              </div>
+            </div>
+            <div class="flex items-center gap-2 flex-shrink-0">
+              <button onclick="copyShareOption(this, '/dispatch.html')" class="copy-btn px-3 py-1.5 rounded-lg bg-white/10 hover:bg-white/20 text-zinc-200 font-semibold text-xs flex items-center gap-1.5 transition-colors cursor-pointer">
+                <i data-lucide="copy" class="w-3.5 h-3.5"></i>
+                <span>Copier</span>
+              </button>
+              <a href="https://d459b01192e48d.lhr.life/dispatch.html" target="_blank" rel="noopener noreferrer" class="share-open-link px-3 py-1.5 rounded-lg bg-emerald-500 hover:bg-emerald-600 text-royal-950 font-bold text-xs flex items-center gap-1.5 transition-colors no-underline">
+                <span>Ouvrir</span>
+                <i data-lucide="external-link" class="w-3.5 h-3.5"></i>
+              </a>
+            </div>
+          </div>
+
+          <!-- 6. Radio MDT Direct -->
+          <div class="share-option-card bg-royal-950/80 hover:bg-royal-950 border border-white/5 hover:border-white/15 rounded-xl p-3 flex items-center justify-between gap-3 transition-colors">
+            <div class="flex items-center gap-3 min-w-0">
+              <div class="w-8 h-8 rounded-lg bg-pink-500/10 border border-pink-500/20 text-pink-400 flex items-center justify-center flex-shrink-0">
+                <i data-lucide="message-square" class="w-4 h-4"></i>
+              </div>
+              <div class="min-w-0">
+                <div class="font-bold text-white text-xs truncate">6. Radio MDT Direct</div>
+                <div class="text-[11px] font-mono text-zinc-400 truncate share-url-label" data-path="/messages.html">https://d459b01192e48d.lhr.life/messages.html</div>
+              </div>
+            </div>
+            <div class="flex items-center gap-2 flex-shrink-0">
+              <button onclick="copyShareOption(this, '/messages.html')" class="copy-btn px-3 py-1.5 rounded-lg bg-white/10 hover:bg-white/20 text-zinc-200 font-semibold text-xs flex items-center gap-1.5 transition-colors cursor-pointer">
+                <i data-lucide="copy" class="w-3.5 h-3.5"></i>
+                <span>Copier</span>
+              </button>
+              <a href="https://d459b01192e48d.lhr.life/messages.html" target="_blank" rel="noopener noreferrer" class="share-open-link px-3 py-1.5 rounded-lg bg-emerald-500 hover:bg-emerald-600 text-royal-950 font-bold text-xs flex items-center gap-1.5 transition-colors no-underline">
+                <span>Ouvrir</span>
+                <i data-lucide="external-link" class="w-3.5 h-3.5"></i>
+              </a>
+            </div>
+          </div>
+
+          <!-- 7. Facturation & Reçus -->
+          <div class="share-option-card bg-royal-950/80 hover:bg-royal-950 border border-white/5 hover:border-white/15 rounded-xl p-3 flex items-center justify-between gap-3 transition-colors">
+            <div class="flex items-center gap-3 min-w-0">
+              <div class="w-8 h-8 rounded-lg bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 flex items-center justify-center flex-shrink-0">
+                <i data-lucide="receipt" class="w-4 h-4"></i>
+              </div>
+              <div class="min-w-0">
+                <div class="font-bold text-white text-xs truncate">7. Facturation & Reçus</div>
+                <div class="text-[11px] font-mono text-zinc-400 truncate share-url-label" data-path="/receipt.html?call=5081">https://d459b01192e48d.lhr.life/receipt.html?call=5081</div>
+              </div>
+            </div>
+            <div class="flex items-center gap-2 flex-shrink-0">
+              <button onclick="copyShareOption(this, '/receipt.html?call=5081')" class="copy-btn px-3 py-1.5 rounded-lg bg-white/10 hover:bg-white/20 text-zinc-200 font-semibold text-xs flex items-center gap-1.5 transition-colors cursor-pointer">
+                <i data-lucide="copy" class="w-3.5 h-3.5"></i>
+                <span>Copier</span>
+              </button>
+              <a href="https://d459b01192e48d.lhr.life/receipt.html?call=5081" target="_blank" rel="noopener noreferrer" class="share-open-link px-3 py-1.5 rounded-lg bg-emerald-500 hover:bg-emerald-600 text-royal-950 font-bold text-xs flex items-center gap-1.5 transition-colors no-underline">
+                <span>Ouvrir</span>
+                <i data-lucide="external-link" class="w-3.5 h-3.5"></i>
+              </a>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Footer -->
+        <div class="mt-4 pt-3 border-t border-white/5 flex items-center justify-between text-xs text-zinc-500 flex-shrink-0">
+          <div class="flex items-center gap-1.5 text-zinc-400">
+            <i data-lucide="info" class="w-3.5 h-3.5 text-emerald-400"></i>
+            <span>Synchronisation temps réel par BroadcastChannel & LocalStorage</span>
+          </div>
+          <button onclick="closeShareModal()" class="text-xs text-zinc-400 hover:text-white px-2.5 py-1 rounded-lg bg-white/5 hover:bg-white/10 transition-colors">
+            Fermer
+          </button>
+        </div>
+
       </div>
     </div>
 
@@ -655,15 +855,29 @@
     let audioCtx = null;
 
     function getAudioContext() {
-      if (!audioCtx) {
-        const AudioContextClass = window.AudioContext || window.webkitAudioContext;
-        if (AudioContextClass) audioCtx = new AudioContextClass();
+      if (window.PulseAudio && typeof window.PulseAudio.getAudioContext === 'function') {
+        return window.PulseAudio.getAudioContext();
       }
-      if (audioCtx && audioCtx.state === 'suspended') audioCtx.resume();
-      return audioCtx;
+      try {
+        if (!audioCtx) {
+          const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+          if (AudioContextClass) audioCtx = new AudioContextClass();
+        }
+        if (audioCtx && audioCtx.state === 'suspended') {
+          audioCtx.resume().catch(() => {});
+        }
+        return audioCtx;
+      } catch (e) {
+        console.warn("AudioContext error:", e);
+        return null;
+      }
     }
 
     function playTone(type) {
+      if (window.PulseAudio && typeof window.PulseAudio.playTone === 'function') {
+        window.PulseAudio.playTone(type);
+        return;
+      }
       try {
         const ctx = getAudioContext();
         if (!ctx) return;
@@ -780,6 +994,7 @@
     }
 
     function startCountdown(call) {
+      if (!call) return;
       currentIncomingCall = call;
       countdownTimeLeft = 20.0;
 
@@ -791,12 +1006,12 @@
       const pickupEl = document.getElementById('alert-pickup-address');
       const destEl = document.getElementById('alert-dest-address');
 
-      if (callIdEl) callIdEl.textContent = `#${call.id}`;
-      if (clientNameEl) clientNameEl.textContent = call.client;
-      if (pickupEl) pickupEl.textContent = call.pickup;
-      if (destEl) destEl.textContent = call.dest;
+      if (callIdEl) callIdEl.textContent = `#${call.id || '5081'}`;
+      if (clientNameEl) clientNameEl.textContent = call.client || 'CLIENT PARTICULIER';
+      if (pickupEl) pickupEl.textContent = call.pickup || 'CENTRE-VILLE MONTRÉAL';
+      if (destEl) destEl.textContent = call.dest || 'AÉROPORT YUL';
 
-      container.classList.remove('hidden');
+      if (container) container.classList.remove('hidden');
       playTone('incoming_alert');
 
       if (countdownInterval) clearInterval(countdownInterval);
@@ -807,9 +1022,9 @@
           clearInterval(countdownInterval);
           rejectIncomingMission(true);
         } else {
-          if (textEl) textEl.textContent = countdownTimeLeft.toFixed(1) + 's';
+          if (textEl) textEl.textContent = (isNaN(countdownTimeLeft) ? '0.0' : countdownTimeLeft.toFixed(1)) + 's';
           if (barEl) {
-            const pct = (countdownTimeLeft / 20.0) * 100;
+            const pct = Math.max(0, Math.min(100, (countdownTimeLeft / 20.0) * 100));
             barEl.style.width = pct + '%';
           }
         }
@@ -911,18 +1126,19 @@
     function launchWazeNavigation() {
       playTone('tap');
       const calls = getVehicleCalls();
-      const call = calls[0];
-      const address = call ? call.pickup : "1250 Boulevard René-Lévesque Ouest, Montréal";
-      const wazeUrlNative = `waze://?q=${encodeURIComponent(address)}&navigate=yes`;
+      const call = calls && calls.length > 0 ? calls[0] : null;
+      const address = (call && (call.status === 'EN_COURSE' ? call.dest : call.pickup)) || (call && call.pickup) || "1250 Boulevard René-Lévesque Ouest, Montréal";
+      const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
       const wazeUrlWeb = `https://www.waze.com/ul?q=${encodeURIComponent(address)}&navigate=yes`;
-
-      const start = Date.now();
-      window.location.href = wazeUrlNative;
-      setTimeout(() => {
-        if (Date.now() - start < 1500) {
+      if (isMobile) {
+        const wazeUrlNative = `waze://?q=${encodeURIComponent(address)}&navigate=yes`;
+        window.location.href = wazeUrlNative;
+        setTimeout(() => {
           window.open(wazeUrlWeb, '_blank');
-        }
-      }, 1000);
+        }, 800);
+      } else {
+        window.open(wazeUrlWeb, '_blank');
+      }
     }
 
     function signalArriveeSurPlace() {
@@ -1006,8 +1222,6 @@
 
     function updateHeaderAndTelemetry() {
       const veh = getSelectedVehicle();
-      if (!veh) return;
-
       const codeEl = document.getElementById('header-unit-code');
       const speedEl = document.getElementById('telemetry-speed');
       const voltEl = document.getElementById('telemetry-voltage');
@@ -1015,12 +1229,22 @@
       const odoEl = document.getElementById('telemetry-odometer');
       const standbyBadge = document.getElementById('standby-unit-badge');
 
-      if (codeEl) codeEl.textContent = veh.code;
-      if (speedEl) speedEl.textContent = veh.speed;
+      if (!veh) {
+        if (codeEl) codeEl.textContent = `UNIT-${currentUnitId}`;
+        if (speedEl) speedEl.textContent = "0";
+        if (voltEl) voltEl.textContent = "14.1";
+        if (tempEl) tempEl.textContent = "91";
+        if (odoEl) odoEl.textContent = "54 120";
+        if (standbyBadge) standbyBadge.textContent = `UNIT-${currentUnitId}`;
+        return;
+      }
+
+      if (codeEl) codeEl.textContent = veh.code || `UNIT-${currentUnitId}`;
+      if (speedEl) speedEl.textContent = (veh.speed !== undefined) ? veh.speed : 0;
       if (voltEl) voltEl.textContent = veh.batteryVoltage || '14.1';
       if (tempEl) tempEl.textContent = veh.coolantTemp || '92';
       if (odoEl) odoEl.textContent = (veh.odometerKm || 54120).toLocaleString('fr-CA');
-      if (standbyBadge) standbyBadge.textContent = veh.code;
+      if (standbyBadge) standbyBadge.textContent = veh.code || `UNIT-${currentUnitId}`;
     }
 
     function renderAll() {
@@ -1032,13 +1256,18 @@
       const missionView = document.getElementById('active-mission-view');
 
       if (activeCall) {
-        standbyView.classList.add('hidden');
-        missionView.classList.remove('hidden');
+        if (standbyView) standbyView.classList.add('hidden');
+        if (missionView) missionView.classList.remove('hidden');
 
-        document.getElementById('active-call-badge').textContent = `#${activeCall.id}`;
-        document.getElementById('mission-client-name').textContent = activeCall.client;
-        document.getElementById('mission-target-address').textContent = activeCall.status === 'EN_ROUTE' ? activeCall.pickup : activeCall.dest;
-        document.getElementById('mission-final-dest').textContent = activeCall.dest;
+        const activeBadge = document.getElementById('active-call-badge');
+        const clientEl = document.getElementById('mission-client-name');
+        const targetEl = document.getElementById('mission-target-address');
+        const finalEl = document.getElementById('mission-final-dest');
+
+        if (activeBadge) activeBadge.textContent = `#${activeCall.id || '5081'}`;
+        if (clientEl) clientEl.textContent = activeCall.client || 'CLIENT PARTICULIER';
+        if (targetEl) targetEl.textContent = (activeCall.status === 'EN_ROUTE' ? activeCall.pickup : activeCall.dest) || 'MONTRÉAL';
+        if (finalEl) finalEl.textContent = activeCall.dest || 'AÉROPORT YUL';
 
         const stageLabel = document.getElementById('mission-stage-label');
         const btnArrivee = document.getElementById('btn-signal-arrivee');
@@ -1097,26 +1326,6 @@
         }
       };
     });
-
-    // Share Modal
-    function openShareModal() {
-      const currentOrigin = window.location.origin.includes('lhr.life') ? window.location.origin : 'https://bc8b85ebe510c4.lhr.life';
-      const pubInput = document.getElementById('share-url-public');
-      if (pubInput) pubInput.value = `${currentOrigin}/driver.html?unit=${currentUnitId}`;
-      document.getElementById('share-modal').classList.remove('hidden');
-    }
-    function closeShareModal() {
-      document.getElementById('share-modal').classList.add('hidden');
-    }
-    function closeShareModalOnBg(e) {
-      if (e.target === document.getElementById('share-modal')) closeShareModal();
-    }
-    function copyPublicUrl() {
-      const input = document.getElementById('share-url-public');
-      input.select();
-      navigator.clipboard.writeText(input.value);
-      alert("LIEN CHAUFFEUR MOBILE COPIÉ !");
-    }
   </script>
 </body>
 </html>

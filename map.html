@@ -814,6 +814,17 @@
     }
 
     function initMontrealMap() {
+      const container = document.getElementById('map');
+      if (!container || typeof L === 'undefined') return;
+
+      if (map) {
+        try { map.remove(); } catch (e) {}
+        map = null;
+      }
+      if (container._leaflet_id) {
+        container._leaflet_id = null;
+      }
+
       map = L.map('map', {
         center: [45.5017, -73.5673],
         zoom: 13,
