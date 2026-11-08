@@ -1,0 +1,732 @@
+<!DOCTYPE html>
+<html lang="fr-CA">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>PULSE CAD — Carte Flotte GPS & Trafic Waze en Direct</title>
+  
+  <!-- High-Readability Enterprise Typography: Plus Jakarta Sans + IBM Plex Mono -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&family=IBM+Plex+Mono:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <script src="state.js"></script>
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Plus Jakarta Sans', 'sans-serif'],
+            mono: ['IBM Plex Mono', 'monospace'],
+          },
+          colors: {
+            noir: '#09090b',
+            charcoal: '#18181b',
+            bordercol: '#d4d4d8',
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      font-family: 'Plus Jakarta Sans', -apple-system, sans-serif;
+      background-color: #f4f4f5;
+      color: #09090b;
+      margin: 0;
+      overflow: hidden;
+      height: 100vh;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    ::-webkit-scrollbar { width: 5px; height: 5px; }
+    ::-webkit-scrollbar-track { background: #f4f4f5; }
+    ::-webkit-scrollbar-thumb { background: #18181b; }
+
+    #map {
+      position: absolute;
+      top: 56px;
+      left: 56px;
+      right: 340px;
+      bottom: 0;
+      background: #f4f4f5;
+      z-index: 10;
+    }
+
+    .brut-box {
+      background: #ffffff;
+      border: 1.5px solid #09090b;
+      box-shadow: 3px 3px 0px #09090b;
+    }
+
+    .nav-btn {
+      width: 44px;
+      height: 44px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #52525b;
+      border: 1px solid transparent;
+      transition: all 0.12s ease;
+      position: relative;
+    }
+    .nav-btn:hover {
+      background: #ffffff;
+      color: #09090b;
+      border-color: #09090b;
+    }
+    .nav-btn.active {
+      background: #09090b;
+      color: #ffffff;
+      border-color: #09090b;
+    }
+
+    /* Status Pills */
+    .status-badge-mono {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 11px;
+      font-weight: 700;
+      padding: 4px 10px;
+      background: #ffffff;
+      border: 1.5px solid #d4d4d8;
+      color: #09090b;
+      white-space: nowrap;
+      user-select: none;
+      cursor: pointer;
+      transition: all 0.12s ease;
+    }
+    .status-badge-mono:hover {
+      border-color: #09090b;
+    }
+    .status-badge-mono.active {
+      background: #09090b;
+      color: #ffffff;
+      border-color: #09090b;
+      box-shadow: 2px 2px 0px #09090b;
+    }
+
+    /* Vehicle Marker Pin */
+    .veh-pin {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #09090b;
+      color: #ffffff;
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 10px;
+      font-weight: 900;
+      border: 2px solid #ffffff;
+      box-shadow: 2px 2px 0px #09090b;
+      cursor: pointer;
+      transition: transform 0.12s ease;
+    }
+    .veh-pin:hover {
+      transform: scale(1.2);
+      z-index: 9999 !important;
+    }
+
+    /* Call Pickup Pin */
+    .call-pin {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #ffffff;
+      color: #09090b;
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 10px;
+      font-weight: 900;
+      border: 2px solid #09090b;
+      box-shadow: 2px 2px 0px #09090b;
+      cursor: pointer;
+    }
+
+    /* Waze Traffic Incident Pin */
+    .waze-pin {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #09090b;
+      color: #ffffff;
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 10px;
+      font-weight: 900;
+      border: 2px solid #ef4444;
+      box-shadow: 2px 2px 0px #ef4444;
+      cursor: pointer;
+    }
+
+    /* Leaflet Popup Brutalist Overrides */
+    .leaflet-popup-content-wrapper {
+      background: #ffffff !important;
+      border: 2px solid #09090b !important;
+      border-radius: 0 !important;
+      box-shadow: 4px 4px 0px #09090b !important;
+      padding: 0 !important;
+      color: #09090b !important;
+    }
+    .leaflet-popup-tip {
+      background: #09090b !important;
+    }
+
+    /* Vehicle card in right drawer */
+    .veh-item {
+      padding: 10px 12px;
+      border-bottom: 1px solid #e4e4e7;
+      background: #ffffff;
+      cursor: pointer;
+      transition: background 0.12s ease;
+    }
+    .veh-item:hover {
+      background: #f4f4f5;
+    }
+    .veh-item.selected {
+      background: #f4f4f5;
+      border-left: 3px solid #09090b;
+    }
+  </style>
+</head>
+<body class="bg-neutral-100 text-noir">
+
+  <!-- TOP HEADER -->
+  <header class="h-14 bg-white border-b-2 border-noir flex items-center justify-between px-4 fixed top-0 left-0 right-0 z-40 select-none">
+    
+    <div class="flex items-center gap-4">
+      <a href="index.html" class="flex items-center gap-2 text-decoration-none">
+        <div class="bg-noir text-white font-mono font-black text-sm px-2.5 py-1 tracking-widest flex items-center gap-1.5">
+          <span class="inline-block w-2 h-2 bg-white"></span>
+          PULSE<span class="text-neutral-400">//</span>CAD
+        </div>
+      </a>
+
+      <div class="h-5 w-px bg-neutral-300"></div>
+
+      <div class="flex items-center gap-2">
+        <span class="font-mono text-[11px] font-bold uppercase bg-neutral-100 border border-neutral-300 px-2 py-0.5 text-neutral-800">
+          CARTE TÉLÉMATIQUE AVL & TRAFIC WAZE
+        </span>
+        <span class="text-neutral-400 text-xs">/</span>
+        <span class="font-mono text-[11px] font-bold text-neutral-900 tracking-wide uppercase">
+          COUVERTURE MÉTROPOLITAINE MONTRÉAL
+        </span>
+      </div>
+    </div>
+
+    <!-- Right Controls -->
+    <div class="flex items-center gap-3">
+      <!-- Collaboration Share Button -->
+      <button onclick="openShareModal()" class="bg-noir text-white font-mono text-xs font-bold uppercase px-3 py-1 flex items-center gap-1.5 border border-noir hover:bg-neutral-800 shadow-[2px_2px_0px_#09090b]">
+        <i data-lucide="share-2" class="w-3.5 h-3.5"></i>
+        PARTAGER AVEC COLLABORATEUR
+      </button>
+
+      <div class="hidden sm:flex items-center gap-2 bg-neutral-50 border border-neutral-300 px-2.5 py-1">
+        <span class="w-1.5 h-1.5 bg-black"></span>
+        <span id="map-clock" class="font-mono text-xs font-semibold text-neutral-900">--:--:--</span>
+      </div>
+
+      <button onclick="triggerJitterRefresh()" class="bg-white text-noir font-mono text-xs font-bold uppercase px-3 py-1 flex items-center gap-1.5 border border-noir hover:bg-neutral-100 shadow-[2px_2px_0px_#09090b]">
+        <i data-lucide="refresh-cw" id="refresh-icon" class="w-3.5 h-3.5"></i>
+        ACTUALISER GPS
+      </button>
+
+      <div class="flex items-center gap-2 bg-noir text-white px-2.5 py-1 border border-noir font-mono text-xs font-bold">
+        OP-408
+      </div>
+    </div>
+  </header>
+
+  <!-- SIDEBAR -->
+  <aside class="w-14 bg-white border-r-2 border-noir fixed top-14 bottom-0 left-0 flex flex-col items-center py-3 gap-2 flex-shrink-0 select-none z-30">
+    <a href="index.html" class="nav-btn" title="Tableau de bord">
+      <i data-lucide="layout-grid" class="w-5 h-5"></i>
+    </a>
+    <a href="dispatch.html" class="nav-btn" title="Répartition">
+      <i data-lucide="radio" class="w-5 h-5"></i>
+    </a>
+    <a href="queue.html" class="nav-btn" title="File des courses">
+      <i data-lucide="list-ordered" class="w-5 h-5"></i>
+    </a>
+    <a href="map.html" class="nav-btn active" title="Carte Flotte">
+      <i data-lucide="map" class="w-5 h-5"></i>
+    </a>
+    <a href="messages.html" class="nav-btn" title="Messages Radio MDT">
+      <i data-lucide="message-square" class="w-5 h-5"></i>
+    </a>
+    <div class="flex-1"></div>
+    <button onclick="PulseState.resetDemoData(); renderAll();" class="nav-btn" title="Réinitialiser données démo">
+      <i data-lucide="rotate-ccw" class="w-5 h-5"></i>
+    </button>
+  </aside>
+
+  <!-- MAP STATUS & WAZE TRAFFIC TOOLBAR -->
+  <div class="fixed top-14 left-14 right-80 h-10 bg-white border-b border-neutral-300 z-20 flex items-center px-4 gap-2 overflow-x-auto select-none font-mono">
+    
+    <!-- Waze Live Traffic Toggle -->
+    <button id="toggle-waze-btn" onclick="toggleWazeTraffic()" class="status-badge-mono bg-noir text-white border-noir font-black">
+      <span class="w-2 h-2 bg-rose-500 rounded-none inline-block"></span>
+      CALQUE TRAFIC WAZE : ACTIF
+    </button>
+
+    <div class="h-4 w-px bg-neutral-300 mx-1"></div>
+
+    <button class="status-badge-mono active" onclick="filterMapByStatus('ALL', this)">
+      TOUTES UNITÉS : <span id="stat-total-vehs">12</span>
+    </button>
+    <button class="status-badge-mono" onclick="filterMapByStatus('LIBRE', this)">
+      <span class="w-2 h-2 bg-emerald-600 inline-block"></span> LIBRES : <span id="stat-libre-vehs">7</span>
+    </button>
+    <button class="status-badge-mono" onclick="filterMapByStatus('EN_ROUTE', this)">
+      <span class="w-2 h-2 bg-black inline-block"></span> EN ROUTE : <span id="stat-enroute-vehs">2</span>
+    </button>
+    <button class="status-badge-mono" onclick="filterMapByStatus('EN_COURSE', this)">
+      <span class="w-2 h-2 bg-neutral-600 inline-block"></span> EN COURSE : <span id="stat-course-vehs">3</span>
+    </button>
+
+    <div class="ml-auto text-[11px] text-neutral-500 font-bold uppercase hidden md:flex items-center gap-2">
+      <span class="inline-block w-2.5 h-1 bg-emerald-500"></span> FLUIDE
+      <span class="inline-block w-2.5 h-1 bg-amber-500"></span> CHARGÉ
+      <span class="inline-block w-2.5 h-1 bg-rose-600"></span> CONGESTION
+    </div>
+  </div>
+
+  <!-- LEAFLET MAP CONTAINER -->
+  <div id="map" style="top:96px;"></div>
+
+  <!-- RIGHT ROSTER DRAWER (340px) -->
+  <aside class="w-80 bg-white border-l-2 border-noir fixed top-14 bottom-0 right-0 flex flex-col z-30 select-none">
+    
+    <!-- Drawer Header -->
+    <div class="p-3 bg-neutral-100 border-b border-neutral-300 flex-shrink-0">
+      <div class="flex items-center justify-between mb-2">
+        <span class="font-mono text-xs font-black uppercase text-noir">UNITÉS FLOTTE (AVL)</span>
+        <span class="bg-noir text-white font-mono text-[10px] font-bold px-1.5 py-0.2">GPS LIVE</span>
+      </div>
+      <!-- Search Input -->
+      <div class="relative">
+        <input id="veh-search" oninput="filterDrawerList()" class="w-full bg-white border border-neutral-300 font-mono text-xs px-2.5 py-1.5 pl-8 outline-none focus:border-noir font-bold" type="text" placeholder="ZONE OU UNITÉ..." />
+        <i data-lucide="search" class="w-3.5 h-3.5 text-neutral-400 absolute left-2.5 top-2"></i>
+      </div>
+    </div>
+
+    <!-- Vehicle List -->
+    <div id="veh-list-container" class="flex-1 overflow-y-auto">
+      <!-- Injected by JavaScript -->
+    </div>
+
+    <!-- Drawer Footer -->
+    <div class="p-2.5 bg-neutral-50 border-t border-neutral-300 font-mono text-[10px] text-neutral-600 flex justify-between">
+      <span>FLUX WAZE LIVE : 100% DISPO</span>
+      <span class="font-bold text-noir">PULSE CAD</span>
+    </div>
+
+  </aside>
+
+  <!-- MODAL DE PARTAGE COLLABORATION (LAN / IP / QR) -->
+  <div id="share-modal" class="fixed inset-0 bg-black/60 z-50 items-center justify-center hidden p-4" onclick="closeShareModalOnBg(event)">
+    <div class="brut-box max-w-md w-full bg-white p-6">
+      
+      <div class="flex items-center justify-between border-b-2 border-noir pb-2 mb-4">
+        <span class="bg-noir text-white font-mono text-xs font-black px-2 py-0.5 uppercase tracking-wider">
+          PARTAGE SESSION COLLABORATIVE
+        </span>
+        <button onclick="closeShareModal()" class="font-mono text-xs font-bold text-neutral-600 hover:text-black">
+          [FERMER X]
+        </button>
+      </div>
+
+      <p class="font-mono text-xs text-neutral-600 mb-4 leading-relaxed font-semibold">
+        Partagez cette carte CAD interactive avec votre collaborateur. Les positions GPS et alertes de trafic sont synchronisées en direct :
+      </p>
+
+      <!-- Public Web URL -->
+      <div class="bg-neutral-50 p-3 border-1.5 border-noir mb-3 font-mono text-xs">
+        <div class="flex items-center justify-between mb-1">
+          <span class="text-[10px] text-neutral-900 uppercase font-black flex items-center gap-1.5">
+            <span class="w-2 h-2 bg-emerald-600 inline-block animate-pulse"></span>
+            1. ACCÈS PUBLIC INTERNET (HTTPS MONDIAL) :
+          </span>
+          <span class="text-[9px] bg-noir text-white px-1.5 py-0.2 font-bold">EN LIGNE</span>
+        </div>
+        <div class="flex items-center justify-between gap-2">
+          <input id="share-url-public" class="bg-white border border-neutral-300 px-2.5 py-1.5 font-bold text-xs flex-1 outline-none text-noir" readonly value="https://a90389d46bbc3d.lhr.life/map.html" />
+          <button onclick="copyPublicUrl()" class="bg-noir text-white px-3 py-1.5 font-black uppercase text-[11px] hover:bg-neutral-800">
+            COPIER
+          </button>
+        </div>
+      </div>
+
+      <!-- Local Network LAN URL -->
+      <div class="bg-neutral-50 p-3 border-1.5 border-neutral-300 mb-4 font-mono text-xs">
+        <div class="text-[10px] text-neutral-500 uppercase font-bold mb-1">2. ACCÈS RÉSEAU LOCAL (WI-FI / LAN) :</div>
+        <div class="flex items-center justify-between gap-2">
+          <input id="share-url-input" class="bg-white border border-neutral-300 px-2.5 py-1.5 font-bold text-xs flex-1 outline-none text-noir" readonly value="http://192.168.1.95:8091/map.html" />
+          <button onclick="copyShareUrl()" class="bg-white text-noir border border-noir px-3 py-1.5 font-bold uppercase text-[11px] hover:bg-neutral-100">
+            COPIER
+          </button>
+        </div>
+      </div>
+
+      <div class="border border-neutral-200 p-2.5 bg-neutral-100 font-mono text-[10px] text-neutral-600 mb-5 leading-normal">
+        • Hébergement : <strong>Tunnel Public TLS / HTTPS</strong> (terminaison SSL active)<br>
+        • Port d'écoute : <strong>8091</strong><br>
+        • Synchronisation inter-terminaux : <strong>Active (CAD Broadcast Sync)</strong>
+      </div>
+
+      <div class="flex justify-end">
+        <button onclick="closeShareModal()" class="px-4 py-2 bg-noir text-white font-mono font-bold text-xs uppercase">
+          FERMER
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+  <script>
+    let map = null;
+    let markersLayer = null;
+    let trafficLayer = null;
+    let selectedVehicleId = null;
+    let activeRouteLine = null;
+    let currentMapFilter = 'ALL';
+    let wazeTrafficActive = true;
+
+    document.addEventListener('DOMContentLoaded', () => {
+      lucide.createIcons();
+      initClock();
+      initMontrealMap();
+      renderAll();
+
+      PULSE_CHANNEL.onmessage = (e) => {
+        if (e.data.type === 'VEHICLES_UPDATED' || e.data.type === 'CALLS_UPDATED') {
+          renderAll();
+        }
+      };
+    });
+
+    function initClock() {
+      const update = () => {
+        const now = new Date();
+        const timeStr = now.toLocaleTimeString('fr-CA', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false });
+        const el = document.getElementById('map-clock');
+        if (el) el.textContent = timeStr;
+      };
+      update();
+      setInterval(update, 1000);
+    }
+
+    function initMontrealMap() {
+      map = L.map('map', {
+        center: [45.5017, -73.5673],
+        zoom: 13,
+        zoomControl: true,
+      });
+
+      L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
+        maxZoom: 19,
+        subdomains: 'abcd',
+      }).addTo(map);
+
+      trafficLayer = L.layerGroup().addTo(map);
+      markersLayer = L.layerGroup().addTo(map);
+
+      renderWazeTrafficLayer();
+    }
+
+    // WAZE LIVE TRAFFIC LAYER (Highways & Arterials Congestion & Hazards)
+    function renderWazeTrafficLayer() {
+      if (!trafficLayer) return;
+      trafficLayer.clearLayers();
+      if (!wazeTrafficActive) return;
+
+      // 1. Autoroute 15 Sud (Congestion Rouge / Sévère)
+      const a15Segment = [
+        [45.555, -73.715],
+        [45.525, -73.665],
+        [45.495, -73.635]
+      ];
+      L.polyline(a15Segment, { color: '#dc2626', weight: 6, opacity: 0.85 }).addTo(trafficLayer)
+        .bindPopup("<b>WAZE TRAFIC: A-15 SUD</b><br>Ralentissement majeur · Vitesse moyenne: 14 km/h (+18 min)");
+
+      // 2. Pont Jacques-Cartier (Fermeture direction sud / Trafic saturé)
+      const pjcSegment = [
+        [45.528, -73.535],
+        [45.520, -73.525],
+        [45.512, -73.518]
+      ];
+      L.polyline(pjcSegment, { color: '#7f1d1d', weight: 7, opacity: 0.9, dashArray: '4, 4' }).addTo(trafficLayer)
+        .bindPopup("<b>WAZE ALERTE: PONT JACQUES-CARTIER</b><br>FERMETURE DIRECTION SUD · Services d'urgence sur place");
+
+      // 3. Boulevard René-Lévesque (Travaux angle Peel / Orange)
+      const rlSegment = [
+        [45.508, -73.558],
+        [45.5019, -73.5674],
+        [45.495, -73.578]
+      ];
+      L.polyline(rlSegment, { color: '#f59e0b', weight: 5, opacity: 0.85 }).addTo(trafficLayer)
+        .bindPopup("<b>WAZE TRAFIC: BOUL. RENÉ-LÉVESQUE</b><br>Travaux de voirie angle Peel · Voie de droite fermée (22 km/h)");
+
+      // 4. Autoroute 20 Ouest vers YUL Airport (Vert / Fluide)
+      const a20Segment = [
+        [45.485, -73.595],
+        [45.465, -73.655],
+        [45.4705, -73.7408]
+      ];
+      L.polyline(a20Segment, { color: '#16a34a', weight: 5, opacity: 0.85 }).addTo(trafficLayer)
+        .bindPopup("<b>WAZE TRAFIC: A-20 OUEST (VERS YUL)</b><br>Circulation fluide · 78 km/h");
+
+      // 5. Waze Hazard Pins
+      const wazeHazardIcon = L.divIcon({
+        html: `<div class="waze-pin" style="padding:2px 5px;background:#09090b;color:#fff;">⚠️ ACCIDENT</div>`,
+        iconSize: [70, 20],
+        iconAnchor: [35, 10],
+      });
+      L.marker([45.520, -73.525], { icon: wazeHazardIcon }).addTo(trafficLayer)
+        .bindPopup("<b>ACCIDENT DE LA ROUTE</b><br>Pont Jacques-Cartier · Voies bloquées");
+
+      const wazeWorkIcon = L.divIcon({
+        html: `<div class="waze-pin" style="padding:2px 5px;background:#09090b;color:#fff;border-color:#f59e0b;box-shadow:2px 2px 0 #f59e0b;">🚧 TRAVAUX</div>`,
+        iconSize: [68, 20],
+        iconAnchor: [34, 10],
+      });
+      L.marker([45.5019, -73.5674], { icon: wazeWorkIcon }).addTo(trafficLayer)
+        .bindPopup("<b>CHANTIER URBAIN PEEL / RENÉ-LÉVESQUE</b><br>Entrave signalée par les usagers");
+    }
+
+    function toggleWazeTraffic() {
+      wazeTrafficActive = !wazeTrafficActive;
+      const btn = document.getElementById('toggle-waze-btn');
+      if (wazeTrafficActive) {
+        btn.className = 'status-badge-mono bg-noir text-white border-noir font-black';
+        btn.innerHTML = `<span class="w-2 h-2 bg-rose-500 rounded-none inline-block"></span> CALQUE TRAFIC WAZE : ACTIF`;
+      } else {
+        btn.className = 'status-badge-mono bg-white text-neutral-600 border-neutral-300 font-bold';
+        btn.innerHTML = `<span class="w-2 h-2 bg-neutral-400 rounded-none inline-block"></span> CALQUE TRAFIC WAZE : MASQUÉ`;
+      }
+      renderWazeTrafficLayer();
+    }
+
+    function renderAll() {
+      renderMarkers();
+      renderDrawerList();
+      updateMapCounters();
+    }
+
+    function updateMapCounters() {
+      const vehs = PulseState.getVehicles();
+      document.getElementById('stat-total-vehs').textContent = vehs.length;
+      document.getElementById('stat-libre-vehs').textContent = vehs.filter(v => v.status === 'LIBRE').length;
+      document.getElementById('stat-enroute-vehs').textContent = vehs.filter(v => v.status === 'EN_ROUTE').length;
+      document.getElementById('stat-course-vehs').textContent = vehs.filter(v => v.status === 'EN_COURSE').length;
+    }
+
+    function renderMarkers() {
+      if (!markersLayer) return;
+      markersLayer.clearLayers();
+
+      const vehicles = PulseState.getVehicles();
+      const calls = PulseState.getCalls();
+
+      // 1. Plot Vehicles
+      vehicles.forEach(v => {
+        if (currentMapFilter !== 'ALL' && v.status !== currentMapFilter) return;
+
+        const pinIcon = L.divIcon({
+          className: '',
+          html: `<div class="veh-pin" style="width:28px;height:28px;">${v.id}</div>`,
+          iconSize: [28, 28],
+          iconAnchor: [14, 14],
+        });
+
+        const popupHTML = `
+          <div style="padding:12px;font-family:'IBM Plex Mono',monospace;min-width:220px;">
+            <div style="background:#09090b;color:#fff;padding:4px 8px;font-weight:900;font-size:11px;margin-bottom:8px;display:flex;justify-content:space-between;">
+              <span>${v.code}</span>
+              <span>[${v.status}]</span>
+            </div>
+            <div style="font-size:11px;color:#09090b;margin-bottom:4px;"><strong>TYPE:</strong> ${v.type}</div>
+            <div style="font-size:10px;color:#52525b;margin-bottom:4px;"><strong>SECTEUR:</strong> ${v.zone}</div>
+            <div style="font-size:10px;color:#52525b;margin-bottom:4px;"><strong>REPÈRE:</strong> ${v.address || 'Montréal'}</div>
+            <div style="font-size:10px;color:#09090b;margin-bottom:10px;"><strong>VITESSE GPS:</strong> ${v.speed} KM/H</div>
+            <a href="dispatch.html?assign=${v.id}" style="display:block;text-align:center;background:#09090b;color:#fff;padding:6px;font-size:10px;font-weight:800;text-decoration:none;text-transform:uppercase;">
+              ASSIGNER CETTE UNITÉ [DISPATCH]
+            </a>
+          </div>
+        `;
+
+        const m = L.marker([v.lat, v.lng], { icon: pinIcon }).bindPopup(popupHTML);
+        m.on('click', () => {
+          highlightVehicle(v);
+        });
+        markersLayer.addLayer(m);
+        v.marker = m;
+      });
+
+      // 2. Plot Active Calls Pickups
+      calls.forEach(call => {
+        if (call.status === 'TERMINÉ' || call.status === 'ANNULÉ') return;
+        let lat = 45.5019, lng = -73.5674;
+        if (call.id === '5081') { lat = 45.5019; lng = -73.5674; }
+        else if (call.id === '5082') { lat = 45.5130; lng = -73.5570; }
+        else if (call.id === '5083') { lat = 45.4990; lng = -73.5680; }
+        else if (call.id === '5084') { lat = 45.5030; lng = -73.5600; }
+        else if (call.id === '5085') { lat = 45.4965; lng = -73.6180; }
+
+        const callIcon = L.divIcon({
+          html: `<div class="call-pin" style="padding:2px 6px;">#${call.id}</div>`,
+          iconSize: [46, 20],
+          iconAnchor: [23, 10],
+        });
+
+        const callPopup = `
+          <div style="padding:10px;font-family:'IBM Plex Mono',monospace;min-width:200px;">
+            <div style="background:#09090b;color:#fff;padding:3px 6px;font-weight:900;font-size:10px;margin-bottom:6px;">COURSE #${call.id} [${call.status}]</div>
+            <div style="font-size:11px;font-weight:800;">${call.client}</div>
+            <div style="font-size:10px;color:#52525b;margin-bottom:6px;">${call.pickup}</div>
+            <a href="queue.html" style="display:block;text-align:center;background:#09090b;color:#fff;padding:5px;font-size:10px;font-weight:800;text-decoration:none;text-transform:uppercase;">
+              VOIR DANS LA FILE
+            </a>
+          </div>
+        `;
+
+        const cm = L.marker([lat, lng], { icon: callIcon }).bindPopup(callPopup);
+        markersLayer.addLayer(cm);
+      });
+    }
+
+    function renderDrawerList() {
+      const container = document.getElementById('veh-list-container');
+      container.innerHTML = '';
+      const query = (document.getElementById('veh-search').value || '').toLowerCase().trim();
+
+      let vehs = PulseState.getVehicles();
+      if (currentMapFilter !== 'ALL') {
+        vehs = vehs.filter(v => v.status === currentMapFilter);
+      }
+      if (query) {
+        vehs = vehs.filter(v => 
+          String(v.id).includes(query) ||
+          v.code.toLowerCase().includes(query) ||
+          v.zone.toLowerCase().includes(query) ||
+          (v.address && v.address.toLowerCase().includes(query))
+        );
+      }
+
+      vehs.forEach(v => {
+        const div = document.createElement('div');
+        div.className = `veh-item ${v.id === selectedVehicleId ? 'selected' : ''}`;
+        div.id = `drawer-veh-${v.id}`;
+        div.innerHTML = `
+          <div class="flex items-center justify-between font-mono mb-1">
+            <span class="font-black text-xs text-noir">${v.code} · ${v.type}</span>
+            <span class="font-mono text-[9px] font-bold px-1.5 py-0.2 ${v.status === 'LIBRE' ? 'bg-emerald-100 text-emerald-800' : 'bg-noir text-white'} uppercase">
+              ${v.status}
+            </span>
+          </div>
+          <div class="text-[10px] text-neutral-500 font-mono truncate font-semibold">${v.address || v.zone}</div>
+          <div class="flex items-center justify-between mt-2 pt-1 border-t border-neutral-100 font-mono text-[10px]">
+            <span class="text-neutral-500 font-bold">${v.speed} KM/H</span>
+            <a href="dispatch.html?assign=${v.id}" class="bg-noir text-white px-2 py-0.5 font-bold uppercase hover:bg-neutral-800">
+              DISPATCHER →
+            </a>
+          </div>
+        `;
+        div.addEventListener('click', (e) => {
+          if (e.target.tagName !== 'A') {
+            highlightVehicle(v);
+          }
+        });
+        container.appendChild(div);
+      });
+    }
+
+    function highlightVehicle(v) {
+      selectedVehicleId = v.id;
+      document.querySelectorAll('.veh-item').forEach(el => el.classList.remove('selected'));
+      const card = document.getElementById(`drawer-veh-${v.id}`);
+      if (card) {
+        card.classList.add('selected');
+        card.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      }
+
+      map.flyTo([v.lat, v.lng], 14, { duration: 0.8 });
+      setTimeout(() => {
+        if (v.marker) v.marker.openPopup();
+      }, 900);
+
+      // Draw polyline to nearest active call
+      if (activeRouteLine) map.removeLayer(activeRouteLine);
+      const calls = PulseState.getCalls().filter(c => c.status === 'EN_ATTENTE');
+      if (calls.length > 0) {
+        const targetCoord = [45.5019, -73.5674];
+        activeRouteLine = L.polyline([[v.lat, v.lng], targetCoord], {
+          color: '#09090b',
+          weight: 3,
+          dashArray: '5, 5'
+        }).addTo(map);
+      }
+    }
+
+    function filterMapByStatus(status, btn) {
+      currentMapFilter = status;
+      document.querySelectorAll('.status-badge-mono').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      renderMarkers();
+      renderDrawerList();
+    }
+
+    function filterDrawerList() {
+      renderDrawerList();
+    }
+
+    function triggerJitterRefresh() {
+      const icon = document.getElementById('refresh-icon');
+      icon.classList.add('animate-spin');
+      setTimeout(() => {
+        icon.classList.remove('animate-spin');
+        const vehs = PulseState.getVehicles();
+        vehs.forEach(v => {
+          if (v.status !== 'PAUSE') {
+            v.lat += (Math.random() - 0.5) * 0.002;
+            v.lng += (Math.random() - 0.5) * 0.002;
+          }
+        });
+        PulseState.saveVehicles(vehs);
+        renderAll();
+      }, 500);
+    }
+
+    // Share Modal
+    function openShareModal() {
+      document.getElementById('share-modal').style.display = 'flex';
+    }
+    function closeShareModal() {
+      document.getElementById('share-modal').style.display = 'none';
+    }
+    function closeShareModalOnBg(e) {
+      if (e.target === document.getElementById('share-modal')) closeShareModal();
+    }
+    function copyShareUrl() {
+      const input = document.getElementById('share-url-input');
+      input.select();
+      navigator.clipboard.writeText(input.value);
+      alert("LIEN LOCAL COPIÉ DANS LE PRESSE-PAPIER !");
+    }
+    function copyPublicUrl() {
+      const input = document.getElementById('share-url-public');
+      input.select();
+      navigator.clipboard.writeText(input.value);
+      alert("LIEN PUBLIC MONDIAL (HTTPS) COPIÉ ! Votre collaborateur peut l'ouvrir de n'importe où.");
+    }
+  </script>
+</body>
+</html>
