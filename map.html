@@ -5,10 +5,10 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>PULSE CAD — Carte Flotte & Télémétrie AVL Montréal</title>
   
-  <!-- Plus Jakarta Sans & IBM Plex Mono -->
+  <!-- High-Readability Sculptural Typography: Syne (Headings) + Plus Jakarta Sans (UI) + IBM Plex Mono (Telemetry) -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital,wght@0,400;0,500;0,600;0,700;1,400;1,700&family=Plus+Jakarta+Sans:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400;1,700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital,wght@0,400;0,500;0,600;0,700;1,400;1,700&family=Plus+Jakarta+Sans:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400;1,700&family=Syne:wght@700;800;900&display=swap" rel="stylesheet">
   
   <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
@@ -28,6 +28,7 @@
       theme: {
         extend: {
           fontFamily: {
+            title: ['Syne', 'sans-serif'],
             sans: ['"Plus Jakarta Sans"', 'sans-serif'],
             mono: ['"IBM Plex Mono"', 'monospace'],
           },
@@ -43,7 +44,7 @@
   <style>
     body {
       font-family: 'Plus Jakarta Sans', sans-serif;
-      background-color: #f4f4f5;
+      background-color: #fafafa;
       color: #09090b;
       height: 100vh;
       overflow: hidden;
@@ -52,14 +53,9 @@
     }
 
     ::-webkit-scrollbar { width: 5px; height: 5px; }
-    ::-webkit-scrollbar-track { background: #f4f4f5; }
-    ::-webkit-scrollbar-thumb { background: #18181b; }
-
-    .brut-box {
-      background: #ffffff;
-      border: 1.5px solid #09090b;
-      box-shadow: 2px 2px 0px #09090b;
-    }
+    ::-webkit-scrollbar-track { background: #fafafa; }
+    ::-webkit-scrollbar-thumb { background: #d4d4d8; border-radius: 3px; }
+    ::-webkit-scrollbar-thumb:hover { background: #18181b; }
 
     .nav-btn {
       width: 44px;
@@ -67,27 +63,26 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      color: #52525b;
+      color: #71717a;
+      border-radius: 10px;
       border: 1px solid transparent;
-      transition: all 0.12s ease;
+      transition: all 0.15s ease;
     }
     .nav-btn:hover {
-      background: #ffffff;
+      background: #f4f4f5;
       color: #09090b;
-      border-color: #09090b;
     }
     .nav-btn.active {
       background: #09090b;
       color: #ffffff;
-      border-color: #09090b;
     }
 
     /* Map container */
     #map {
       position: absolute;
-      top: 104px;
+      top: 108px;
       bottom: 0;
-      left: 56px;
+      left: 64px;
       right: 360px;
       background: #cbd5e1;
       z-index: 10;
@@ -101,13 +96,14 @@
       cursor: crosshair !important;
     }
 
-    /* Tactile Status Badge */
+    /* Clean Status Badge Pill */
     .status-badge-mono {
       font-family: 'IBM Plex Mono', monospace;
       font-size: 11px;
       font-weight: 700;
-      padding: 4px 8px;
-      border: 1px solid #d4d4d8;
+      padding: 5px 10px;
+      border-radius: 8px;
+      border: 1px solid #e4e4e7;
       background: #ffffff;
       color: #09090b;
       display: inline-flex;
@@ -115,16 +111,16 @@
       gap: 6px;
       cursor: pointer;
       user-select: none;
-      transition: all 0.12s ease;
+      transition: all 0.15s ease;
     }
     .status-badge-mono:hover {
       border-color: #09090b;
+      background: #f4f4f5;
     }
     .status-badge-mono.active {
       background: #09090b;
       color: #ffffff;
       border-color: #09090b;
-      box-shadow: 1px 1px 0px #09090b;
     }
 
     /* Map Markers custom */
@@ -137,13 +133,14 @@
       font-family: 'IBM Plex Mono', monospace;
       font-size: 10px;
       font-weight: 900;
+      border-radius: 50%;
       border: 2px solid #ffffff;
-      box-shadow: 2px 2px 0px #000000;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.3);
       cursor: pointer;
       transition: transform 0.2s ease;
     }
     .veh-pin:hover {
-      transform: scale(1.15);
+      transform: scale(1.2);
       z-index: 999 !important;
     }
 
@@ -156,8 +153,9 @@
       font-family: 'IBM Plex Mono', monospace;
       font-size: 10px;
       font-weight: 900;
-      border: 2px solid #09090b;
-      box-shadow: 2px 2px 0px #09090b;
+      border-radius: 6px;
+      border: 1.5px solid #09090b;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.15);
       cursor: pointer;
     }
 
@@ -170,8 +168,9 @@
       font-family: 'IBM Plex Mono', monospace;
       font-size: 10px;
       font-weight: 900;
-      border: 2px solid #facc15;
-      box-shadow: 3px 3px 0px #000000;
+      border-radius: 6px;
+      border: 1.5px solid #facc15;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.35);
       cursor: pointer;
     }
 
@@ -184,71 +183,79 @@
       font-family: 'IBM Plex Mono', monospace;
       font-size: 10px;
       font-weight: 900;
-      border: 2px solid #ef4444;
-      box-shadow: 2px 2px 0px #ef4444;
+      border-radius: 6px;
+      border: 1.5px solid #ef4444;
+      box-shadow: 0 4px 12px rgba(239,68,68,0.3);
       cursor: pointer;
     }
 
-    /* Leaflet Popup Brutalist Overrides */
+    /* Leaflet Popup Overrides */
     .leaflet-popup-content-wrapper {
       background: #ffffff !important;
-      border: 2px solid #09090b !important;
-      border-radius: 0 !important;
-      box-shadow: 4px 4px 0px #09090b !important;
+      border: 1px solid #e4e4e7 !important;
+      border-radius: 12px !important;
+      box-shadow: 0 12px 30px rgba(0,0,0,0.15) !important;
       padding: 0 !important;
       color: #09090b !important;
+      overflow: hidden;
     }
     .leaflet-popup-tip {
-      background: #09090b !important;
+      background: #ffffff !important;
     }
 
     /* Vehicle card in right drawer */
     .veh-item {
-      padding: 10px 12px;
-      border-bottom: 1px solid #e4e4e7;
+      padding: 12px 14px;
+      border-bottom: 1px solid #f4f4f5;
       background: #ffffff;
       cursor: pointer;
-      transition: background 0.12s ease;
+      transition: all 0.15s ease;
     }
     .veh-item:hover {
-      background: #f4f4f5;
+      background: #fafafa;
     }
     .veh-item.selected {
       background: #f4f4f5;
       border-left: 3px solid #09090b;
     }
 
-    /* Monochrome Alert Animation */
-    @keyframes monoFlash {
-      0%, 100% { background-color: #09090b; color: #ffffff; }
-      50% { background-color: #ffffff; color: #09090b; }
+    /* Aerospace HUD Alert Entrance Animation */
+    @keyframes hudSlideDown {
+      0% {
+        opacity: 0;
+        transform: translate(-50%, -16px) scale(0.96);
+      }
+      100% {
+        opacity: 1;
+        transform: translate(-50%, 0) scale(1);
+      }
     }
-    .mono-alert-flash {
-      animation: monoFlash 0.5s ease-in-out 3;
+    .hud-alert-enter {
+      animation: hudSlideDown 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
     }
   </style>
 </head>
-<body class="bg-neutral-100 text-noir">
+<body class="bg-[#fafafa] text-noir">
 
-  <!-- TOP HEADER -->
-  <header class="h-14 bg-white border-b-2 border-noir flex items-center justify-between px-4 fixed top-0 left-0 right-0 z-40 select-none">
+  <!-- TOP HEADER (ELEGANT MINIMALIST HIGH-TECH) -->
+  <header class="h-16 bg-white border-b border-neutral-200/80 flex items-center justify-between px-6 fixed top-0 left-0 right-0 z-40 select-none">
     
-    <div class="flex items-center gap-4">
-      <a href="index.html" class="flex items-center gap-2 text-decoration-none">
-        <div class="bg-noir text-white font-mono font-black text-sm px-2.5 py-1 tracking-widest flex items-center gap-1.5">
-          <span class="inline-block w-2 h-2 bg-white"></span>
-          PULSE<span class="text-neutral-400">//</span>CAD
+    <div class="flex items-center gap-5">
+      <a href="index.html" class="flex items-center gap-2.5 text-decoration-none group">
+        <div class="bg-noir text-white font-title font-black text-base px-3 py-1.5 rounded-lg tracking-wider flex items-center gap-2 shadow-sm group-hover:bg-neutral-800 transition-colors">
+          <span class="inline-block w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse"></span>
+          PULSE<span class="text-neutral-500 font-light">//</span>CAD
         </div>
       </a>
 
-      <div class="h-5 w-px bg-neutral-300"></div>
+      <div class="h-6 w-px bg-neutral-200"></div>
 
-      <div class="flex items-center gap-2">
-        <span class="font-mono text-[11px] font-bold uppercase bg-neutral-100 border border-neutral-300 px-2 py-0.5 text-neutral-800">
+      <div class="flex items-center gap-2.5">
+        <span class="font-mono text-xs font-semibold uppercase bg-neutral-100 text-neutral-800 px-2.5 py-1 rounded-md border border-neutral-200">
           CARTE TÉLÉMATIQUE AVL & TRAFIC WAZE
         </span>
-        <span class="text-neutral-400 text-xs">/</span>
-        <span class="font-mono text-[11px] font-bold text-neutral-900 tracking-wide uppercase">
+        <span class="text-neutral-300 text-xs">/</span>
+        <span class="font-mono text-xs font-medium text-neutral-500 tracking-wide uppercase hidden sm:inline">
           COUVERTURE MÉTROPOLITAINE MONTRÉAL
         </span>
       </div>
@@ -257,24 +264,24 @@
     <!-- Right Controls -->
     <div class="flex items-center gap-3">
       <!-- Collaboration Share Button -->
-      <button onclick="openShareModal()" class="bg-noir text-white font-mono text-xs font-bold uppercase px-3 py-1 flex items-center gap-1.5 border border-noir hover:bg-neutral-800 shadow-[2px_2px_0px_#09090b]">
-        <i data-lucide="share-2" class="w-3.5 h-3.5"></i>
-        PARTAGER AVEC COLLABORATEUR
+      <button onclick="openShareModal()" class="bg-noir text-white font-mono text-xs font-bold uppercase px-3.5 py-1.5 rounded-lg flex items-center gap-2 hover:bg-neutral-800 transition-colors shadow-sm">
+        <i data-lucide="share-2" class="w-3.5 h-3.5 text-emerald-400"></i>
+        <span>PARTAGER CARTE</span>
       </button>
 
-      <div class="hidden sm:flex items-center gap-2 bg-neutral-50 border border-neutral-300 px-2.5 py-1">
-        <span class="w-1.5 h-1.5 bg-black"></span>
-        <span id="map-clock" class="font-mono text-xs font-semibold text-neutral-900">--:--:--</span>
+      <div class="hidden sm:flex items-center gap-2 bg-neutral-50 border border-neutral-200 px-3 py-1.5 rounded-lg">
+        <span class="w-2 h-2 rounded-full bg-neutral-400"></span>
+        <span id="map-clock" class="font-mono text-xs font-semibold text-neutral-800">--:--:--</span>
       </div>
 
-      <div class="flex items-center gap-2 bg-noir text-white px-2.5 py-1 border border-noir font-mono text-xs font-bold">
+      <div class="flex items-center gap-2 bg-neutral-100 text-neutral-800 px-3 py-1.5 rounded-lg border border-neutral-200 font-mono text-xs font-semibold">
         OP-408
       </div>
     </div>
   </header>
 
   <!-- SIDEBAR -->
-  <aside class="w-14 bg-white border-r-2 border-noir fixed top-14 bottom-0 left-0 flex flex-col items-center py-3 gap-2 flex-shrink-0 select-none z-30">
+  <aside class="w-16 bg-white border-r border-neutral-200/80 fixed top-16 bottom-0 left-0 flex flex-col items-center py-4 gap-2.5 flex-shrink-0 select-none z-30">
     <a href="index.html" class="nav-btn" title="Tableau de bord">
       <i data-lucide="layout-grid" class="w-5 h-5"></i>
     </a>
@@ -303,188 +310,200 @@
   </aside>
 
   <!-- MAP STATUS & FILTERS BAR -->
-  <div class="fixed top-14 left-14 right-[360px] h-11 bg-white border-b border-neutral-300 z-20 flex items-center px-4 gap-2 overflow-x-auto select-none font-mono">
+  <div class="fixed top-16 left-16 right-[360px] h-11 bg-white/95 backdrop-blur-md border-b border-neutral-200/80 z-20 flex items-center px-4 gap-2 overflow-x-auto select-none font-mono">
     
     <!-- Waze Live Traffic Toggle -->
-    <button id="toggle-waze-btn" onclick="toggleWazeTraffic()" class="status-badge-mono bg-noir text-white border-noir font-black">
-      <span class="w-2 h-2 bg-rose-500 rounded-none inline-block animate-pulse"></span>
-      CALQUE TRAFIC WAZE : ACTIF
+    <button id="toggle-waze-btn" onclick="toggleWazeTraffic()" class="status-badge-mono bg-noir text-white border-noir font-bold">
+      <span class="w-2 h-2 rounded-full bg-rose-500 inline-block animate-pulse"></span>
+      CALQUE WAZE : ACTIF
     </button>
 
-    <div class="h-4 w-px bg-neutral-300 mx-1"></div>
+    <div class="h-4 w-px bg-neutral-200 mx-1"></div>
 
     <button class="status-badge-mono active" onclick="filterMapByStatus('ALL', this)">
-      TOUTES UNITÉS : <span id="stat-total-vehs">12</span>
+      TOUTES : <span id="stat-total-vehs" class="font-bold">12</span>
     </button>
     <button class="status-badge-mono" onclick="filterMapByStatus('LIBRE', this)">
-      <span class="w-2 h-2 bg-emerald-600 inline-block"></span> LIBRES : <span id="stat-libre-vehs">7</span>
+      <span class="w-2 h-2 rounded-full bg-emerald-500 inline-block"></span> LIBRES : <span id="stat-libre-vehs" class="font-bold">7</span>
     </button>
     <button class="status-badge-mono" onclick="filterMapByStatus('EN_ROUTE', this)">
-      <span class="w-2 h-2 bg-black inline-block"></span> EN ROUTE : <span id="stat-enroute-vehs">2</span>
+      <span class="w-2 h-2 rounded-full bg-neutral-900 inline-block"></span> EN ROUTE : <span id="stat-enroute-vehs" class="font-bold">2</span>
     </button>
     <button class="status-badge-mono" onclick="filterMapByStatus('EN_COURSE', this)">
-      <span class="w-2 h-2 bg-neutral-600 inline-block"></span> EN COURSE : <span id="stat-course-vehs">3</span>
+      <span class="w-2 h-2 rounded-full bg-neutral-400 inline-block"></span> EN COURSE : <span id="stat-course-vehs" class="font-bold">3</span>
     </button>
 
     <!-- Fond de Carte Selector (Rues Réelles, Satellite, Voyager, CAD) -->
-    <div class="hidden sm:flex items-center gap-1 border border-neutral-300 p-0.5 bg-neutral-100 mx-2">
-      <span class="text-[9px] text-neutral-500 font-black px-1 uppercase">CARTE :</span>
-      <button onclick="setBaseLayer('streets', this)" class="base-layer-btn px-2 py-0.5 text-[10px] font-black bg-noir text-white border border-noir">
+    <div class="hidden sm:flex items-center gap-1 border border-neutral-200 p-0.5 rounded-lg bg-neutral-50 mx-2">
+      <span class="text-[9px] text-neutral-400 font-bold px-1.5 uppercase">CARTE :</span>
+      <button onclick="setBaseLayer('streets', this)" class="base-layer-btn px-2.5 py-0.5 text-[10px] font-bold rounded bg-noir text-white">
         🗺️ RUES (ESRI)
       </button>
-      <button onclick="setBaseLayer('satellite', this)" class="base-layer-btn px-2 py-0.5 text-[10px] font-bold bg-white text-noir hover:bg-neutral-100 border border-neutral-300">
+      <button onclick="setBaseLayer('satellite', this)" class="base-layer-btn px-2.5 py-0.5 text-[10px] font-semibold text-neutral-600 hover:text-black rounded">
         🛰️ SATELLITE
       </button>
-      <button onclick="setBaseLayer('voyager', this)" class="base-layer-btn px-2 py-0.5 text-[10px] font-bold bg-white text-noir hover:bg-neutral-100 border border-neutral-300">
+      <button onclick="setBaseLayer('voyager', this)" class="base-layer-btn px-2.5 py-0.5 text-[10px] font-semibold text-neutral-600 hover:text-black rounded">
         🏙️ VOYAGER
       </button>
-      <button onclick="setBaseLayer('cad', this)" class="base-layer-btn px-2 py-0.5 text-[10px] font-bold bg-white text-noir hover:bg-neutral-100 border border-neutral-300">
+      <button onclick="setBaseLayer('cad', this)" class="base-layer-btn px-2.5 py-0.5 text-[10px] font-semibold text-neutral-600 hover:text-black rounded">
         📄 CAD
       </button>
     </div>
 
-    <div class="ml-auto text-[11px] text-neutral-500 font-bold uppercase hidden md:flex items-center gap-2">
-      <span class="inline-block w-2.5 h-1 bg-emerald-500"></span> FLUIDE
-      <span class="inline-block w-2.5 h-1 bg-amber-500"></span> CHARGÉ
-      <span class="inline-block w-2.5 h-1 bg-rose-600"></span> CONGESTION
+    <div class="ml-auto text-[11px] text-neutral-400 font-medium uppercase hidden md:flex items-center gap-2.5">
+      <span class="inline-flex items-center gap-1"><span class="inline-block w-2 h-2 rounded-full bg-emerald-500"></span> FLUIDE</span>
+      <span class="inline-flex items-center gap-1"><span class="inline-block w-2 h-2 rounded-full bg-amber-500"></span> CHARGÉ</span>
+      <span class="inline-flex items-center gap-1"><span class="inline-block w-2 h-2 rounded-full bg-rose-600"></span> CONGESTION</span>
     </div>
   </div>
 
   <!-- FLOATING TACTICAL CAD TELEMETRY COMMAND BAR -->
   <div class="fixed top-28 left-20 z-30 select-none font-mono">
-    <div class="brut-box bg-white p-2 flex items-center gap-2 shadow-[3px_3px_0px_#09090b]">
+    <div class="bg-white/95 backdrop-blur-md px-3 py-2 rounded-xl border border-neutral-200/90 shadow-[0_8px_24px_rgba(0,0,0,0.08)] flex items-center gap-2.5">
       
       <!-- Simulation Play / Pause -->
-      <button id="sim-play-btn" onclick="toggleSimPlay()" class="bg-noir text-white text-xs font-black px-3 py-1.5 flex items-center gap-1.5 hover:bg-neutral-800 border border-noir">
+      <button id="sim-play-btn" onclick="toggleSimPlay()" class="bg-noir text-white text-xs font-bold px-3 py-1.5 rounded-lg flex items-center gap-1.5 hover:bg-neutral-800 transition-colors">
         <span id="sim-play-icon">⏸</span>
         <span id="sim-play-text">PAUSE GPS</span>
       </button>
 
       <!-- Multiplier chips -->
-      <div class="flex items-center border border-neutral-300">
-        <button id="speed-1x" onclick="setSimSpeed(1)" class="px-2.5 py-1 text-xs font-black bg-noir text-white">1X</button>
-        <button id="speed-2x" onclick="setSimSpeed(2)" class="px-2.5 py-1 text-xs font-bold bg-white text-noir hover:bg-neutral-100 border-l border-neutral-300">2X</button>
-        <button id="speed-5x" onclick="setSimSpeed(5)" class="px-2.5 py-1 text-xs font-bold bg-white text-noir hover:bg-neutral-100 border-l border-neutral-300">5X</button>
+      <div class="flex items-center bg-neutral-100 p-0.5 rounded-lg border border-neutral-200">
+        <button id="speed-1x" onclick="setSimSpeed(1)" class="px-2.5 py-1 text-xs font-bold rounded-md bg-noir text-white transition-colors">1X</button>
+        <button id="speed-2x" onclick="setSimSpeed(2)" class="px-2.5 py-1 text-xs font-medium text-neutral-600 hover:text-black hover:bg-white rounded-md transition-colors">2X</button>
+        <button id="speed-5x" onclick="setSimSpeed(5)" class="px-2.5 py-1 text-xs font-medium text-neutral-600 hover:text-black hover:bg-white rounded-md transition-colors">5X</button>
       </div>
 
-      <div class="h-4 w-px bg-neutral-300 mx-0.5"></div>
+      <div class="h-4 w-px bg-neutral-200 mx-0.5"></div>
 
       <!-- Inject Road Hazard Button -->
-      <button onclick="injectNextHazard()" class="bg-white text-rose-700 border-1.5 border-rose-700 hover:bg-rose-50 text-xs font-bold px-3 py-1.5 flex items-center gap-1.5">
+      <button onclick="injectNextHazard()" class="bg-rose-50 text-rose-700 border border-rose-200 hover:bg-rose-100 text-xs font-bold px-3 py-1.5 rounded-lg flex items-center gap-1.5 transition-colors">
         <span>⚡</span> INJECTER ALÉA WAZE
       </button>
 
       <!-- Waypoint Mode Toggle -->
-      <button id="btn-waypoint-mode" onclick="toggleWaypointMode()" class="bg-white text-noir border-1.5 border-neutral-400 hover:border-black text-xs font-bold px-3 py-1.5 flex items-center gap-1.5">
+      <button id="btn-waypoint-mode" onclick="toggleWaypointMode()" class="bg-neutral-50 text-neutral-700 border border-neutral-200 hover:border-black text-xs font-bold px-3 py-1.5 rounded-lg flex items-center gap-1.5 transition-colors">
         <span>📍</span>
-        <span id="wp-mode-text">FORCER ROUTAGE WAYPOINTS : INACTIF</span>
+        <span id="wp-mode-text">ROUTAGE WAYPOINTS : OFF</span>
       </button>
 
       <!-- Clear Waypoints -->
-      <button id="btn-clear-wp" onclick="clearAllWaypoints()" class="hidden bg-neutral-100 text-neutral-700 border border-neutral-300 hover:text-black hover:border-black text-xs font-black px-2.5 py-1.5">
-        ✕ EFFACER WAYPOINTS (<span id="wp-count">0</span>)
+      <button id="btn-clear-wp" onclick="clearAllWaypoints()" class="hidden bg-neutral-100 text-neutral-700 border border-neutral-200 hover:text-black hover:border-black text-xs font-bold px-2.5 py-1.5 rounded-lg transition-colors">
+        ✕ EFFACER (<span id="wp-count">0</span>)
       </button>
 
     </div>
   </div>
 
-  <!-- FLOATING MONOCHROME HIGH-CONTRAST VISUAL ALERT (0 SOUND) -->
-  <div id="visual-alert-banner" class="hidden fixed top-44 left-20 z-40 bg-noir text-white border-2 border-white px-4 py-2.5 font-mono text-xs font-black uppercase tracking-wider shadow-[4px_4px_0_#000] flex items-center gap-3">
-    <span class="w-2.5 h-2.5 bg-white inline-block animate-ping"></span>
-    <span id="visual-alert-text">ALERTE SYSTÈME CAD</span>
-    <button onclick="closeVisualAlert()" class="ml-4 text-neutral-400 hover:text-white font-black text-sm">✕</button>
+  <!-- FLOATING AEROSPACE HUD VISUAL ALERT PILL -->
+  <div id="visual-alert-banner" class="hidden fixed top-28 left-1/2 -translate-x-1/2 z-50 bg-neutral-950/95 backdrop-blur-xl border border-neutral-700/80 text-white rounded-full px-5 py-2.5 shadow-[0_12px_40px_rgba(0,0,0,0.6)] flex items-center gap-3.5 transition-all duration-300 pointer-events-auto">
+    <span class="relative flex h-3 w-3">
+      <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+      <span class="relative inline-flex rounded-full h-3 w-3 bg-emerald-500"></span>
+    </span>
+    <span class="font-mono text-[10px] font-black uppercase tracking-wider text-emerald-400 bg-emerald-950/80 px-2 py-0.5 rounded border border-emerald-800/80">
+      CAD ALERTE
+    </span>
+    <span id="visual-alert-text" class="font-mono text-xs font-semibold text-neutral-100 tracking-wide">
+      ALERTE SYSTÈME CAD
+    </span>
+    <button onclick="closeVisualAlert()" class="ml-2 w-6 h-6 rounded-full bg-neutral-800/80 hover:bg-neutral-700 text-neutral-400 hover:text-white flex items-center justify-center font-bold text-xs transition-colors">
+      ✕
+    </button>
   </div>
 
   <!-- LEAFLET MAP CONTAINER -->
   <div id="map"></div>
 
   <!-- RIGHT ROSTER DRAWER (360px) WITH OBD-II TELEMETRY TERMINAL -->
-  <aside class="w-[360px] bg-white border-l-2 border-noir fixed top-14 bottom-0 right-0 flex flex-col z-30 select-none">
+  <aside class="w-[360px] bg-white border-l border-neutral-200/80 fixed top-16 bottom-0 right-0 flex flex-col z-30 select-none">
     
     <!-- Drawer Header -->
-    <div class="p-3 bg-neutral-100 border-b border-neutral-300 flex-shrink-0">
-      <div class="flex items-center justify-between mb-2">
-        <span class="font-mono text-xs font-black uppercase text-noir">UNITÉS FLOTTE (AVL)</span>
-        <span class="bg-noir text-white font-mono text-[10px] font-bold px-1.5 py-0.2">GPS LIVE 6-DÉC</span>
+    <div class="p-3.5 bg-neutral-50/80 border-b border-neutral-200/80 flex-shrink-0">
+      <div class="flex items-center justify-between mb-2.5">
+        <span class="font-title text-sm font-bold uppercase text-noir">Unités Flotte (AVL)</span>
+        <span class="bg-noir text-white font-mono text-[10px] font-bold px-2 py-0.5 rounded">GPS LIVE 6-DÉC</span>
       </div>
       <!-- Search Input -->
       <div class="relative">
-        <input id="veh-search" oninput="filterDrawerList()" class="w-full bg-white border border-neutral-300 font-mono text-xs px-2.5 py-1.5 pl-8 outline-none focus:border-noir font-bold" type="text" placeholder="ZONE OU UNITÉ..." />
-        <i data-lucide="search" class="w-3.5 h-3.5 text-neutral-400 absolute left-2.5 top-2"></i>
+        <input id="veh-search" oninput="filterDrawerList()" class="w-full bg-white border border-neutral-200 rounded-lg font-mono text-xs px-3 py-2 pl-8 outline-none focus:border-noir transition-colors" type="text" placeholder="Rechercher zone ou unité..." />
+        <i data-lucide="search" class="w-3.5 h-3.5 text-neutral-400 absolute left-2.5 top-2.5"></i>
       </div>
     </div>
 
     <!-- OBD-II CAN BUS DIAGNOSTIC TERMINAL (DYNAMICALLY FILLED ON VEHICLE CLICK) -->
-    <div id="obd-terminal-container" class="flex-shrink-0 bg-noir text-white p-3 font-mono border-b-2 border-noir hidden">
+    <div id="obd-terminal-container" class="flex-shrink-0 bg-neutral-950 text-white p-4 font-mono border-b border-neutral-800 hidden">
       <!-- Injected via JavaScript -->
     </div>
 
     <!-- Vehicle List -->
-    <div id="veh-list-container" class="flex-1 overflow-y-auto">
+    <div id="veh-list-container" class="flex-1 overflow-y-auto divide-y divide-neutral-100">
       <!-- Injected by JavaScript -->
     </div>
 
     <!-- Drawer Footer -->
-    <div class="p-2.5 bg-neutral-50 border-t border-neutral-300 font-mono text-[10px] text-neutral-600 flex justify-between">
-      <span>FLUX WAZE LIVE : 100% DISPO</span>
+    <div class="p-3 bg-neutral-50 border-t border-neutral-200 font-mono text-[10px] text-neutral-500 flex justify-between">
+      <span>FLUX WAZE LIVE : 100% OPÉRATIONNEL</span>
       <span class="font-bold text-noir">PULSE CAD</span>
     </div>
 
   </aside>
 
-  <!-- MODAL DE PARTAGE COLLABORATION (LAN / IP / QR) -->
-  <div id="share-modal" class="fixed inset-0 bg-black/60 z-50 items-center justify-center hidden p-4" onclick="closeShareModalOnBg(event)">
-    <div class="brut-box max-w-md w-full bg-white p-6">
+  <!-- COLLABORATIVE SHARE MODAL -->
+  <div id="share-modal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 items-center justify-center hidden p-4" onclick="closeShareModalOnBg(event)">
+    <div class="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl border border-neutral-200">
       
-      <div class="flex items-center justify-between border-b-2 border-noir pb-2 mb-4">
-        <span class="bg-noir text-white font-mono text-xs font-black px-2 py-0.5 uppercase tracking-wider">
-          PARTAGE SESSION COLLABORATIVE
-        </span>
-        <button onclick="closeShareModal()" class="font-mono text-xs font-bold text-neutral-600 hover:text-black">
-          [FERMER X]
+      <div class="flex items-center justify-between border-b border-neutral-100 pb-3 mb-4">
+        <div class="flex items-center gap-2">
+          <i data-lucide="share-2" class="w-5 h-5 text-noir"></i>
+          <span class="font-title text-base font-bold uppercase text-noir">
+            Partage Session Carte
+          </span>
+        </div>
+        <button onclick="closeShareModal()" class="w-8 h-8 rounded-full bg-neutral-100 hover:bg-neutral-200 text-neutral-600 flex items-center justify-center font-bold text-sm transition-colors">
+          ✕
         </button>
       </div>
 
-      <p class="font-mono text-xs text-neutral-600 mb-4 leading-relaxed font-semibold">
+      <p class="font-mono text-xs text-neutral-600 mb-4 leading-relaxed">
         Partagez cette carte CAD interactive avec votre collaborateur. Les positions GPS et alertes de trafic sont synchronisées en direct :
       </p>
 
       <!-- Public Web URL -->
-      <div class="bg-neutral-50 p-3 border-1.5 border-noir mb-3 font-mono text-xs">
-        <div class="flex items-center justify-between mb-1">
-          <span class="text-[10px] text-neutral-900 uppercase font-black flex items-center gap-1.5">
-            <span class="w-2 h-2 bg-emerald-600 inline-block animate-pulse"></span>
-            1. ACCÈS PUBLIC INTERNET (HTTPS MONDIAL) :
+      <div class="bg-neutral-50 p-3.5 rounded-xl border border-neutral-200 mb-3 font-mono text-xs">
+        <div class="flex items-center justify-between mb-1.5">
+          <span class="text-xs text-neutral-900 uppercase font-bold flex items-center gap-1.5">
+            <span class="w-2 h-2 rounded-full bg-emerald-500 inline-block animate-pulse"></span>
+            LIEN PUBLIC MONDIAL (HTTPS) :
           </span>
-          <span class="text-[9px] bg-noir text-white px-1.5 py-0.2 font-bold">EN LIGNE</span>
+          <span class="text-[10px] bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded font-bold">EN LIGNE</span>
         </div>
         <div class="flex items-center justify-between gap-2">
-          <input id="share-url-public" class="bg-white border border-neutral-300 px-2.5 py-1.5 font-bold text-xs flex-1 outline-none text-noir" readonly value="https://a90389d46bbc3d.lhr.life/map.html" />
-          <button onclick="copyPublicUrl()" class="bg-noir text-white px-3 py-1.5 font-black uppercase text-[11px] hover:bg-neutral-800">
+          <input id="share-url-public" class="bg-white border border-neutral-300 rounded px-2.5 py-1.5 font-bold text-xs flex-1 outline-none text-noir" readonly value="https://a90389d46bbc3d.lhr.life/map.html" />
+          <button onclick="copyPublicUrl()" class="bg-noir text-white px-3 py-1.5 rounded font-bold uppercase text-[11px] hover:bg-neutral-800 transition-colors">
             COPIER
           </button>
         </div>
       </div>
 
       <!-- Local Network LAN URL -->
-      <div class="bg-neutral-50 p-3 border-1.5 border-neutral-300 mb-4 font-mono text-xs">
-        <div class="text-[10px] text-neutral-500 uppercase font-bold mb-1">2. ACCÈS RÉSEAU LOCAL (WI-FI / LAN) :</div>
+      <div class="bg-neutral-50 p-3.5 rounded-xl border border-neutral-200 mb-4 font-mono text-xs">
+        <div class="text-[10px] text-neutral-500 uppercase font-bold mb-1.5">ACCÈS RÉSEAU LOCAL (WI-FI / LAN) :</div>
         <div class="flex items-center justify-between gap-2">
-          <input id="share-url-input" class="bg-white border border-neutral-300 px-2.5 py-1.5 font-bold text-xs flex-1 outline-none text-noir" readonly value="http://192.168.1.95:8091/map.html" />
-          <button onclick="copyShareUrl()" class="bg-white text-noir border border-noir px-3 py-1.5 font-bold uppercase text-[11px] hover:bg-neutral-100">
+          <input id="share-url-input" class="bg-white border border-neutral-300 rounded px-2.5 py-1.5 font-bold text-xs flex-1 outline-none text-noir" readonly value="http://192.168.1.95:8091/map.html" />
+          <button onclick="copyShareUrl()" class="bg-white text-noir border border-neutral-300 rounded px-3 py-1.5 font-bold uppercase text-[11px] hover:bg-neutral-100 transition-colors">
             COPIER
           </button>
         </div>
       </div>
 
-      <div class="border border-neutral-200 p-2.5 bg-neutral-100 font-mono text-[10px] text-neutral-600 mb-5 leading-normal">
-        • Hébergement : <strong>Tunnel Public TLS / HTTPS</strong> (terminaison SSL active)<br>
-        • Port d'écoute : <strong>8091</strong><br>
-        • Synchronisation inter-terminaux : <strong>Active (CAD Broadcast Sync)</strong>
+      <div class="rounded-lg p-3 bg-neutral-100 font-mono text-xs text-neutral-600 mb-4 leading-relaxed">
+        • Hébergement : <strong>Tunnel Public TLS / HTTPS</strong><br>
+        • Port : <strong>8091</strong> · Synchronisation CAD Broadcast active
       </div>
 
       <div class="flex justify-end">
-        <button onclick="closeShareModal()" class="px-4 py-2 bg-noir text-white font-mono font-bold text-xs uppercase">
+        <button onclick="closeShareModal()" class="px-4 py-2 bg-noir text-white rounded-lg font-mono font-bold text-xs uppercase hover:bg-neutral-800 transition-colors">
           FERMER
         </button>
       </div>
@@ -571,10 +590,10 @@
       currentBaseTileLayer.bringToBack();
 
       document.querySelectorAll('.base-layer-btn').forEach(b => {
-        b.className = 'base-layer-btn px-2 py-0.5 text-[10px] font-bold bg-white text-noir hover:bg-neutral-100 border border-neutral-300';
+        b.className = 'base-layer-btn px-2.5 py-0.5 text-[10px] font-semibold text-neutral-600 hover:text-black rounded';
       });
       if (btn) {
-        btn.className = 'base-layer-btn px-2 py-0.5 text-[10px] font-black bg-noir text-white border border-noir';
+        btn.className = 'base-layer-btn px-2.5 py-0.5 text-[10px] font-bold rounded bg-noir text-white';
       }
     }
 
@@ -585,7 +604,7 @@
         zoomControl: true,
       });
 
-      // Default to full, high-contrast, rich real street map
+      // Default to rich real street map (Esri World Street Map)
       setBaseLayer('streets');
 
       trafficLayer = L.layerGroup().addTo(map);
@@ -622,12 +641,12 @@
       const icon = document.getElementById('sim-play-icon');
       const text = document.getElementById('sim-play-text');
       if (isRunning) {
-        btn.className = "bg-noir text-white text-xs font-black px-3 py-1.5 flex items-center gap-1.5 hover:bg-neutral-800 border border-noir";
+        btn.className = "bg-noir text-white text-xs font-bold px-3 py-1.5 rounded-lg flex items-center gap-1.5 hover:bg-neutral-800 transition-colors";
         icon.textContent = "⏸";
         text.textContent = "PAUSE GPS";
         showVisualAlert("TÉLÉMÉTRIE CAD : MOTEUR GPS LIVE ACTIVÉ [PLAY]");
       } else {
-        btn.className = "bg-amber-400 text-noir text-xs font-black px-3 py-1.5 flex items-center gap-1.5 hover:bg-amber-300 border border-noir";
+        btn.className = "bg-amber-400 text-noir text-xs font-bold px-3 py-1.5 rounded-lg flex items-center gap-1.5 hover:bg-amber-300 transition-colors";
         icon.textContent = "▶";
         text.textContent = "REPRENDRE GPS";
         showVisualAlert("TÉLÉMÉTRIE CAD : MOTEUR GPS MIS EN PAUSE");
@@ -638,10 +657,10 @@
       PulseState.setSimulationSpeed(speed);
       ['speed-1x', 'speed-2x', 'speed-5x'].forEach(id => {
         const btn = document.getElementById(id);
-        btn.className = "px-2.5 py-1 text-xs font-bold bg-white text-noir hover:bg-neutral-100 border-l border-neutral-300";
+        btn.className = "px-2.5 py-1 text-xs font-medium text-neutral-600 hover:text-black hover:bg-white rounded-md transition-colors";
       });
       const activeBtn = document.getElementById(`speed-${speed}x`);
-      activeBtn.className = "px-2.5 py-1 text-xs font-black bg-noir text-white border-l border-noir";
+      activeBtn.className = "px-2.5 py-1 text-xs font-bold rounded-md bg-noir text-white transition-colors";
       showVisualAlert(`CAD SIMULATION : MULTIPLICATEUR TEMPOREL ${speed}X`);
     }
 
@@ -659,13 +678,13 @@
       const text = document.getElementById('wp-mode-text');
       const mapEl = document.getElementById('map');
       if (waypointModeActive) {
-        btn.className = "bg-noir text-white border-1.5 border-noir text-xs font-black px-3 py-1.5 flex items-center gap-1.5 shadow-[2px_2px_0px_#09090b]";
-        text.textContent = "📍 FORCER ROUTAGE WAYPOINTS : ACTIF (CLIQUEZ SUR CARTE)";
+        btn.className = "bg-noir text-white border border-noir text-xs font-bold px-3 py-1.5 rounded-lg flex items-center gap-1.5 shadow-sm";
+        text.textContent = "📍 ROUTAGE WAYPOINTS : ACTIF (CLIQUEZ CARTE)";
         mapEl.classList.add('waypoint-crosshair');
         showVisualAlert("MODE ROUTAGE PAR WAYPOINTS ACTIF : Cliquez sur la carte de Montréal pour forcer l'itinéraire");
       } else {
-        btn.className = "bg-white text-noir border-1.5 border-neutral-400 hover:border-black text-xs font-bold px-3 py-1.5 flex items-center gap-1.5";
-        text.textContent = "📍 FORCER ROUTAGE WAYPOINTS : INACTIF";
+        btn.className = "bg-neutral-50 text-neutral-700 border border-neutral-200 hover:border-black text-xs font-bold px-3 py-1.5 rounded-lg flex items-center gap-1.5 transition-colors";
+        text.textContent = "📍 ROUTAGE WAYPOINTS : OFF";
         mapEl.classList.remove('waypoint-crosshair');
       }
     }
@@ -685,7 +704,7 @@
 
       waypoints.forEach((wp) => {
         const icon = L.divIcon({
-          html: `<div class="wp-pin" style="padding:2px 6px;">📍 ${wp.label}</div>`,
+          html: `<div class="wp-pin" style="padding:3px 8px;">📍 ${wp.label}</div>`,
           iconSize: [64, 22],
           iconAnchor: [32, 11]
         });
@@ -714,14 +733,14 @@
       routePoints.push(targetCoord);
 
       activeRouteLine = L.polyline(routePoints, {
-        color: waypoints.length > 0 ? '#09090b' : '#52525b',
+        color: waypoints.length > 0 ? '#09090b' : '#71717a',
         weight: waypoints.length > 0 ? 5 : 3,
         dashArray: waypoints.length > 0 ? '8, 6' : '5, 5'
       }).addTo(map);
     }
 
     /* -------------------------------------------------------------
-     * VISUAL MONOCHROME ALERT (0 SOUND)
+     * AEROSPACE REFINED HUD VISUAL ALERT
      * ----------------------------------------------------------- */
     let alertBannerTimeout = null;
     function showVisualAlert(message) {
@@ -731,16 +750,18 @@
 
       text.textContent = message;
       banner.classList.remove('hidden');
-      banner.classList.add('mono-alert-flash');
+      banner.classList.remove('hud-alert-enter');
+      void banner.offsetWidth; // Force CSS reflow to re-trigger animation
+      banner.classList.add('hud-alert-enter');
 
       clearTimeout(alertBannerTimeout);
       alertBannerTimeout = setTimeout(() => {
-        banner.classList.remove('mono-alert-flash');
         banner.classList.add('hidden');
       }, 4500);
     }
     function closeVisualAlert() {
-      document.getElementById('visual-alert-banner').classList.add('hidden');
+      const banner = document.getElementById('visual-alert-banner');
+      if (banner) banner.classList.add('hidden');
     }
 
     /* -------------------------------------------------------------
@@ -791,7 +812,7 @@
       const dynamicIncidents = PulseState.getWazeIncidents();
       dynamicIncidents.forEach(inc => {
         const hazardIcon = L.divIcon({
-          html: `<div class="waze-pin" style="padding:2px 5px;background:#09090b;color:#fff;">⚠️ ${inc.id}</div>`,
+          html: `<div class="waze-pin" style="padding:3px 8px;background:#09090b;color:#fff;">⚠️ ${inc.id}</div>`,
           iconSize: [65, 20],
           iconAnchor: [32, 10],
         });
@@ -804,11 +825,11 @@
       wazeTrafficActive = !wazeTrafficActive;
       const btn = document.getElementById('toggle-waze-btn');
       if (wazeTrafficActive) {
-        btn.className = 'status-badge-mono bg-noir text-white border-noir font-black';
-        btn.innerHTML = `<span class="w-2 h-2 bg-rose-500 rounded-none inline-block animate-pulse"></span> CALQUE TRAFIC WAZE : ACTIF`;
+        btn.className = 'status-badge-mono bg-noir text-white border-noir font-bold';
+        btn.innerHTML = `<span class="w-2 h-2 rounded-full bg-rose-500 inline-block animate-pulse"></span> CALQUE WAZE : ACTIF`;
       } else {
         btn.className = 'status-badge-mono bg-white text-neutral-600 border-neutral-300 font-bold';
-        btn.innerHTML = `<span class="w-2 h-2 bg-neutral-400 rounded-none inline-block"></span> CALQUE TRAFIC WAZE : MASQUÉ`;
+        btn.innerHTML = `<span class="w-2 h-2 rounded-full bg-neutral-400 inline-block"></span> CALQUE WAZE : MASQUÉ`;
       }
       renderWazeTrafficLayer();
     }
@@ -842,44 +863,44 @@
 
       container.classList.remove('hidden');
       container.innerHTML = `
-        <div class="flex items-center justify-between pb-2 border-b border-neutral-700 mb-2">
+        <div class="flex items-center justify-between pb-2 border-b border-neutral-800 mb-2.5">
           <div class="flex items-center gap-2">
-            <span class="w-2 h-2 bg-emerald-400 inline-block animate-pulse"></span>
-            <span class="text-xs font-black uppercase tracking-wider">OBD-II CAN BUS // ${veh.code}</span>
+            <span class="w-2 h-2 rounded-full bg-emerald-400 inline-block animate-pulse"></span>
+            <span class="text-xs font-bold uppercase tracking-wider text-white">OBD-II CAN BUS // ${veh.code}</span>
           </div>
-          <span class="text-[9px] bg-white text-noir font-black px-1.5 py-0.2">CAN-ISO-11898</span>
+          <span class="text-[9px] bg-neutral-800 text-neutral-300 font-mono px-2 py-0.5 rounded">CAN-ISO-11898</span>
         </div>
 
-        <div class="grid grid-cols-2 gap-2 text-[10px] mb-2">
+        <div class="grid grid-cols-2 gap-2 text-[11px] mb-3">
           <div>
-            <div class="text-neutral-400 text-[9px] uppercase font-bold">GPS FIX EXACT (6 DÉC.)</div>
-            <div class="font-bold text-white tracking-tight">${veh.lat.toFixed(6)}° N<br>${veh.lng.toFixed(6)}° W</div>
+            <div class="text-neutral-500 text-[9px] uppercase font-semibold">GPS FIX (6 DÉC.)</div>
+            <div class="font-mono font-medium text-white tracking-tight">${veh.lat.toFixed(6)}° N<br>${veh.lng.toFixed(6)}° W</div>
           </div>
           <div>
-            <div class="text-neutral-400 text-[9px] uppercase font-bold">CAP & ODOMÈTRE</div>
-            <div class="font-bold text-white">${veh.heading || 0}° · ${(veh.odometerKm || 50000).toLocaleString('fr-CA')} KM</div>
-          </div>
-        </div>
-
-        <div class="grid grid-cols-3 gap-1.5 text-center bg-neutral-900 p-2 border border-neutral-700 text-[10px] mb-2">
-          <div>
-            <div class="text-[8px] text-neutral-400 uppercase font-bold">TENSION CAN</div>
-            <div class="font-black text-emerald-400">${veh.batteryVoltage || 13.9} V</div>
-          </div>
-          <div>
-            <div class="text-[8px] text-neutral-400 uppercase font-bold">T° MOTEUR</div>
-            <div class="font-black text-amber-400">${veh.coolantTemp || 91} °C</div>
-          </div>
-          <div>
-            <div class="text-[8px] text-neutral-400 uppercase font-bold">VITESSE CAN</div>
-            <div class="font-black text-white">${veh.speed} KM/H</div>
+            <div class="text-neutral-500 text-[9px] uppercase font-semibold">CAP & ODOMÈTRE</div>
+            <div class="font-mono font-medium text-white">${veh.heading || 0}° · ${(veh.odometerKm || 50000).toLocaleString('fr-CA')} KM</div>
           </div>
         </div>
 
-        <div class="text-[9px] text-neutral-400 space-y-0.5 border-t border-neutral-800 pt-1.5 leading-snug">
+        <div class="grid grid-cols-3 gap-2 text-center bg-neutral-900/90 p-2.5 rounded-lg border border-neutral-800 text-[11px] mb-3">
+          <div>
+            <div class="text-[8px] text-neutral-400 uppercase font-medium">TENSION CAN</div>
+            <div class="font-bold text-emerald-400">${veh.batteryVoltage || 13.9} V</div>
+          </div>
+          <div>
+            <div class="text-[8px] text-neutral-400 uppercase font-medium">T° MOTEUR</div>
+            <div class="font-bold text-amber-400">${veh.coolantTemp || 91} °C</div>
+          </div>
+          <div>
+            <div class="text-[8px] text-neutral-400 uppercase font-medium">VITESSE CAN</div>
+            <div class="font-bold text-white">${veh.speed} KM/H</div>
+          </div>
+        </div>
+
+        <div class="text-[10px] text-neutral-400 space-y-1 border-t border-neutral-800 pt-2 leading-relaxed">
           <div>MATÉRIEL : <strong class="text-neutral-200">${veh.mdtHardwareId || 'MDT-HW-99232-REV4'}</strong></div>
-          <div>N° VIN : <strong class="text-neutral-200">${veh.vin || '2C3CDXAG8KH23209'}</strong></div>
-          <div>LIAISON IOT : <span class="text-emerald-400 font-bold">4G/LTE · 24ms · RSSI ${veh.networkRssi || -68} dBm · AES-256</span></div>
+          <div>N° VIN : <strong class="text-neutral-200 font-mono">${veh.vin || '2C3CDXAG8KH23209'}</strong></div>
+          <div>LIAISON IOT : <span class="text-emerald-400 font-semibold">4G/LTE · 24ms · RSSI ${veh.networkRssi || -68} dBm · AES-256</span></div>
         </div>
       `;
     }
@@ -898,22 +919,22 @@
         const isSelected = v.id === selectedVehicleId;
         const pinIcon = L.divIcon({
           className: '',
-          html: `<div class="veh-pin" style="width:${isSelected ? '32px' : '28px'};height:${isSelected ? '32px' : '28px'};${isSelected ? 'border-color:#facc15;box-shadow:3px 3px 0 #000;' : ''}">${v.id}</div>`,
-          iconSize: [isSelected ? 32 : 28, isSelected ? 32 : 28],
-          iconAnchor: [isSelected ? 16 : 14, isSelected ? 16 : 14],
+          html: `<div class="veh-pin" style="width:${isSelected ? '34px' : '28px'};height:${isSelected ? '34px' : '28px'};${isSelected ? 'border-color:#10b981;box-shadow:0 0 16px rgba(16,185,129,0.7);' : ''}">${v.id}</div>`,
+          iconSize: [isSelected ? 34 : 28, isSelected ? 34 : 28],
+          iconAnchor: [isSelected ? 17 : 14, isSelected ? 17 : 14],
         });
 
         const popupHTML = `
-          <div style="padding:12px;font-family:'IBM Plex Mono',monospace;min-width:240px;">
-            <div style="background:#09090b;color:#fff;padding:4px 8px;font-weight:900;font-size:11px;margin-bottom:8px;display:flex;justify-content:space-between;">
+          <div style="padding:14px;font-family:'IBM Plex Mono',monospace;min-width:240px;">
+            <div style="background:#09090b;color:#fff;padding:6px 10px;border-radius:6px;font-weight:700;font-size:11px;margin-bottom:10px;display:flex;justify-content:space-between;">
               <span>${v.code}</span>
-              <span>[${v.status}]</span>
+              <span style="color:#10b981;">[${v.status}]</span>
             </div>
-            <div style="font-size:11px;color:#09090b;margin-bottom:3px;"><strong>TYPE:</strong> ${v.type}</div>
-            <div style="font-size:10px;color:#52525b;margin-bottom:3px;"><strong>SECTEUR:</strong> ${v.zone}</div>
-            <div style="font-size:10px;color:#09090b;margin-bottom:3px;"><strong>GPS:</strong> ${v.lat.toFixed(6)}, ${v.lng.toFixed(6)}</div>
-            <div style="font-size:10px;color:#09090b;margin-bottom:8px;"><strong>VITESSE CAN:</strong> ${v.speed} KM/H (CAP ${v.heading || 0}°)</div>
-            <a href="dispatch.html?assign=${v.id}" style="display:block;text-align:center;background:#09090b;color:#fff;padding:6px;font-size:10px;font-weight:800;text-decoration:none;text-transform:uppercase;">
+            <div style="font-size:11px;color:#09090b;margin-bottom:4px;"><strong>TYPE:</strong> ${v.type}</div>
+            <div style="font-size:10px;color:#71717a;margin-bottom:4px;"><strong>SECTEUR:</strong> ${v.zone}</div>
+            <div style="font-size:10px;color:#09090b;margin-bottom:4px;"><strong>GPS:</strong> ${v.lat.toFixed(6)}, ${v.lng.toFixed(6)}</div>
+            <div style="font-size:10px;color:#09090b;margin-bottom:10px;"><strong>VITESSE CAN:</strong> ${v.speed} KM/H (CAP ${v.heading || 0}°)</div>
+            <a href="dispatch.html?assign=${v.id}" style="display:block;text-align:center;background:#09090b;color:#fff;padding:8px;border-radius:6px;font-size:11px;font-weight:700;text-decoration:none;text-transform:uppercase;">
               ASSIGNER CETTE UNITÉ [DISPATCH]
             </a>
           </div>
@@ -938,17 +959,17 @@
         else if (call.id === '5085') { lat = 45.4965; lng = -73.6180; }
 
         const callIcon = L.divIcon({
-          html: `<div class="call-pin" style="padding:2px 6px;">#${call.id}</div>`,
-          iconSize: [46, 20],
-          iconAnchor: [23, 10],
+          html: `<div class="call-pin" style="padding:3px 7px;">#${call.id}</div>`,
+          iconSize: [48, 22],
+          iconAnchor: [24, 11],
         });
 
         const callPopup = `
-          <div style="padding:10px;font-family:'IBM Plex Mono',monospace;min-width:200px;">
-            <div style="background:#09090b;color:#fff;padding:3px 6px;font-weight:900;font-size:10px;margin-bottom:6px;">COURSE #${call.id} [${call.status}]</div>
-            <div style="font-size:11px;font-weight:800;">${call.client}</div>
-            <div style="font-size:10px;color:#52525b;margin-bottom:6px;">${call.pickup}</div>
-            <a href="queue.html" style="display:block;text-align:center;background:#09090b;color:#fff;padding:5px;font-size:10px;font-weight:800;text-decoration:none;text-transform:uppercase;">
+          <div style="padding:12px;font-family:'IBM Plex Mono',monospace;min-width:210px;">
+            <div style="background:#09090b;color:#fff;padding:5px 8px;border-radius:6px;font-weight:700;font-size:10px;margin-bottom:8px;">COURSE #${call.id} [${call.status}]</div>
+            <div style="font-size:11px;font-weight:700;">${call.client}</div>
+            <div style="font-size:10px;color:#71717a;margin-bottom:8px;">${call.pickup}</div>
+            <a href="queue.html" style="display:block;text-align:center;background:#09090b;color:#fff;padding:6px;border-radius:6px;font-size:10px;font-weight:700;text-decoration:none;text-transform:uppercase;">
               VOIR DANS LA FILE
             </a>
           </div>
@@ -983,15 +1004,15 @@
         div.id = `drawer-veh-${v.id}`;
         div.innerHTML = `
           <div class="flex items-center justify-between font-mono mb-1">
-            <span class="font-black text-xs text-noir">${v.code} · ${v.type}</span>
-            <span class="font-mono text-[9px] font-bold px-1.5 py-0.2 ${v.status === 'LIBRE' ? 'bg-emerald-100 text-emerald-800' : 'bg-noir text-white'} uppercase">
+            <span class="font-bold text-xs text-noir">${v.code} · ${v.type}</span>
+            <span class="font-mono text-[9px] font-bold px-2 py-0.5 rounded-full ${v.status === 'LIBRE' ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' : 'bg-neutral-900 text-white'} uppercase">
               ${v.status}
             </span>
           </div>
-          <div class="text-[10px] text-neutral-500 font-mono truncate font-semibold">${v.address || v.zone}</div>
-          <div class="flex items-center justify-between mt-2 pt-1 border-t border-neutral-100 font-mono text-[10px]">
-            <span class="text-neutral-700 font-bold">${v.speed} KM/H · ${v.batteryVoltage || 13.9}V</span>
-            <a href="dispatch.html?assign=${v.id}" class="bg-noir text-white px-2 py-0.5 font-bold uppercase hover:bg-neutral-800">
+          <div class="text-[11px] text-neutral-500 font-mono truncate font-medium">${v.address || v.zone}</div>
+          <div class="flex items-center justify-between mt-2.5 pt-1.5 border-t border-neutral-100 font-mono text-[10px]">
+            <span class="text-neutral-500 font-medium">${v.speed} KM/H · ${v.batteryVoltage || 13.9}V</span>
+            <a href="dispatch.html?assign=${v.id}" class="bg-noir text-white px-2.5 py-1 rounded font-bold uppercase hover:bg-neutral-800 transition-colors">
               DISPATCHER →
             </a>
           </div>
