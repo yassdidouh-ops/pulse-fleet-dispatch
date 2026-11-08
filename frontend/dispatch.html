@@ -962,10 +962,15 @@
       dispatchMapInstance = L.map('dispatch-map', { zoomControl: false, attributionControl: false })
         .setView(mtlCenter, 13);
 
-      L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
+      // Real World Street Map (Full Montreal Streets, Roads & Geography)
+      L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}', {
         maxZoom: 19,
-        subdomains: 'abcd',
+        attribution: '© Esri, HERE, Garmin'
       }).addTo(dispatchMapInstance);
+
+      setTimeout(() => {
+        if (dispatchMapInstance) dispatchMapInstance.invalidateSize();
+      }, 250);
 
       L.control.zoom({ position: 'bottomright' }).addTo(dispatchMapInstance);
 

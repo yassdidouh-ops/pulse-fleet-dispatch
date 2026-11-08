@@ -89,8 +89,13 @@
       bottom: 0;
       left: 56px;
       right: 360px;
-      background: #e4e4e7;
+      background: #cbd5e1;
       z-index: 10;
+    }
+    @media (max-width: 1024px) {
+      #map {
+        right: 0;
+      }
     }
     #map.waypoint-crosshair {
       cursor: crosshair !important;
@@ -315,6 +320,23 @@
       <span class="w-2 h-2 bg-neutral-600 inline-block"></span> EN COURSE : <span id="stat-course-vehs">3</span>
     </button>
 
+    <!-- Fond de Carte Selector (Rues Réelles, Satellite, Voyager, CAD) -->
+    <div class="hidden sm:flex items-center gap-1 border border-neutral-300 p-0.5 bg-neutral-100 mx-2">
+      <span class="text-[9px] text-neutral-500 font-black px-1 uppercase">CARTE :</span>
+      <button onclick="setBaseLayer('streets', this)" class="base-layer-btn px-2 py-0.5 text-[10px] font-black bg-noir text-white border border-noir">
+        🗺️ RUES (ESRI)
+      </button>
+      <button onclick="setBaseLayer('satellite', this)" class="base-layer-btn px-2 py-0.5 text-[10px] font-bold bg-white text-noir hover:bg-neutral-100 border border-neutral-300">
+        🛰️ SATELLITE
+      </button>
+      <button onclick="setBaseLayer('voyager', this)" class="base-layer-btn px-2 py-0.5 text-[10px] font-bold bg-white text-noir hover:bg-neutral-100 border border-neutral-300">
+        🏙️ VOYAGER
+      </button>
+      <button onclick="setBaseLayer('cad', this)" class="base-layer-btn px-2 py-0.5 text-[10px] font-bold bg-white text-noir hover:bg-neutral-100 border border-neutral-300">
+        📄 CAD
+      </button>
+    </div>
+
     <div class="ml-auto text-[11px] text-neutral-500 font-bold uppercase hidden md:flex items-center gap-2">
       <span class="inline-block w-2.5 h-1 bg-emerald-500"></span> FLUIDE
       <span class="inline-block w-2.5 h-1 bg-amber-500"></span> CHARGÉ
@@ -514,6 +536,42 @@
       setInterval(update, 1000);
     }
 
+    let currentBaseTileLayer = null;
+    const BASE_LAYERS = {
+      streets: {
+        url: 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}',
+        options: { maxZoom: 19, attribution: '© Esri, HERE, Garmin, OpenStreetMap' }
+      },
+      satellite: {
+        url: 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
+        options: { maxZoom: 19, attribution: '© Esri, Maxar, Earthstar Geographics' }
+      },
+      voyager: {
+        url: 'https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png',
+        options: { maxZoom: 19, subdomains: 'abcd', attribution: '© CARTO, OpenStreetMap' }
+      },
+      cad: {
+        url: 'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png',
+        options: { maxZoom: 19, subdomains: 'abcd', attribution: '© CARTO' }
+      }
+    };
+
+    function setBaseLayer(type, btn) {
+      if (currentBaseTileLayer && map) {
+        map.removeLayer(currentBaseTileLayer);
+      }
+      const config = BASE_LAYERS[type] || BASE_LAYERS.streets;
+      currentBaseTileLayer = L.tileLayer(config.url, config.options).addTo(map);
+      currentBaseTileLayer.bringToBack();
+
+      document.querySelectorAll('.base-layer-btn').forEach(b => {
+        b.className = 'base-layer-btn px-2 py-0.5 text-[10px] font-bold bg-white text-noir hover:bg-neutral-100 border border-neutral-300';
+      });
+      if (btn) {
+        btn.className = 'base-layer-btn px-2 py-0.5 text-[10px] font-black bg-noir text-white border border-noir';
+      }
+    }
+
     function initMontrealMap() {
       map = L.map('map', {
         center: [45.5017, -73.5673],
@@ -521,16 +579,22 @@
         zoomControl: true,
       });
 
-      L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
-        maxZoom: 19,
-        subdomains: 'abcd',
-      }).addTo(map);
+      // Default to full, high-contrast, rich real street map
+      setBaseLayer('streets');
 
       trafficLayer = L.layerGroup().addTo(map);
       markersLayer = L.layerGroup().addTo(map);
       waypointsLayer = L.layerGroup().addTo(map);
 
       renderWazeTrafficLayer();
+
+      setTimeout(() => {
+        if (map) map.invalidateSize();
+      }, 200);
+
+      window.addEventListener('resize', () => {
+        if (map) map.invalidateSize();
+      });
 
       // Click on map to place waypoints when active
       map.on('click', (e) => {
