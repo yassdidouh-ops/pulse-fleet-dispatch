@@ -1,0 +1,772 @@
+<!DOCTYPE html>
+<html lang="fr-CA">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>PULSE CAD — Facture & Reçu Officiel de Course</title>
+
+  <!-- High-Readability Enterprise Typography: Plus Jakarta Sans + IBM Plex Mono -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&family=IBM+Plex+Mono:wght@400;500;600;700&display=swap" rel="stylesheet" />
+
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <script src="state.js"></script>
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Plus Jakarta Sans', 'sans-serif'],
+            mono: ['IBM Plex Mono', 'monospace'],
+          },
+          colors: {
+            noir: '#09090b',
+            charcoal: '#18181b',
+            bordercol: '#d4d4d8',
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      font-family: 'Plus Jakarta Sans', -apple-system, sans-serif;
+      background-color: #121214;
+      background-image: 
+        radial-gradient(#27272a 1px, transparent 1px),
+        linear-gradient(to right, rgba(255,255,255,0.02) 1px, transparent 1px);
+      background-size: 24px 24px, 120px 120px;
+      color: #09090b;
+      margin: 0;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* Thermal receipt container styling */
+    .thermal-receipt {
+      background: #ffffff;
+      color: #000000;
+      width: 100%;
+      max-width: 440px;
+      margin: 0 auto;
+      position: relative;
+      box-shadow: 0 20px 45px rgba(0,0,0,0.45), 0 0 0 1px rgba(0,0,0,0.9);
+      padding: 24px 28px 28px;
+    }
+
+    /* Sawtooth thermal tear edges */
+    .tear-edge-top {
+      position: absolute;
+      top: -10px;
+      left: 0;
+      right: 0;
+      height: 10px;
+      background: radial-gradient(circle, transparent, transparent 50%, #ffffff 50%, #ffffff 100%);
+      background-size: 14px 14px;
+      background-position: bottom;
+    }
+
+    .tear-edge-bottom {
+      position: absolute;
+      bottom: -10px;
+      left: 0;
+      right: 0;
+      height: 10px;
+      background: radial-gradient(circle, transparent, transparent 50%, #ffffff 50%, #ffffff 100%);
+      background-size: 14px 14px;
+      background-position: top;
+    }
+
+    .dashed-line {
+      border-bottom: 1.5px dashed #000000;
+      margin: 14px 0;
+    }
+
+    .double-line {
+      border-top: 1.5px solid #000000;
+      border-bottom: 1.5px solid #000000;
+      height: 4px;
+      margin: 12px 0;
+    }
+
+    .btn-action {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 14px;
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 12px;
+      font-weight: 700;
+      text-transform: uppercase;
+      border: 1.5px solid #09090b;
+      cursor: pointer;
+      transition: all 0.12s ease;
+      user-select: none;
+    }
+    .btn-action:hover {
+      transform: translate(-1px, -1px);
+      box-shadow: 2px 2px 0px #09090b;
+    }
+    .btn-action:active {
+      transform: translate(1px, 1px);
+      box-shadow: none;
+    }
+
+    /* Print Specific Clean Media Queries */
+    @media print {
+      body {
+        background: #ffffff !important;
+        background-image: none !important;
+        color: #000000 !important;
+        margin: 0 !important;
+        padding: 0 !important;
+      }
+      .no-print {
+        display: none !important;
+      }
+      .print-container {
+        padding: 0 !important;
+        margin: 0 auto !important;
+      }
+      .thermal-receipt {
+        box-shadow: none !important;
+        border: 1px solid #000000 !important;
+        margin: 0 auto !important;
+        padding: 18px 20px !important;
+        max-width: 100% !important;
+        width: 380px !important;
+      }
+      .tear-edge-top, .tear-edge-bottom {
+        display: none !important;
+      }
+      @page {
+        margin: 8mm;
+        size: auto;
+      }
+    }
+  </style>
+</head>
+<body class="selection:bg-black selection:text-white">
+
+  <!-- TOP CONSOLE ACTION BAR (CLEANLY HIDDEN ON PRINT) -->
+  <header class="no-print bg-white border-b-2 border-noir sticky top-0 z-50 px-4 py-2.5 flex flex-wrap items-center justify-between gap-3 shadow-md">
+    <div class="flex items-center gap-3">
+      <a href="queue.html" class="btn-action bg-white text-noir hover:bg-neutral-100 shadow-[1px_1px_0px_#09090b]">
+        <i data-lucide="arrow-left" class="w-4 h-4"></i>
+        <span>RETOUR CONSOLE</span>
+      </a>
+
+      <div class="h-5 w-px bg-neutral-300"></div>
+
+      <div class="flex items-center gap-2">
+        <div class="bg-noir text-white font-mono font-black text-xs px-2.5 py-1 tracking-widest flex items-center gap-1.5">
+          <span class="inline-block w-2 h-2 bg-white"></span>
+          PULSE<span class="text-neutral-400">//</span>BILLING
+        </div>
+        <span class="font-mono text-[11px] font-bold uppercase text-neutral-600 hidden sm:inline">
+          ÉMISSION REÇU OFFICIEL FISCAL
+        </span>
+      </div>
+    </div>
+
+    <!-- QUICK CALL SELECTOR & PRINT BUTTON -->
+    <div class="flex items-center gap-2">
+      <!-- Selector for existing calls -->
+      <div class="flex items-center gap-1.5 font-mono text-xs">
+        <label for="call-selector" class="text-neutral-500 font-bold hidden md:inline">COURSE :</label>
+        <select id="call-selector" onchange="switchCall(this.value)" class="bg-neutral-100 border border-noir font-mono text-xs font-bold px-2 py-1.5 outline-none cursor-pointer">
+          <!-- Populated dynamically -->
+        </select>
+      </div>
+
+      <button onclick="window.print()" class="btn-action bg-noir text-white hover:bg-neutral-800 shadow-[2px_2px_0px_#09090b]">
+        <i data-lucide="printer" class="w-4 h-4"></i>
+        <span>IMPRIMER / EXPORT PDF</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- RECEIPT DISPLAY AREA -->
+  <main class="flex-1 print-container flex items-center justify-center p-4 sm:p-8">
+    
+    <div class="thermal-receipt font-mono text-xs leading-relaxed" id="receipt-node">
+      
+      <!-- Serrated tear off decor -->
+      <div class="tear-edge-top no-print"></div>
+      <div class="tear-edge-bottom no-print"></div>
+
+      <!-- HEADER BLOCK -->
+      <div class="text-center pb-2">
+        <div class="bg-noir text-white px-2 py-1.5 font-black text-sm tracking-widest uppercase mb-1">
+          PULSE FLEET DISPATCH
+        </div>
+        <div class="font-bold text-[11px] tracking-wider text-neutral-800 uppercase">
+          CAD OFFICIAL RECEIPT // REÇU OFFICIEL CAD
+        </div>
+        <div class="text-[10px] text-neutral-600 mt-1 uppercase font-semibold">
+          VILLE DE MONTRÉAL &bull; SERVICE DU TRANSPORT PAR TAXI & CAD
+        </div>
+      </div>
+
+      <div class="dashed-line"></div>
+
+      <!-- METADATA SECTION -->
+      <div class="grid grid-cols-2 gap-y-1 text-[11px]">
+        <div><span class="font-bold text-neutral-500">OPÉRATEUR :</span> <span class="font-black text-noir">OP-408</span></div>
+        <div class="text-right"><span class="font-bold text-neutral-500">STATUT :</span> <span class="font-black" id="meta-status">CLÔTURÉ</span></div>
+
+        <div><span class="font-bold text-neutral-500">DATE ÉMISSION :</span> <span class="font-bold" id="meta-date">2026-11-08</span></div>
+        <div class="text-right"><span class="font-bold text-neutral-500">HEURE LOCALE :</span> <span class="font-bold" id="meta-time">01:50:52 EST</span></div>
+
+        <div class="col-span-2 text-[9px] text-neutral-600 tracking-tight pt-1">
+          <span class="font-bold">HORODATAGE ISO :</span> <span class="font-mono" id="meta-iso">2026-11-08T01:50:52.000Z</span>
+        </div>
+
+        <div class="col-span-2 text-[9px] text-neutral-500 border-t border-dotted border-neutral-300 pt-1 mt-1">
+          NEQ: 1178-9042-33 &bull; TPS: 102938475 RT0001 &bull; TVQ: 102938475 TQ0001
+        </div>
+      </div>
+
+      <div class="dashed-line"></div>
+
+      <!-- COURSE DETAILS -->
+      <div class="space-y-1 text-[11px]">
+        <div class="flex justify-between items-center bg-neutral-100 px-2 py-1 border border-neutral-300">
+          <span class="font-black text-noir text-xs">RIDE ID / N° COURSE :</span>
+          <span class="font-black text-sm text-noir" id="val-ride-id">#5081</span>
+        </div>
+
+        <div class="flex justify-between pt-1">
+          <span class="text-neutral-500 font-bold">UNITÉ ASSIGNÉE :</span>
+          <span class="font-black text-noir" id="val-unit-code">UNIT-232</span>
+        </div>
+
+        <div class="flex justify-between">
+          <span class="text-neutral-500 font-bold">TYPE VÉHICULE :</span>
+          <span class="font-black text-noir" id="val-veh-type">BERLINE STANDARD</span>
+        </div>
+
+        <div class="flex justify-between">
+          <span class="text-neutral-500 font-bold">CLIENT RÉFÉRENCE :</span>
+          <span class="font-bold text-noir truncate max-w-[200px]" id="val-client">CORP-AIR-CANADA // AC-882</span>
+        </div>
+
+        <div class="flex justify-between">
+          <span class="text-neutral-500 font-bold">PASSAGERS / CONTACT :</span>
+          <span class="font-bold text-neutral-800" id="val-passengers">2 ADULTES &bull; (514) 872-4091</span>
+        </div>
+      </div>
+
+      <div class="dashed-line"></div>
+
+      <!-- ROUTE SECTION -->
+      <div>
+        <div class="font-black text-[11px] text-neutral-900 uppercase mb-1 tracking-wide">
+          ITINÉRAIRE MÉTROPOLITAIN (COURSE CAD)
+        </div>
+
+        <div class="space-y-1.5 text-[11px] bg-neutral-50 p-2 border border-neutral-200">
+          <div>
+            <div class="text-[9px] font-bold text-neutral-500 uppercase tracking-wider flex items-center gap-1">
+              <span class="inline-block w-1.5 h-1.5 bg-black"></span> PRISE EN CHARGE (ORIGINE)
+            </div>
+            <div class="font-bold text-neutral-900 pl-2.5 text-[11px] leading-snug" id="val-pickup">
+              1250 Boulevard René-Lévesque Ouest, Montréal
+            </div>
+            <div class="text-[9px] text-neutral-500 pl-2.5 font-mono" id="val-suite">
+              Tour Bell / Entrée Sud
+            </div>
+          </div>
+
+          <div class="border-t border-dotted border-neutral-300 pt-1.5">
+            <div class="text-[9px] font-bold text-neutral-500 uppercase tracking-wider flex items-center gap-1">
+              <span class="inline-block w-1.5 h-1.5 bg-neutral-600"></span> DESTINATION TERMINALE
+            </div>
+            <div class="font-bold text-neutral-900 pl-2.5 text-[11px] leading-snug" id="val-dest">
+              Aéroport International Montréal-Trudeau (YUL)
+            </div>
+          </div>
+        </div>
+
+        <div class="flex justify-between items-center mt-2 px-1 text-[11px]">
+          <span class="font-bold text-neutral-600">DISTANCE RÉELLEMENT ESTIMÉE :</span>
+          <span class="font-black text-xs text-noir" id="val-distance">19.4 KM</span>
+        </div>
+      </div>
+
+      <div class="dashed-line"></div>
+
+      <!-- ITEMIZATION & TAX BREAKDOWN -->
+      <div>
+        <div class="flex justify-between text-[10px] font-bold text-neutral-500 uppercase pb-1 border-b border-black">
+          <span>DÉSIGNATION PRESTATION</span>
+          <span class="text-right">MONTANT ($ CAD)</span>
+        </div>
+
+        <div class="py-1.5 space-y-1 text-[11px]">
+          <!-- Base fare -->
+          <div class="flex justify-between">
+            <div>
+              <div class="font-bold text-noir">PRISE EN CHARGE (BASE FARE)</div>
+              <div class="text-[9px] text-neutral-500">Tarif initial réglementaire ville de MTL</div>
+            </div>
+            <div class="font-bold text-noir text-right" id="row-base-fare">$4.10</div>
+          </div>
+
+          <!-- Kilometric fare -->
+          <div class="flex justify-between">
+            <div>
+              <div class="font-bold text-noir" id="label-km-fare">TARIF KILOMÉTRIQUE</div>
+              <div class="text-[9px] text-neutral-500" id="detail-km-fare">19.4 km &times; $1.95 / km</div>
+            </div>
+            <div class="font-bold text-noir text-right" id="row-km-fare">$37.83</div>
+          </div>
+
+          <!-- Special Surcharge -->
+          <div class="flex justify-between" id="container-surcharge">
+            <div>
+              <div class="font-bold text-noir" id="label-surcharge">SURCHARGE SPÉCIALE (AÉROPORT)</div>
+              <div class="text-[9px] text-neutral-500" id="detail-surcharge">Desserte Terminal Trudeau (YUL)</div>
+            </div>
+            <div class="font-bold text-noir text-right" id="row-surcharge">$5.00</div>
+          </div>
+        </div>
+
+        <!-- Solid subtotal divider -->
+        <div class="border-t-2 border-black pt-1.5 space-y-1 text-[11px]">
+          <div class="flex justify-between">
+            <span class="font-bold text-neutral-800">SOUS-TOTAL HORS TAXES :</span>
+            <span class="font-black text-noir" id="val-subtotal">$46.93</span>
+          </div>
+
+          <div class="flex justify-between text-neutral-700">
+            <span>TPS QUÉBEC (5.000%) :</span>
+            <span class="font-bold" id="val-tps">$2.35</span>
+          </div>
+
+          <div class="flex justify-between text-neutral-700">
+            <span>TVQ QUÉBEC (9.975%) :</span>
+            <span class="font-bold" id="val-tvq">$4.68</span>
+          </div>
+        </div>
+
+        <!-- Total Box -->
+        <div class="double-line"></div>
+        <div class="bg-noir text-white p-2.5 flex justify-between items-center">
+          <div>
+            <div class="text-[10px] tracking-wider text-neutral-300 uppercase font-semibold">TOTAL DÛ / PAYÉ</div>
+            <div class="text-xs font-black tracking-widest">TOTAL TTC ($ CAD)</div>
+          </div>
+          <div class="text-xl font-black font-mono tracking-tight" id="val-total">
+            $53.96
+          </div>
+        </div>
+      </div>
+
+      <div class="dashed-line"></div>
+
+      <!-- PAYMENT METHOD TAG -->
+      <div class="text-center">
+        <div class="text-[10px] font-bold text-neutral-500 uppercase tracking-wider mb-1">
+          MODE DE RÈGLEMENT CONFIRMÉ
+        </div>
+        <div class="inline-block border-2 border-black px-2.5 py-1 font-black text-[11px] tracking-wide uppercase bg-neutral-100" id="val-payment-tag">
+          COMPTE CORPORATIF / FACTURATION DIRECTE
+        </div>
+        <div class="text-[9px] text-neutral-600 mt-1 font-mono" id="val-payment-auth">
+          REF AUTORISATION : AUTH-TX-994208 &bull; PROTOCOLE MDT ACTIF
+        </div>
+      </div>
+
+      <div class="dashed-line"></div>
+
+      <!-- BARCODE SECTION -->
+      <div class="text-center">
+        <div id="svg-barcode-container" class="flex justify-center mb-1">
+          <!-- Dynamically generated crisp vector barcode -->
+        </div>
+        <div class="text-[10px] font-bold tracking-widest uppercase font-mono text-neutral-800" id="val-barcode-text">
+          *CAD-5081-OP408*
+        </div>
+      </div>
+
+      <!-- QR CODE SECTION -->
+      <div class="flex items-center justify-center gap-3 mt-3 pt-2 border-t border-dotted border-neutral-300">
+        <div id="svg-qrcode-container" class="w-16 h-16 flex-shrink-0">
+          <!-- Dynamically generated crisp vector QR code -->
+        </div>
+        <div class="text-left text-[9px] text-neutral-600 font-mono leading-tight">
+          <div class="font-bold text-neutral-900 uppercase">VÉRIFICATION D'AUTHENTICITÉ CAD</div>
+          <div>Scannez pour valider la signature cryptographique du reçu sur le portail central de la Ville de Montréal.</div>
+          <div class="text-[8px] text-neutral-400 mt-0.5">SHA256: 8a4c9f12b704c3...</div>
+        </div>
+      </div>
+
+      <div class="dashed-line"></div>
+
+      <!-- FOOTER LEGAL NOTICE -->
+      <div class="text-center text-[9px] text-neutral-500 space-y-1">
+        <p class="font-semibold uppercase">MERCI DE VOTRE CONFIANCE DANS LE RÉSEAU MÉTROPOLITAIN</p>
+        <p>PULSE CAD DISPATCH SYSTEMS &bull; CERTIFICATION CONFORME RÈGL. MTL 2026-T7</p>
+        <p class="text-[8px] text-neutral-400">DOCUMENT OFFICIEL GÉOPOSITIONNÉ ET CONSERVÉ AU REGISTRE CENTRAL CAD</p>
+      </div>
+
+    </div>
+
+  </main>
+
+  <script>
+    // Known accurate road distances (km) for standard demonstration routes in Montréal
+    const DISTANCE_MATRIX = {
+      "5081": 19.4, // René-Lévesque to YUL Airport
+      "5082": 4.2,  // CHUM to Rue Guy
+      "5083": 7.1,  // Fairmont The Queen Elizabeth to Casino de Montréal
+      "5084": 1.6,  // Palais des Congrès to Gare Centrale
+      "5085": 13.8  // Cedar to Hôpital Maisonneuve-Rosemont
+    };
+
+    function calculateDistanceKm(call) {
+      if (DISTANCE_MATRIX[call.id]) return DISTANCE_MATRIX[call.id];
+      if (call.dest && (call.dest.toLowerCase().includes('yul') || call.dest.toLowerCase().includes('aérop'))) return 19.4;
+      if (call.dest && call.dest.toLowerCase().includes('casino')) return 7.1;
+      if (call.dest && call.dest.toLowerCase().includes('gare')) return 2.1;
+      
+      // Deterministic approximation based on ID
+      const num = parseInt(String(call.id).replace(/\D/g, ''), 10) || 5000;
+      return Number((3.5 + (num % 160) / 10).toFixed(1));
+    }
+
+    function checkSpecialSurcharge(call) {
+      const vehType = (call.vehType || '').toUpperCase();
+      const restrictions = (call.restrictions || []).join(' ').toUpperCase();
+      const notes = (call.notes || '').toUpperCase();
+      const dest = (call.dest || '').toUpperCase();
+      const client = (call.client || '').toUpperCase();
+
+      const isAirport = dest.includes('YUL') || dest.includes('AÉROPORT') || dest.includes('TRUDEAU') || restrictions.includes('AÉROPORT');
+      const isTPMR = vehType === 'TPMR' || restrictions.includes('TPMR') || restrictions.includes('FAUTEUIL');
+      const isVIP = restrictions.includes('VIP') || restrictions.includes('PRIORITAIRE') || client.includes('VIP');
+
+      if (isAirport) {
+        return {
+          applicable: true,
+          amount: 5.00,
+          label: 'SURCHARGE SPÉCIALE (AÉROPORT YUL)',
+          detail: 'Desserte Terminal International Trudeau'
+        };
+      }
+      if (isTPMR) {
+        return {
+          applicable: true,
+          amount: 5.00,
+          label: 'SURCHARGE SPÉCIALE (ACCÈS TPMR)',
+          detail: 'Prise en charge adaptée / rampe d\'accès'
+        };
+      }
+      if (isVIP) {
+        return {
+          applicable: true,
+          amount: 5.00,
+          label: 'SURCHARGE SPÉCIALE (SERVICE VIP)',
+          detail: 'Accès express et priorité centrale'
+        };
+      }
+
+      return {
+        applicable: false,
+        amount: 0.00,
+        label: 'SURCHARGE SPÉCIALE NON REQUISE',
+        detail: 'Tarification urbaine standard'
+      };
+    }
+
+    function getPaymentInfo(call) {
+      const client = (call.client || '').toUpperCase();
+      const notes = (call.notes || '').toUpperCase();
+      const restrictions = (call.restrictions || []).join(' ').toUpperCase();
+
+      const isCorporate = client.includes('CORP') || 
+                          client.includes('AIR-CANADA') || 
+                          client.includes('FAIRMONT') || 
+                          client.includes('CIUSS') || 
+                          client.includes('CUSM') || 
+                          client.includes('PALAIS') ||
+                          notes.includes('FACTURE') || 
+                          restrictions.includes('FACTURE');
+
+      if (isCorporate) {
+        return {
+          tag: "COMPTE CORPORATIF / FACTURATION DIRECTE",
+          auth: `REF CORP: CAD-ACC-${call.id}-DIR &bull; PROTOCOLE FACTURATION CENTRALISÉE`
+        };
+      } else {
+        return {
+          tag: "PAIEMENT SANS CONTACT",
+          auth: `NFC SANS CONTACT &bull; AUTH-TX-${call.id}892 &bull; TERMINAL EMBARQUÉ MDT`
+        };
+      }
+    }
+
+    /**
+     * Vector SVG Barcode Generator (Code 128 / Code 39 styled)
+     */
+    function renderBarcodeSVG(text) {
+      const pattern = [2, 1, 3, 1, 1, 2, 1, 3, 2, 1, 1, 1, 3, 2, 1, 2, 3, 1, 1, 2, 2, 1, 3, 1, 2, 1, 1, 3, 2];
+      let rects = '';
+      let currentX = 12;
+
+      // Start guard bars
+      rects += `<rect x="${currentX}" y="0" width="3" height="46" fill="#000000" />`;
+      currentX += 5;
+      rects += `<rect x="${currentX}" y="0" width="1.5" height="46" fill="#000000" />`;
+      currentX += 4;
+
+      for (let i = 0; i < text.length; i++) {
+        const charCode = text.charCodeAt(i);
+        const w1 = ((charCode % 3) + 1) * 1.5;
+        const gap = ((charCode >> 1) % 2 + 1) * 1.8;
+        const w2 = (((charCode >> 2) % 3) + 1) * 1.2;
+
+        rects += `<rect x="${currentX}" y="0" width="${w1}" height="42" fill="#000000" />`;
+        currentX += w1 + gap;
+        rects += `<rect x="${currentX}" y="0" width="${w2}" height="42" fill="#000000" />`;
+        currentX += w2 + gap + 1;
+      }
+
+      // Stop guard bars
+      rects += `<rect x="${currentX}" y="0" width="1.5" height="46" fill="#000000" />`;
+      currentX += 4;
+      rects += `<rect x="${currentX}" y="0" width="3" height="46" fill="#000000" />`;
+      currentX += 14;
+
+      return `
+        <svg viewBox="0 0 ${currentX} 46" class="w-full h-11" preserveAspectRatio="none">
+          ${rects}
+        </svg>
+      `;
+    }
+
+    /**
+     * Crisp Vector QR Code Generator (21x21 matrix simulation)
+     */
+    function renderQRCodeSVG(seedText) {
+      const size = 21;
+      let grid = Array(size).fill(0).map(() => Array(size).fill(false));
+
+      // Draw standard 7x7 corner finder patterns
+      function drawFinder(startX, startY) {
+        for (let r = 0; r < 7; r++) {
+          for (let c = 0; c < 7; c++) {
+            if (r === 0 || r === 6 || c === 0 || c === 6 || (r >= 2 && r <= 4 && c >= 2 && c <= 4)) {
+              grid[startY + r][startX + c] = true;
+            }
+          }
+        }
+      }
+      drawFinder(0, 0);       // Top-left
+      drawFinder(14, 0);      // Top-right
+      drawFinder(0, 14);      // Bottom-left
+
+      // Timing lines
+      for (let i = 8; i < 13; i++) {
+        grid[6][i] = (i % 2 === 0);
+        grid[i][6] = (i % 2 === 0);
+      }
+
+      // Deterministic pseudo-random content
+      let hash = 0;
+      for (let i = 0; i < seedText.length; i++) {
+        hash = (hash << 5) - hash + seedText.charCodeAt(i);
+        hash |= 0;
+      }
+
+      for (let r = 0; r < size; r++) {
+        for (let c = 0; c < size; c++) {
+          // Skip finder zones
+          const inTL = (r < 8 && c < 8);
+          const inTR = (r < 8 && c >= 13);
+          const inBL = (r >= 13 && c < 8);
+          if (inTL || inTR || inBL || r === 6 || c === 6) continue;
+
+          const bit = Math.abs((hash * (r + 1) * (c + 7)) % 100) > 48;
+          grid[r][c] = bit;
+        }
+      }
+
+      let rects = '';
+      for (let r = 0; r < size; r++) {
+        for (let c = 0; c < size; c++) {
+          if (grid[r][c]) {
+            rects += `<rect x="${c}" y="${r}" width="1" height="1" fill="#000000" />`;
+          }
+        }
+      }
+
+      return `
+        <svg viewBox="0 0 ${size} ${size}" class="w-full h-full" shape-rendering="crispEdges">
+          <rect width="${size}" height="${size}" fill="#ffffff" />
+          ${rects}
+        </svg>
+      `;
+    }
+
+    function switchCall(callId) {
+      const url = new URL(window.location);
+      url.searchParams.set('call', callId);
+      window.history.pushState({}, '', url);
+      renderReceipt(callId);
+    }
+
+    function populateCallSelector(calls, selectedId) {
+      const select = document.getElementById('call-selector');
+      if (!select) return;
+      select.innerHTML = '';
+      calls.forEach(c => {
+        const opt = document.createElement('option');
+        opt.value = c.id;
+        opt.textContent = `#${c.id} - ${c.client.split('//')[0].trim()}`;
+        if (String(c.id) === String(selectedId)) opt.selected = true;
+        select.appendChild(opt);
+      });
+    }
+
+    function renderReceipt(targetId) {
+      const calls = (typeof PulseState !== 'undefined') ? PulseState.getCalls() : [];
+      let call = null;
+
+      if (targetId) {
+        call = calls.find(c => String(c.id) === String(targetId));
+      }
+      if (!call && calls.length > 0) {
+        call = calls[0];
+      }
+
+      // Safe Fallback if calls array is totally empty
+      if (!call) {
+        call = {
+          id: "5081",
+          client: "CORP-AIR-CANADA // AC-882",
+          phone: "(514) 872-4091",
+          pickup: "1250 Boulevard René-Lévesque Ouest, Montréal",
+          suite: "Tour Bell / Entrée Sud",
+          dest: "Aéroport International Montréal-Trudeau (YUL)",
+          zone: "ZONE-01 (CENTRE-VILLE)",
+          vehType: "BERLINE",
+          passengers: 2,
+          restrictions: ["RÉSERVATION PRIORITAIRE", "AÉROPORT TRUDEAU (YUL)"],
+          status: "TERMINÉ",
+          assignedUnit: 232,
+          createdAt: "01:22:10"
+        };
+      }
+
+      populateCallSelector(calls, call.id);
+
+      // 1. Header & Metadata
+      const now = new Date();
+      const isoString = now.toISOString();
+      const dateString = now.toLocaleDateString('fr-CA', { year: 'numeric', month: '2-digit', day: '2-digit' });
+      const timeString = (call.createdAt ? call.createdAt + " EST" : now.toLocaleTimeString('fr-CA', { hour: '2-digit', minute: '2-digit', second: '2-digit' }) + " EST");
+
+      document.getElementById('meta-date').textContent = dateString;
+      document.getElementById('meta-time').textContent = timeString;
+      document.getElementById('meta-iso').textContent = isoString;
+      document.getElementById('meta-status').textContent = (call.status || 'TERMINÉ').toUpperCase();
+
+      // 2. Course Details
+      document.getElementById('val-ride-id').textContent = `#${call.id}`;
+
+      // Vehicle code resolution
+      let unitCode = "UNIT-232";
+      if (call.assignedUnit) {
+        const vehicles = (typeof PulseState !== 'undefined') ? PulseState.getVehicles() : [];
+        const veh = vehicles.find(v => v.id === Number(call.assignedUnit));
+        unitCode = veh ? veh.code : `UNIT-${call.assignedUnit}`;
+      }
+      document.getElementById('val-unit-code').textContent = unitCode;
+      document.getElementById('val-veh-type').textContent = (call.vehType || 'BERLINE').toUpperCase();
+      document.getElementById('val-client').textContent = call.client || 'CLIENT PARTICULIER';
+      document.getElementById('val-passengers').textContent = `${call.passengers || 1} PASSAGER(S) &bull; ${call.phone || 'POSTE RADIO'}`;
+
+      // 3. Route Details
+      document.getElementById('val-pickup').textContent = call.pickup || 'CENTRE-VILLE MONTRÉAL';
+      document.getElementById('val-suite').textContent = call.suite || (call.zone || 'SECTEUR MÉTROPOLITAIN');
+      document.getElementById('val-dest').textContent = call.dest || 'DESTINATION LIBRE';
+
+      const distanceKm = calculateDistanceKm(call);
+      document.getElementById('val-distance').textContent = `${distanceKm.toFixed(1)} KM`;
+
+      // 4. Tax & Fare Itemization
+      const baseFare = 4.10;
+      const kmRate = 1.95;
+      const kmFare = Math.round(distanceKm * kmRate * 100) / 100;
+
+      const surchargeInfo = checkSpecialSurcharge(call);
+      const surchargeContainer = document.getElementById('container-surcharge');
+      
+      if (surchargeInfo.applicable) {
+        surchargeContainer.style.display = 'flex';
+        document.getElementById('label-surcharge').textContent = surchargeInfo.label;
+        document.getElementById('detail-surcharge').textContent = surchargeInfo.detail;
+        document.getElementById('row-surcharge').textContent = `$${surchargeInfo.amount.toFixed(2)}`;
+      } else {
+        surchargeContainer.style.display = 'none';
+      }
+
+      document.getElementById('row-base-fare').textContent = `$${baseFare.toFixed(2)}`;
+      document.getElementById('label-km-fare').textContent = `TARIF KILOMÉTRIQUE (${distanceKm.toFixed(1)} km)`;
+      document.getElementById('detail-km-fare').textContent = `${distanceKm.toFixed(1)} km \u00D7 $${kmRate.toFixed(2)} / km`;
+      document.getElementById('row-km-fare').textContent = `$${kmFare.toFixed(2)}`;
+
+      const subtotal = Math.round((baseFare + kmFare + (surchargeInfo.applicable ? surchargeInfo.amount : 0)) * 100) / 100;
+      const tps = Math.round(subtotal * 0.05 * 100) / 100;
+      const tvq = Math.round(subtotal * 0.09975 * 100) / 100;
+      const total = Math.round((subtotal + tps + tvq) * 100) / 100;
+
+      document.getElementById('val-subtotal').textContent = `$${subtotal.toFixed(2)}`;
+      document.getElementById('val-tps').textContent = `$${tps.toFixed(2)}`;
+      document.getElementById('val-tvq').textContent = `$${tvq.toFixed(2)}`;
+      document.getElementById('val-total').textContent = `$${total.toFixed(2)}`;
+
+      // 5. Payment Method Tag
+      const payment = getPaymentInfo(call);
+      document.getElementById('val-payment-tag').textContent = payment.tag;
+      document.getElementById('val-payment-auth').innerHTML = payment.auth;
+
+      // 6. Stylized SVG Barcode & QR Code
+      const barcodeCode = `*CAD-${call.id}-OP408*`;
+      document.getElementById('val-barcode-text').textContent = barcodeCode;
+      document.getElementById('svg-barcode-container').innerHTML = renderBarcodeSVG(barcodeCode);
+
+      const qrSeed = `https://pulse.cad.montreal/verify/call=${call.id}&auth=OP408&total=${total.toFixed(2)}`;
+      document.getElementById('svg-qrcode-container').innerHTML = renderQRCodeSVG(qrSeed);
+
+      lucide.createIcons();
+    }
+
+    // Initialize on window load
+    window.addEventListener('DOMContentLoaded', () => {
+      const urlParams = new URLSearchParams(window.location.search);
+      const callParam = urlParams.get('call');
+      renderReceipt(callParam);
+    });
+
+    // Handle cross-tab updates via BroadcastChannel if call list changes
+    if (typeof PULSE_CHANNEL !== 'undefined') {
+      PULSE_CHANNEL.addEventListener('message', (event) => {
+        if (event.data && (event.data.type === 'CALLS_UPDATED' || event.data.type === 'VEHICLES_UPDATED')) {
+          const urlParams = new URLSearchParams(window.location.search);
+          renderReceipt(urlParams.get('call'));
+        }
+      });
+    }
+  </script>
+</body>
+</html>
