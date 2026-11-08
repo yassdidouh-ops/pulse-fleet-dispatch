@@ -1,19 +1,26 @@
 <!DOCTYPE html>
-<html lang="fr-CA">
+<html lang="fr" class="h-full">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>PULSE CAD — Carte Flotte GPS & Trafic Waze en Direct</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PULSE CAD — Carte Flotte & Télémétrie AVL Montréal</title>
   
-  <!-- High-Readability Enterprise Typography: Plus Jakarta Sans + IBM Plex Mono -->
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&family=IBM+Plex+Mono:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <!-- Plus Jakarta Sans & IBM Plex Mono -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital,wght@0,400;0,500;0,600;0,700;1,400;1,700&family=Plus+Jakarta+Sans:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400;1,700&display=swap" rel="stylesheet">
   
-  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
-  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  
+  <!-- Lucide Icons -->
   <script src="https://unpkg.com/lucide@latest"></script>
+
+  <!-- Leaflet CSS & JS -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+  <!-- Central CAD State Management -->
   <script src="state.js"></script>
 
   <script>
@@ -21,13 +28,12 @@
       theme: {
         extend: {
           fontFamily: {
-            sans: ['Plus Jakarta Sans', 'sans-serif'],
-            mono: ['IBM Plex Mono', 'monospace'],
+            sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+            mono: ['"IBM Plex Mono"', 'monospace'],
           },
           colors: {
             noir: '#09090b',
-            charcoal: '#18181b',
-            bordercol: '#d4d4d8',
+            blanc: '#ffffff',
           }
         }
       }
@@ -35,14 +41,13 @@
   </script>
 
   <style>
-    * { box-sizing: border-box; }
     body {
-      font-family: 'Plus Jakarta Sans', -apple-system, sans-serif;
+      font-family: 'Plus Jakarta Sans', sans-serif;
       background-color: #f4f4f5;
       color: #09090b;
-      margin: 0;
-      overflow: hidden;
       height: 100vh;
+      overflow: hidden;
+      margin: 0;
       -webkit-font-smoothing: antialiased;
     }
 
@@ -50,20 +55,10 @@
     ::-webkit-scrollbar-track { background: #f4f4f5; }
     ::-webkit-scrollbar-thumb { background: #18181b; }
 
-    #map {
-      position: absolute;
-      top: 56px;
-      left: 56px;
-      right: 340px;
-      bottom: 0;
-      background: #f4f4f5;
-      z-index: 10;
-    }
-
     .brut-box {
       background: #ffffff;
       border: 1.5px solid #09090b;
-      box-shadow: 3px 3px 0px #09090b;
+      box-shadow: 2px 2px 0px #09090b;
     }
 
     .nav-btn {
@@ -75,7 +70,6 @@
       color: #52525b;
       border: 1px solid transparent;
       transition: all 0.12s ease;
-      position: relative;
     }
     .nav-btn:hover {
       background: #ffffff;
@@ -88,21 +82,34 @@
       border-color: #09090b;
     }
 
-    /* Status Pills */
+    /* Map container */
+    #map {
+      position: absolute;
+      top: 104px;
+      bottom: 0;
+      left: 56px;
+      right: 360px;
+      background: #e4e4e7;
+      z-index: 10;
+    }
+    #map.waypoint-crosshair {
+      cursor: crosshair !important;
+    }
+
+    /* Tactile Status Badge */
     .status-badge-mono {
-      display: inline-flex;
-      align-items: center;
-      gap: 5px;
       font-family: 'IBM Plex Mono', monospace;
       font-size: 11px;
       font-weight: 700;
-      padding: 4px 10px;
+      padding: 4px 8px;
+      border: 1px solid #d4d4d8;
       background: #ffffff;
-      border: 1.5px solid #d4d4d8;
       color: #09090b;
-      white-space: nowrap;
-      user-select: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
       cursor: pointer;
+      user-select: none;
       transition: all 0.12s ease;
     }
     .status-badge-mono:hover {
@@ -112,10 +119,10 @@
       background: #09090b;
       color: #ffffff;
       border-color: #09090b;
-      box-shadow: 2px 2px 0px #09090b;
+      box-shadow: 1px 1px 0px #09090b;
     }
 
-    /* Vehicle Marker Pin */
+    /* Map Markers custom */
     .veh-pin {
       display: flex;
       align-items: center;
@@ -126,16 +133,15 @@
       font-size: 10px;
       font-weight: 900;
       border: 2px solid #ffffff;
-      box-shadow: 2px 2px 0px #09090b;
+      box-shadow: 2px 2px 0px #000000;
       cursor: pointer;
-      transition: transform 0.12s ease;
+      transition: transform 0.2s ease;
     }
     .veh-pin:hover {
-      transform: scale(1.2);
-      z-index: 9999 !important;
+      transform: scale(1.15);
+      z-index: 999 !important;
     }
 
-    /* Call Pickup Pin */
     .call-pin {
       display: flex;
       align-items: center;
@@ -150,7 +156,20 @@
       cursor: pointer;
     }
 
-    /* Waze Traffic Incident Pin */
+    .wp-pin {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #09090b;
+      color: #facc15;
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 10px;
+      font-weight: 900;
+      border: 2px solid #facc15;
+      box-shadow: 3px 3px 0px #000000;
+      cursor: pointer;
+    }
+
     .waze-pin {
       display: flex;
       align-items: center;
@@ -193,6 +212,15 @@
       background: #f4f4f5;
       border-left: 3px solid #09090b;
     }
+
+    /* Monochrome Alert Animation */
+    @keyframes monoFlash {
+      0%, 100% { background-color: #09090b; color: #ffffff; }
+      50% { background-color: #ffffff; color: #09090b; }
+    }
+    .mono-alert-flash {
+      animation: monoFlash 0.5s ease-in-out 3;
+    }
   </style>
 </head>
 <body class="bg-neutral-100 text-noir">
@@ -234,11 +262,6 @@
         <span id="map-clock" class="font-mono text-xs font-semibold text-neutral-900">--:--:--</span>
       </div>
 
-      <button onclick="triggerJitterRefresh()" class="bg-white text-noir font-mono text-xs font-bold uppercase px-3 py-1 flex items-center gap-1.5 border border-noir hover:bg-neutral-100 shadow-[2px_2px_0px_#09090b]">
-        <i data-lucide="refresh-cw" id="refresh-icon" class="w-3.5 h-3.5"></i>
-        ACTUALISER GPS
-      </button>
-
       <div class="flex items-center gap-2 bg-noir text-white px-2.5 py-1 border border-noir font-mono text-xs font-bold">
         OP-408
       </div>
@@ -263,17 +286,17 @@
       <i data-lucide="message-square" class="w-5 h-5"></i>
     </a>
     <div class="flex-1"></div>
-    <button onclick="PulseState.resetDemoData(); renderAll();" class="nav-btn" title="Réinitialiser données démo">
+    <button onclick="PulseState.resetDemoData(); location.reload();" class="nav-btn" title="Réinitialiser données démo">
       <i data-lucide="rotate-ccw" class="w-5 h-5"></i>
     </button>
   </aside>
 
-  <!-- MAP STATUS & WAZE TRAFFIC TOOLBAR -->
-  <div class="fixed top-14 left-14 right-80 h-10 bg-white border-b border-neutral-300 z-20 flex items-center px-4 gap-2 overflow-x-auto select-none font-mono">
+  <!-- MAP STATUS & FILTERS BAR -->
+  <div class="fixed top-14 left-14 right-[360px] h-11 bg-white border-b border-neutral-300 z-20 flex items-center px-4 gap-2 overflow-x-auto select-none font-mono">
     
     <!-- Waze Live Traffic Toggle -->
     <button id="toggle-waze-btn" onclick="toggleWazeTraffic()" class="status-badge-mono bg-noir text-white border-noir font-black">
-      <span class="w-2 h-2 bg-rose-500 rounded-none inline-block"></span>
+      <span class="w-2 h-2 bg-rose-500 rounded-none inline-block animate-pulse"></span>
       CALQUE TRAFIC WAZE : ACTIF
     </button>
 
@@ -299,23 +322,73 @@
     </div>
   </div>
 
-  <!-- LEAFLET MAP CONTAINER -->
-  <div id="map" style="top:96px;"></div>
+  <!-- FLOATING TACTICAL CAD TELEMETRY COMMAND BAR -->
+  <div class="fixed top-28 left-20 z-30 select-none font-mono">
+    <div class="brut-box bg-white p-2 flex items-center gap-2 shadow-[3px_3px_0px_#09090b]">
+      
+      <!-- Simulation Play / Pause -->
+      <button id="sim-play-btn" onclick="toggleSimPlay()" class="bg-noir text-white text-xs font-black px-3 py-1.5 flex items-center gap-1.5 hover:bg-neutral-800 border border-noir">
+        <span id="sim-play-icon">⏸</span>
+        <span id="sim-play-text">PAUSE GPS</span>
+      </button>
 
-  <!-- RIGHT ROSTER DRAWER (340px) -->
-  <aside class="w-80 bg-white border-l-2 border-noir fixed top-14 bottom-0 right-0 flex flex-col z-30 select-none">
+      <!-- Multiplier chips -->
+      <div class="flex items-center border border-neutral-300">
+        <button id="speed-1x" onclick="setSimSpeed(1)" class="px-2.5 py-1 text-xs font-black bg-noir text-white">1X</button>
+        <button id="speed-2x" onclick="setSimSpeed(2)" class="px-2.5 py-1 text-xs font-bold bg-white text-noir hover:bg-neutral-100 border-l border-neutral-300">2X</button>
+        <button id="speed-5x" onclick="setSimSpeed(5)" class="px-2.5 py-1 text-xs font-bold bg-white text-noir hover:bg-neutral-100 border-l border-neutral-300">5X</button>
+      </div>
+
+      <div class="h-4 w-px bg-neutral-300 mx-0.5"></div>
+
+      <!-- Inject Road Hazard Button -->
+      <button onclick="injectNextHazard()" class="bg-white text-rose-700 border-1.5 border-rose-700 hover:bg-rose-50 text-xs font-bold px-3 py-1.5 flex items-center gap-1.5">
+        <span>⚡</span> INJECTER ALÉA WAZE
+      </button>
+
+      <!-- Waypoint Mode Toggle -->
+      <button id="btn-waypoint-mode" onclick="toggleWaypointMode()" class="bg-white text-noir border-1.5 border-neutral-400 hover:border-black text-xs font-bold px-3 py-1.5 flex items-center gap-1.5">
+        <span>📍</span>
+        <span id="wp-mode-text">FORCER ROUTAGE WAYPOINTS : INACTIF</span>
+      </button>
+
+      <!-- Clear Waypoints -->
+      <button id="btn-clear-wp" onclick="clearAllWaypoints()" class="hidden bg-neutral-100 text-neutral-700 border border-neutral-300 hover:text-black hover:border-black text-xs font-black px-2.5 py-1.5">
+        ✕ EFFACER WAYPOINTS (<span id="wp-count">0</span>)
+      </button>
+
+    </div>
+  </div>
+
+  <!-- FLOATING MONOCHROME HIGH-CONTRAST VISUAL ALERT (0 SOUND) -->
+  <div id="visual-alert-banner" class="hidden fixed top-44 left-20 z-40 bg-noir text-white border-2 border-white px-4 py-2.5 font-mono text-xs font-black uppercase tracking-wider shadow-[4px_4px_0_#000] flex items-center gap-3">
+    <span class="w-2.5 h-2.5 bg-white inline-block animate-ping"></span>
+    <span id="visual-alert-text">ALERTE SYSTÈME CAD</span>
+    <button onclick="closeVisualAlert()" class="ml-4 text-neutral-400 hover:text-white font-black text-sm">✕</button>
+  </div>
+
+  <!-- LEAFLET MAP CONTAINER -->
+  <div id="map"></div>
+
+  <!-- RIGHT ROSTER DRAWER (360px) WITH OBD-II TELEMETRY TERMINAL -->
+  <aside class="w-[360px] bg-white border-l-2 border-noir fixed top-14 bottom-0 right-0 flex flex-col z-30 select-none">
     
     <!-- Drawer Header -->
     <div class="p-3 bg-neutral-100 border-b border-neutral-300 flex-shrink-0">
       <div class="flex items-center justify-between mb-2">
         <span class="font-mono text-xs font-black uppercase text-noir">UNITÉS FLOTTE (AVL)</span>
-        <span class="bg-noir text-white font-mono text-[10px] font-bold px-1.5 py-0.2">GPS LIVE</span>
+        <span class="bg-noir text-white font-mono text-[10px] font-bold px-1.5 py-0.2">GPS LIVE 6-DÉC</span>
       </div>
       <!-- Search Input -->
       <div class="relative">
         <input id="veh-search" oninput="filterDrawerList()" class="w-full bg-white border border-neutral-300 font-mono text-xs px-2.5 py-1.5 pl-8 outline-none focus:border-noir font-bold" type="text" placeholder="ZONE OU UNITÉ..." />
         <i data-lucide="search" class="w-3.5 h-3.5 text-neutral-400 absolute left-2.5 top-2"></i>
       </div>
+    </div>
+
+    <!-- OBD-II CAN BUS DIAGNOSTIC TERMINAL (DYNAMICALLY FILLED ON VEHICLE CLICK) -->
+    <div id="obd-terminal-container" class="flex-shrink-0 bg-noir text-white p-3 font-mono border-b-2 border-noir hidden">
+      <!-- Injected via JavaScript -->
     </div>
 
     <!-- Vehicle List -->
@@ -393,12 +466,22 @@
 
   <script>
     let map = null;
-    let markersLayer = null;
     let trafficLayer = null;
-    let selectedVehicleId = null;
+    let markersLayer = null;
+    let waypointsLayer = null;
     let activeRouteLine = null;
+    let selectedVehicleId = 232;
     let currentMapFilter = 'ALL';
     let wazeTrafficActive = true;
+    let waypointModeActive = false;
+    let activeHazardIndex = 0;
+
+    const WAZE_PRESET_HAZARDS = [
+      { artery: "AUTOROUTE 40 (METROPOLITAINE)", desc: "Carambolage 3 véhicules angle Décarie · Vitesse 8 km/h (+25 min)", lat: 45.4990, lng: -73.6550 },
+      { artery: "TUNNEL LOUIS-H.-LA FONTAINE", desc: "Voie centrale bloquée panne poids lourd · Ralentissement majeur", lat: 45.5890, lng: -73.5010 },
+      { artery: "PONT SAMUEL-DE CHAMPLAIN", desc: "Fort ralentissement amont direction Île de Montréal (31 km/h)", lat: 45.4750, lng: -73.5280 },
+      { artery: "VOIE CAMILLIEN-HOUDE (MONT-ROYAL)", desc: "Entrave cycliste & voirie urbaine · Vitesse limitée à 15 km/h", lat: 45.5090, lng: -73.5910 }
+    ];
 
     document.addEventListener('DOMContentLoaded', () => {
       lucide.createIcons();
@@ -408,7 +491,14 @@
 
       PULSE_CHANNEL.onmessage = (e) => {
         if (e.data.type === 'VEHICLES_UPDATED' || e.data.type === 'CALLS_UPDATED') {
-          renderAll();
+          renderMarkers();
+          updateOBDTerminal();
+          updateMapCounters();
+        } else if (e.data.type === 'WAYPOINTS_UPDATED') {
+          renderWaypoints();
+          recalculateActiveRoute();
+        } else if (e.data.type === 'WAZE_INCIDENTS_UPDATED') {
+          renderWazeTrafficLayer();
         }
       };
     });
@@ -438,11 +528,154 @@
 
       trafficLayer = L.layerGroup().addTo(map);
       markersLayer = L.layerGroup().addTo(map);
+      waypointsLayer = L.layerGroup().addTo(map);
 
       renderWazeTrafficLayer();
+
+      // Click on map to place waypoints when active
+      map.on('click', (e) => {
+        if (!waypointModeActive) return;
+        const newWp = PulseState.addWaypoint(e.latlng.lat, e.latlng.lng);
+        showVisualAlert(`WAYPOINT ${newWp.label} INJECTÉ : LAT ${newWp.lat.toFixed(4)} / LNG ${newWp.lng.toFixed(4)}`);
+        renderWaypoints();
+        recalculateActiveRoute();
+      });
     }
 
-    // WAZE LIVE TRAFFIC LAYER (Highways & Arterials Congestion & Hazards)
+    /* -------------------------------------------------------------
+     * SIMULATION CONTROLS & WAYPOINT ROUTING
+     * ----------------------------------------------------------- */
+    function toggleSimPlay() {
+      const isRunning = !PulseState.simulationRunning;
+      PulseState.setSimulationRunning(isRunning);
+      const btn = document.getElementById('sim-play-btn');
+      const icon = document.getElementById('sim-play-icon');
+      const text = document.getElementById('sim-play-text');
+      if (isRunning) {
+        btn.className = "bg-noir text-white text-xs font-black px-3 py-1.5 flex items-center gap-1.5 hover:bg-neutral-800 border border-noir";
+        icon.textContent = "⏸";
+        text.textContent = "PAUSE GPS";
+        showVisualAlert("TÉLÉMÉTRIE CAD : MOTEUR GPS LIVE ACTIVÉ [PLAY]");
+      } else {
+        btn.className = "bg-amber-400 text-noir text-xs font-black px-3 py-1.5 flex items-center gap-1.5 hover:bg-amber-300 border border-noir";
+        icon.textContent = "▶";
+        text.textContent = "REPRENDRE GPS";
+        showVisualAlert("TÉLÉMÉTRIE CAD : MOTEUR GPS MIS EN PAUSE");
+      }
+    }
+
+    function setSimSpeed(speed) {
+      PulseState.setSimulationSpeed(speed);
+      ['speed-1x', 'speed-2x', 'speed-5x'].forEach(id => {
+        const btn = document.getElementById(id);
+        btn.className = "px-2.5 py-1 text-xs font-bold bg-white text-noir hover:bg-neutral-100 border-l border-neutral-300";
+      });
+      const activeBtn = document.getElementById(`speed-${speed}x`);
+      activeBtn.className = "px-2.5 py-1 text-xs font-black bg-noir text-white border-l border-noir";
+      showVisualAlert(`CAD SIMULATION : MULTIPLICATEUR TEMPOREL ${speed}X`);
+    }
+
+    function injectNextHazard() {
+      const hazard = WAZE_PRESET_HAZARDS[activeHazardIndex % WAZE_PRESET_HAZARDS.length];
+      activeHazardIndex++;
+      PulseState.injectWazeIncident(hazard.artery, hazard.desc, hazard.lat, hazard.lng);
+      renderWazeTrafficLayer();
+      showVisualAlert(`ALERTE SIGNALEMENT WAZE : ${hazard.artery} — ${hazard.desc}`);
+    }
+
+    function toggleWaypointMode() {
+      waypointModeActive = !waypointModeActive;
+      const btn = document.getElementById('btn-waypoint-mode');
+      const text = document.getElementById('wp-mode-text');
+      const mapEl = document.getElementById('map');
+      if (waypointModeActive) {
+        btn.className = "bg-noir text-white border-1.5 border-noir text-xs font-black px-3 py-1.5 flex items-center gap-1.5 shadow-[2px_2px_0px_#09090b]";
+        text.textContent = "📍 FORCER ROUTAGE WAYPOINTS : ACTIF (CLIQUEZ SUR CARTE)";
+        mapEl.classList.add('waypoint-crosshair');
+        showVisualAlert("MODE ROUTAGE PAR WAYPOINTS ACTIF : Cliquez sur la carte de Montréal pour forcer l'itinéraire");
+      } else {
+        btn.className = "bg-white text-noir border-1.5 border-neutral-400 hover:border-black text-xs font-bold px-3 py-1.5 flex items-center gap-1.5";
+        text.textContent = "📍 FORCER ROUTAGE WAYPOINTS : INACTIF";
+        mapEl.classList.remove('waypoint-crosshair');
+      }
+    }
+
+    function renderWaypoints() {
+      if (!waypointsLayer) return;
+      waypointsLayer.clearLayers();
+
+      const waypoints = PulseState.getWaypoints();
+      const countEl = document.getElementById('wp-count');
+      const clearBtn = document.getElementById('btn-clear-wp');
+      if (countEl) countEl.textContent = waypoints.length;
+      if (clearBtn) {
+        if (waypoints.length > 0) clearBtn.classList.remove('hidden');
+        else clearBtn.classList.add('hidden');
+      }
+
+      waypoints.forEach((wp) => {
+        const icon = L.divIcon({
+          html: `<div class="wp-pin" style="padding:2px 6px;">📍 ${wp.label}</div>`,
+          iconSize: [64, 22],
+          iconAnchor: [32, 11]
+        });
+        const m = L.marker([wp.lat, wp.lng], { icon }).addTo(waypointsLayer)
+          .bindPopup(`<b>POINT DE PASSAGE OBLIGATOIRE ${wp.label}</b><br>Lat: ${wp.lat}<br>Lng: ${wp.lng}`);
+      });
+    }
+
+    function clearAllWaypoints() {
+      PulseState.clearWaypoints();
+      renderWaypoints();
+      recalculateActiveRoute();
+      showVisualAlert("POINTS DE PASSAGE CAD EFFACÉS — RETOUR À L'ITINÉRAIRE STANDARD");
+    }
+
+    function recalculateActiveRoute() {
+      if (activeRouteLine) map.removeLayer(activeRouteLine);
+      const veh = PulseState.getVehicles().find(v => v.id === selectedVehicleId);
+      if (!veh) return;
+
+      const waypoints = PulseState.getWaypoints();
+      const targetCoord = [45.5019, -73.5674]; // Default central pickup
+      
+      const routePoints = [[veh.lat, veh.lng]];
+      waypoints.forEach(wp => routePoints.push([wp.lat, wp.lng]));
+      routePoints.push(targetCoord);
+
+      activeRouteLine = L.polyline(routePoints, {
+        color: waypoints.length > 0 ? '#09090b' : '#52525b',
+        weight: waypoints.length > 0 ? 5 : 3,
+        dashArray: waypoints.length > 0 ? '8, 6' : '5, 5'
+      }).addTo(map);
+    }
+
+    /* -------------------------------------------------------------
+     * VISUAL MONOCHROME ALERT (0 SOUND)
+     * ----------------------------------------------------------- */
+    let alertBannerTimeout = null;
+    function showVisualAlert(message) {
+      const banner = document.getElementById('visual-alert-banner');
+      const text = document.getElementById('visual-alert-text');
+      if (!banner || !text) return;
+
+      text.textContent = message;
+      banner.classList.remove('hidden');
+      banner.classList.add('mono-alert-flash');
+
+      clearTimeout(alertBannerTimeout);
+      alertBannerTimeout = setTimeout(() => {
+        banner.classList.remove('mono-alert-flash');
+        banner.classList.add('hidden');
+      }, 4500);
+    }
+    function closeVisualAlert() {
+      document.getElementById('visual-alert-banner').classList.add('hidden');
+    }
+
+    /* -------------------------------------------------------------
+     * WAZE LIVE TRAFFIC LAYER
+     * ----------------------------------------------------------- */
     function renderWazeTrafficLayer() {
       if (!trafficLayer) return;
       trafficLayer.clearLayers();
@@ -484,22 +717,17 @@
       L.polyline(a20Segment, { color: '#16a34a', weight: 5, opacity: 0.85 }).addTo(trafficLayer)
         .bindPopup("<b>WAZE TRAFIC: A-20 OUEST (VERS YUL)</b><br>Circulation fluide · 78 km/h");
 
-      // 5. Waze Hazard Pins
-      const wazeHazardIcon = L.divIcon({
-        html: `<div class="waze-pin" style="padding:2px 5px;background:#09090b;color:#fff;">⚠️ ACCIDENT</div>`,
-        iconSize: [70, 20],
-        iconAnchor: [35, 10],
+      // Dynamic injected hazards
+      const dynamicIncidents = PulseState.getWazeIncidents();
+      dynamicIncidents.forEach(inc => {
+        const hazardIcon = L.divIcon({
+          html: `<div class="waze-pin" style="padding:2px 5px;background:#09090b;color:#fff;">⚠️ ${inc.id}</div>`,
+          iconSize: [65, 20],
+          iconAnchor: [32, 10],
+        });
+        L.marker([inc.lat, inc.lng], { icon: hazardIcon }).addTo(trafficLayer)
+          .bindPopup(`<b>ALERTE SIGNALEMENT WAZE (${inc.id})</b><br>${inc.artery}<br>${inc.desc}`);
       });
-      L.marker([45.520, -73.525], { icon: wazeHazardIcon }).addTo(trafficLayer)
-        .bindPopup("<b>ACCIDENT DE LA ROUTE</b><br>Pont Jacques-Cartier · Voies bloquées");
-
-      const wazeWorkIcon = L.divIcon({
-        html: `<div class="waze-pin" style="padding:2px 5px;background:#09090b;color:#fff;border-color:#f59e0b;box-shadow:2px 2px 0 #f59e0b;">🚧 TRAVAUX</div>`,
-        iconSize: [68, 20],
-        iconAnchor: [34, 10],
-      });
-      L.marker([45.5019, -73.5674], { icon: wazeWorkIcon }).addTo(trafficLayer)
-        .bindPopup("<b>CHANTIER URBAIN PEEL / RENÉ-LÉVESQUE</b><br>Entrave signalée par les usagers");
     }
 
     function toggleWazeTraffic() {
@@ -507,7 +735,7 @@
       const btn = document.getElementById('toggle-waze-btn');
       if (wazeTrafficActive) {
         btn.className = 'status-badge-mono bg-noir text-white border-noir font-black';
-        btn.innerHTML = `<span class="w-2 h-2 bg-rose-500 rounded-none inline-block"></span> CALQUE TRAFIC WAZE : ACTIF`;
+        btn.innerHTML = `<span class="w-2 h-2 bg-rose-500 rounded-none inline-block animate-pulse"></span> CALQUE TRAFIC WAZE : ACTIF`;
       } else {
         btn.className = 'status-badge-mono bg-white text-neutral-600 border-neutral-300 font-bold';
         btn.innerHTML = `<span class="w-2 h-2 bg-neutral-400 rounded-none inline-block"></span> CALQUE TRAFIC WAZE : MASQUÉ`;
@@ -515,9 +743,14 @@
       renderWazeTrafficLayer();
     }
 
+    /* -------------------------------------------------------------
+     * RENDERING ENGINE & OBD-II TERMINAL
+     * ----------------------------------------------------------- */
     function renderAll() {
       renderMarkers();
       renderDrawerList();
+      renderWaypoints();
+      updateOBDTerminal();
       updateMapCounters();
     }
 
@@ -527,6 +760,58 @@
       document.getElementById('stat-libre-vehs').textContent = vehs.filter(v => v.status === 'LIBRE').length;
       document.getElementById('stat-enroute-vehs').textContent = vehs.filter(v => v.status === 'EN_ROUTE').length;
       document.getElementById('stat-course-vehs').textContent = vehs.filter(v => v.status === 'EN_COURSE').length;
+    }
+
+    function updateOBDTerminal() {
+      const container = document.getElementById('obd-terminal-container');
+      const veh = PulseState.getVehicles().find(v => v.id === selectedVehicleId);
+      if (!veh) {
+        container.classList.add('hidden');
+        return;
+      }
+
+      container.classList.remove('hidden');
+      container.innerHTML = `
+        <div class="flex items-center justify-between pb-2 border-b border-neutral-700 mb-2">
+          <div class="flex items-center gap-2">
+            <span class="w-2 h-2 bg-emerald-400 inline-block animate-pulse"></span>
+            <span class="text-xs font-black uppercase tracking-wider">OBD-II CAN BUS // ${veh.code}</span>
+          </div>
+          <span class="text-[9px] bg-white text-noir font-black px-1.5 py-0.2">CAN-ISO-11898</span>
+        </div>
+
+        <div class="grid grid-cols-2 gap-2 text-[10px] mb-2">
+          <div>
+            <div class="text-neutral-400 text-[9px] uppercase font-bold">GPS FIX EXACT (6 DÉC.)</div>
+            <div class="font-bold text-white tracking-tight">${veh.lat.toFixed(6)}° N<br>${veh.lng.toFixed(6)}° W</div>
+          </div>
+          <div>
+            <div class="text-neutral-400 text-[9px] uppercase font-bold">CAP & ODOMÈTRE</div>
+            <div class="font-bold text-white">${veh.heading || 0}° · ${(veh.odometerKm || 50000).toLocaleString('fr-CA')} KM</div>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-3 gap-1.5 text-center bg-neutral-900 p-2 border border-neutral-700 text-[10px] mb-2">
+          <div>
+            <div class="text-[8px] text-neutral-400 uppercase font-bold">TENSION CAN</div>
+            <div class="font-black text-emerald-400">${veh.batteryVoltage || 13.9} V</div>
+          </div>
+          <div>
+            <div class="text-[8px] text-neutral-400 uppercase font-bold">T° MOTEUR</div>
+            <div class="font-black text-amber-400">${veh.coolantTemp || 91} °C</div>
+          </div>
+          <div>
+            <div class="text-[8px] text-neutral-400 uppercase font-bold">VITESSE CAN</div>
+            <div class="font-black text-white">${veh.speed} KM/H</div>
+          </div>
+        </div>
+
+        <div class="text-[9px] text-neutral-400 space-y-0.5 border-t border-neutral-800 pt-1.5 leading-snug">
+          <div>MATÉRIEL : <strong class="text-neutral-200">${veh.mdtHardwareId || 'MDT-HW-99232-REV4'}</strong></div>
+          <div>N° VIN : <strong class="text-neutral-200">${veh.vin || '2C3CDXAG8KH23209'}</strong></div>
+          <div>LIAISON IOT : <span class="text-emerald-400 font-bold">4G/LTE · 24ms · RSSI ${veh.networkRssi || -68} dBm · AES-256</span></div>
+        </div>
+      `;
     }
 
     function renderMarkers() {
@@ -540,23 +825,24 @@
       vehicles.forEach(v => {
         if (currentMapFilter !== 'ALL' && v.status !== currentMapFilter) return;
 
+        const isSelected = v.id === selectedVehicleId;
         const pinIcon = L.divIcon({
           className: '',
-          html: `<div class="veh-pin" style="width:28px;height:28px;">${v.id}</div>`,
-          iconSize: [28, 28],
-          iconAnchor: [14, 14],
+          html: `<div class="veh-pin" style="width:${isSelected ? '32px' : '28px'};height:${isSelected ? '32px' : '28px'};${isSelected ? 'border-color:#facc15;box-shadow:3px 3px 0 #000;' : ''}">${v.id}</div>`,
+          iconSize: [isSelected ? 32 : 28, isSelected ? 32 : 28],
+          iconAnchor: [isSelected ? 16 : 14, isSelected ? 16 : 14],
         });
 
         const popupHTML = `
-          <div style="padding:12px;font-family:'IBM Plex Mono',monospace;min-width:220px;">
+          <div style="padding:12px;font-family:'IBM Plex Mono',monospace;min-width:240px;">
             <div style="background:#09090b;color:#fff;padding:4px 8px;font-weight:900;font-size:11px;margin-bottom:8px;display:flex;justify-content:space-between;">
               <span>${v.code}</span>
               <span>[${v.status}]</span>
             </div>
-            <div style="font-size:11px;color:#09090b;margin-bottom:4px;"><strong>TYPE:</strong> ${v.type}</div>
-            <div style="font-size:10px;color:#52525b;margin-bottom:4px;"><strong>SECTEUR:</strong> ${v.zone}</div>
-            <div style="font-size:10px;color:#52525b;margin-bottom:4px;"><strong>REPÈRE:</strong> ${v.address || 'Montréal'}</div>
-            <div style="font-size:10px;color:#09090b;margin-bottom:10px;"><strong>VITESSE GPS:</strong> ${v.speed} KM/H</div>
+            <div style="font-size:11px;color:#09090b;margin-bottom:3px;"><strong>TYPE:</strong> ${v.type}</div>
+            <div style="font-size:10px;color:#52525b;margin-bottom:3px;"><strong>SECTEUR:</strong> ${v.zone}</div>
+            <div style="font-size:10px;color:#09090b;margin-bottom:3px;"><strong>GPS:</strong> ${v.lat.toFixed(6)}, ${v.lng.toFixed(6)}</div>
+            <div style="font-size:10px;color:#09090b;margin-bottom:8px;"><strong>VITESSE CAN:</strong> ${v.speed} KM/H (CAP ${v.heading || 0}°)</div>
             <a href="dispatch.html?assign=${v.id}" style="display:block;text-align:center;background:#09090b;color:#fff;padding:6px;font-size:10px;font-weight:800;text-decoration:none;text-transform:uppercase;">
               ASSIGNER CETTE UNITÉ [DISPATCH]
             </a>
@@ -634,7 +920,7 @@
           </div>
           <div class="text-[10px] text-neutral-500 font-mono truncate font-semibold">${v.address || v.zone}</div>
           <div class="flex items-center justify-between mt-2 pt-1 border-t border-neutral-100 font-mono text-[10px]">
-            <span class="text-neutral-500 font-bold">${v.speed} KM/H</span>
+            <span class="text-neutral-700 font-bold">${v.speed} KM/H · ${v.batteryVoltage || 13.9}V</span>
             <a href="dispatch.html?assign=${v.id}" class="bg-noir text-white px-2 py-0.5 font-bold uppercase hover:bg-neutral-800">
               DISPATCHER →
             </a>
@@ -658,22 +944,13 @@
         card.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
       }
 
+      updateOBDTerminal();
+      recalculateActiveRoute();
+
       map.flyTo([v.lat, v.lng], 14, { duration: 0.8 });
       setTimeout(() => {
         if (v.marker) v.marker.openPopup();
       }, 900);
-
-      // Draw polyline to nearest active call
-      if (activeRouteLine) map.removeLayer(activeRouteLine);
-      const calls = PulseState.getCalls().filter(c => c.status === 'EN_ATTENTE');
-      if (calls.length > 0) {
-        const targetCoord = [45.5019, -73.5674];
-        activeRouteLine = L.polyline([[v.lat, v.lng], targetCoord], {
-          color: '#09090b',
-          weight: 3,
-          dashArray: '5, 5'
-        }).addTo(map);
-      }
     }
 
     function filterMapByStatus(status, btn) {
@@ -688,25 +965,12 @@
       renderDrawerList();
     }
 
-    function triggerJitterRefresh() {
-      const icon = document.getElementById('refresh-icon');
-      icon.classList.add('animate-spin');
-      setTimeout(() => {
-        icon.classList.remove('animate-spin');
-        const vehs = PulseState.getVehicles();
-        vehs.forEach(v => {
-          if (v.status !== 'PAUSE') {
-            v.lat += (Math.random() - 0.5) * 0.002;
-            v.lng += (Math.random() - 0.5) * 0.002;
-          }
-        });
-        PulseState.saveVehicles(vehs);
-        renderAll();
-      }, 500);
-    }
-
     // Share Modal
     function openShareModal() {
+      const currentOrigin = window.location.origin.includes('lhr.life') ? window.location.origin : 'https://f3dfe920cfc829.lhr.life';
+      const page = window.location.pathname.split('/').pop() || 'map.html';
+      const pubInput = document.getElementById('share-url-public');
+      if (pubInput) pubInput.value = `${currentOrigin}/${page}`;
       document.getElementById('share-modal').style.display = 'flex';
     }
     function closeShareModal() {
