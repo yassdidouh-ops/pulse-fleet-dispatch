@@ -586,6 +586,10 @@ ${msg.body}
 
     // Share Modal
     function openShareModal() {
+      const currentOrigin = window.location.origin.includes('lhr.life') ? window.location.origin : 'https://f3dfe920cfc829.lhr.life';
+      const page = window.location.pathname.split('/').pop() || 'messages.html';
+      const pubInput = document.getElementById('share-url-public');
+      if (pubInput) pubInput.value = `${currentOrigin}/${page}`;
       document.getElementById('share-modal').style.display = 'flex';
     }
     function closeShareModal() {
