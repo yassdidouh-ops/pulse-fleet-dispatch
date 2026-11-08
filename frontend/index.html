@@ -1,14 +1,14 @@
 <!DOCTYPE html>
-<html lang="fr-CA">
+<html lang="fr-CA" class="h-full">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>PULSE CAD — Console Centrale de Dispatch</title>
 
-  <!-- High-Readability Enterprise Typography: Plus Jakarta Sans + IBM Plex Mono -->
+  <!-- Apple / Modern Minimalist Typography: Plus Jakarta Sans + IBM Plex Mono -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&family=IBM+Plex+Mono:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600;700&display=swap" rel="stylesheet" />
 
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://unpkg.com/lucide@latest"></script>
@@ -19,13 +19,14 @@
       theme: {
         extend: {
           fontFamily: {
-            sans: ['Plus Jakarta Sans', 'sans-serif'],
-            mono: ['IBM Plex Mono', 'monospace'],
+            sans: ['"Plus Jakarta Sans"', '-apple-system', 'BlinkMacSystemFont', 'sans-serif'],
+            mono: ['"IBM Plex Mono"', 'monospace'],
           },
           colors: {
-            noir: '#09090b',
-            charcoal: '#18181b',
-            bordercol: '#d4d4d8',
+            noir: '#111113',
+            studio: '#ebecef',
+            window: '#f5f5f7',
+            frosted: 'rgba(255, 255, 255, 0.75)',
           }
         }
       }
@@ -35,557 +36,746 @@
     * { box-sizing: border-box; }
     body {
       font-family: 'Plus Jakarta Sans', -apple-system, sans-serif;
-      background-color: #f4f4f5;
-      color: #09090b;
+      background-color: #ebecef;
+      color: #111113;
       margin: 0;
       height: 100vh;
       overflow: hidden;
       display: flex;
-      flex-direction: column;
       -webkit-font-smoothing: antialiased;
     }
 
     ::-webkit-scrollbar { width: 5px; height: 5px; }
-    ::-webkit-scrollbar-track { background: #f4f4f5; }
-    ::-webkit-scrollbar-thumb { background: #18181b; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: #d4d4d8; border-radius: 4px; }
+    ::-webkit-scrollbar-thumb:hover { background: #a1a1aa; }
 
-    /* Brutalist Structural Card */
-    .brut-card {
-      background: #ffffff;
-      border: 1.5px solid #09090b;
-      box-shadow: 3px 3px 0px #09090b;
-      transition: all 0.12s ease;
-      position: relative;
-    }
-    .brut-card:hover {
-      transform: translate(-2px, -2px);
-      box-shadow: 5px 5px 0px #09090b;
-    }
-
-    .brut-btn-black {
-      background: #09090b;
-      color: #ffffff;
-      border: 1.5px solid #09090b;
-      transition: all 0.12s ease;
-      box-shadow: 2px 2px 0px #09090b;
-    }
-    .brut-btn-black:hover {
-      background: #18181b;
-      transform: translate(-1px, -1px);
-      box-shadow: 3px 3px 0px #09090b;
+    /* Outer Floating Black Dock (Exact match to reference) */
+    .dock-pill {
+      background: #1c1c1e;
+      border-radius: 26px;
+      padding: 10px 8px;
+      box-shadow: 0 16px 36px -6px rgba(0, 0, 0, 0.25);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 14px;
     }
 
-    .nav-btn {
-      width: 44px;
-      height: 44px;
+    .dock-btn {
+      width: 38px;
+      height: 38px;
+      border-radius: 14px;
       display: flex;
       align-items: center;
       justify-content: center;
-      color: #52525b;
-      border: 1px solid transparent;
-      transition: all 0.12s ease;
+      color: #8e8e93;
+      transition: all 0.18s cubic-bezier(0.16, 1, 0.3, 1);
       position: relative;
     }
-    .nav-btn:hover {
-      background: #ffffff;
-      color: #09090b;
-      border-color: #09090b;
-    }
-    .nav-btn.active {
-      background: #09090b;
+    .dock-btn:hover {
+      background: rgba(255, 255, 255, 0.12);
       color: #ffffff;
-      border-color: #09090b;
+      transform: scale(1.05);
     }
-    .nav-btn .tip {
+    .dock-btn.active {
+      background: #ffffff;
+      color: #1c1c1e;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    }
+    .dock-btn .tip {
       position: absolute;
       left: 54px;
-      background: #09090b;
+      background: #1c1c1e;
       color: #ffffff;
-      font-family: 'IBM Plex Mono', monospace;
+      font-family: 'Plus Jakarta Sans', sans-serif;
       font-size: 11px;
-      font-weight: 700;
-      padding: 4px 8px;
+      font-weight: 600;
+      padding: 6px 12px;
+      border-radius: 8px;
       white-space: nowrap;
       pointer-events: none;
       opacity: 0;
       transition: opacity 0.15s ease;
       z-index: 100;
-      border: 1px solid #27272a;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.25);
     }
-    .nav-btn:hover .tip { opacity: 1; }
+    .dock-btn:hover .tip { opacity: 1; }
+
+    /* Main Window Surface (macOS rounded chassis) */
+    .window-chassis {
+      background: #f5f5f7;
+      border-radius: 28px;
+      border: 1px solid rgba(255, 255, 255, 0.85);
+      box-shadow: 0 25px 60px -15px rgba(0, 0, 0, 0.08), 0 0 0 1px rgba(0, 0, 0, 0.04);
+      overflow: hidden;
+      display: flex;
+      flex: 1;
+      height: calc(100vh - 2rem);
+      margin: 1rem 1rem 1rem 0;
+    }
+
+    /* Reference Active Navigation Item (Frosted Glowing Pill) */
+    .nav-frosted-active {
+      background: rgba(255, 255, 255, 0.85);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border-radius: 14px;
+      border: 1px solid rgba(255, 255, 255, 0.9);
+      box-shadow: 0 3px 12px -2px rgba(0, 0, 0, 0.05), inset 0 1px 1px rgba(255, 255, 255, 0.9);
+      color: #111113;
+      font-weight: 600;
+    }
+
+    .nav-frosted-inactive {
+      color: #636366;
+      border-radius: 12px;
+      transition: all 0.15s ease;
+    }
+    .nav-frosted-inactive:hover {
+      background: rgba(255, 255, 255, 0.5);
+      color: #111113;
+    }
+
+    /* Glass Cards in Main Pane */
+    .glass-card {
+      background: rgba(255, 255, 255, 0.8);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border-radius: 20px;
+      border: 1px solid rgba(255, 255, 255, 0.9);
+      box-shadow: 0 8px 25px -4px rgba(0, 0, 0, 0.03), 0 1px 2px rgba(0, 0, 0, 0.02);
+      transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .glass-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 16px 36px -6px rgba(0, 0, 0, 0.06);
+    }
+
+    /* Vertical Micro Text Labels */
+    .vertical-label {
+      writing-mode: vertical-lr;
+      text-orientation: mixed;
+      transform: rotate(180deg);
+      letter-spacing: 0.15em;
+    }
   </style>
 </head>
-<body class="bg-neutral-100 text-noir">
+<body class="bg-studio flex items-center p-3">
 
-  <!-- TOP HEADER (BRUT BLANC / BLOC NOIR) -->
-  <header class="h-14 bg-white border-b-2 border-noir flex items-center justify-between px-4 z-40 flex-shrink-0 select-none">
+  <!-- ========================================================================= -->
+  <!-- 1. LEFT FLOATING BLACK DOCK (EXACT REAGLE STYLE REFERENCE)                -->
+  <!-- ========================================================================= -->
+  <aside class="w-16 flex flex-col items-center justify-between h-[calc(100vh-2rem)] py-2 select-none z-40 flex-shrink-0">
     
-    <!-- LEFT: System Brand & Division -->
-    <div class="flex items-center gap-4">
-      <a href="index.html" class="flex items-center gap-2 text-decoration-none">
-        <div class="bg-noir text-white font-mono font-black text-sm px-2.5 py-1 tracking-widest flex items-center gap-1.5">
-          <span class="inline-block w-2 h-2 bg-white"></span>
-          PULSE<span class="text-neutral-400">//</span>CAD
-        </div>
+    <!-- Top Black Capsule -->
+    <div class="dock-pill">
+      
+      <!-- Logo Star / Asterisk -->
+      <a href="index.html" class="w-9 h-9 rounded-full bg-white/10 flex items-center justify-center text-white hover:bg-white/20 transition-colors mb-1">
+        <i data-lucide="sparkles" class="w-4 h-4 text-emerald-400"></i>
       </a>
 
-      <div class="h-5 w-px bg-neutral-300"></div>
+      <!-- Navigation Icons -->
+      <a href="index.html" class="dock-btn active" title="Vue d'ensemble">
+        <i data-lucide="home" class="w-4 h-4"></i>
+        <span class="tip">Tableau de Bord [F1]</span>
+      </a>
 
-      <!-- Enterprise Context -->
-      <div class="flex items-center gap-2">
-        <span class="font-mono text-[11px] font-bold uppercase bg-neutral-100 border border-neutral-300 px-2 py-0.5 text-neutral-800">
-          CENTRAL METRO DISPATCH
-        </span>
-        <span class="text-neutral-400 text-xs">/</span>
-        <span class="font-mono text-[11px] text-neutral-600 font-bold tracking-wide uppercase">
-          RÉSEAU OPÉRATIONNEL PRINCIPAL // SYS-CAD-01
-        </span>
-      </div>
+      <a href="dispatch.html" class="dock-btn" title="Répartition Immédiate">
+        <i data-lucide="radio" class="w-4 h-4"></i>
+        <span class="tip">Répartition Immédiate [F2]</span>
+      </a>
+
+      <a href="queue.html" class="dock-btn" title="File des courses">
+        <i data-lucide="list-ordered" class="w-4 h-4"></i>
+        <span class="tip">File des Courses [F3]</span>
+      </a>
+
+      <a href="map.html" class="dock-btn" title="Carte Flotte GPS AVL">
+        <i data-lucide="globe" class="w-4 h-4"></i>
+        <span class="tip">Carte Flotte & Waze [F4]</span>
+      </a>
+
+      <a href="messages.html" class="dock-btn" title="Messagerie Radio MDT">
+        <i data-lucide="message-square" class="w-4 h-4"></i>
+        <span class="tip">Messagerie MDT [F5]</span>
+      </a>
+
+      <a href="driver.html" class="dock-btn" title="Terminal Mobile Chauffeur">
+        <i data-lucide="smartphone" class="w-4 h-4"></i>
+        <span class="tip">Terminal Chauffeur [F6]</span>
+      </a>
+
+      <a href="receipt.html" class="dock-btn" title="Facturation & Reçus">
+        <i data-lucide="receipt" class="w-4 h-4"></i>
+        <span class="tip">Facturation & Reçus CAD</span>
+      </a>
+
     </div>
 
-    <!-- RIGHT: Telemetry, Clock, Operator -->
-    <div class="flex items-center gap-3">
-      <!-- Collaboration Share Button -->
-      <button onclick="openShareModal()" class="bg-noir text-white font-mono text-xs font-bold uppercase px-3 py-1 flex items-center gap-1.5 border border-noir hover:bg-neutral-800 shadow-[2px_2px_0px_#09090b]">
-        <i data-lucide="share-2" class="w-3.5 h-3.5"></i>
-        PARTAGER AVEC COLLABORATEUR
-      </button>
-
-      <!-- Live Clock -->
-      <div class="hidden md:flex items-center gap-2 bg-neutral-50 border border-neutral-300 px-2.5 py-1">
-        <span class="w-1.5 h-1.5 bg-black"></span>
-        <span id="clock" class="font-mono text-xs font-semibold text-neutral-900 uppercase">--:--:--</span>
-      </div>
-
-      <!-- Network / Operational Status -->
-      <div class="flex items-center gap-1.5 bg-neutral-50 border border-neutral-300 px-2.5 py-1">
-        <span class="w-2 h-2 bg-emerald-600"></span>
-        <span class="font-mono text-[11px] font-bold text-neutral-800 uppercase tracking-wider">SYSTÈME EN LIGNE</span>
-      </div>
-
-      <!-- Operator Profile Badge -->
-      <div class="flex items-center gap-2 bg-noir text-white px-2.5 py-1 border border-noir font-mono text-xs font-bold">
-        <span class="text-neutral-400">DISP:</span>
-        <span class="tracking-wider">AGENT-01</span>
-        <span class="bg-neutral-800 text-[10px] px-1.5 py-0.2 text-neutral-300">OP-408</span>
-      </div>
+    <!-- Vertical Watermark Label -->
+    <div class="text-[9px] font-mono text-neutral-400 font-bold uppercase vertical-label tracking-widest my-auto opacity-70">
+      PULSE 2026 CAD
     </div>
-  </header>
 
-  <!-- BODY LAYOUT (SIDEBAR + WORKSPACE) -->
-  <div class="flex flex-1 overflow-hidden">
-
-    <!-- LEFT COMPACT BRUTALIST SIDEBAR -->
-    <aside class="w-14 bg-white border-r-2 border-noir flex flex-col items-center py-3 gap-2 flex-shrink-0 select-none z-30">
-      
-      <a href="index.html" class="nav-btn active" title="Vue d'ensemble">
-        <i data-lucide="layout-grid" class="w-5 h-5"></i>
-        <span class="tip">TABLEAU DE BORD [F1]</span>
-      </a>
-
-      <a href="dispatch.html" class="nav-btn" title="Console de Répartition">
-        <i data-lucide="radio" class="w-5 h-5"></i>
-        <span class="tip">RÉPARTITION IMMÉDIATE [F2]</span>
-      </a>
-
-      <a href="queue.html" class="nav-btn" title="File des courses">
-        <i data-lucide="list-ordered" class="w-5 h-5"></i>
-        <span class="tip">FILE DES COURSES [F3]</span>
-      </a>
-
-      <a href="map.html" class="nav-btn" title="Carte temps réel">
-        <i data-lucide="map" class="w-5 h-5"></i>
-        <span class="tip">CARTE FLOTTE [F4]</span>
-      </a>
-
-      <a href="messages.html" class="nav-btn" title="Radio & Messages MDT">
-        <i data-lucide="message-square" class="w-5 h-5"></i>
-        <span class="tip">MESSAGERIE MDT [F5]</span>
-      </a>
-
-      <a href="receipt.html" class="nav-btn" title="Facturation & Reçus CAD">
-        <i data-lucide="receipt" class="w-5 h-5"></i>
-        <span class="tip">FACTURATION & REÇUS</span>
-      </a>
-
-      <a href="driver.html" class="nav-btn" title="Terminal Mobile Chauffeur MDT">
-        <i data-lucide="smartphone" class="w-5 h-5"></i>
-        <span class="tip">TERMINAL CHAUFFEUR [F6]</span>
-      </a>
-
-      <div class="flex-1"></div>
-
-      <button onclick="PulseState.resetDemoData(); location.reload();" class="nav-btn" title="Réinitialiser données système">
-        <i data-lucide="rotate-ccw" class="w-5 h-5"></i>
-        <span class="tip">RÉINITIALISER SYSTÈME</span>
+    <!-- Bottom Settings Capsule -->
+    <div class="flex flex-col items-center gap-2">
+      <button onclick="PulseState.resetDemoData(); location.reload();" class="w-11 h-11 bg-[#1c1c1e] text-neutral-400 hover:text-white rounded-[16px] flex items-center justify-center shadow-lg transition-transform hover:scale-105" title="Réinitialiser données système">
+        <i data-lucide="settings" class="w-4 h-4"></i>
       </button>
-    </aside>
+    </div>
 
-    <!-- MAIN DASHBOARD CONTENT -->
-    <main class="flex-1 overflow-y-auto p-6 flex flex-col justify-between">
+  </aside>
+
+  <!-- ========================================================================= -->
+  <!-- 2. MAIN WINDOW CONTAINER (MACOS ROUNDED CHASSIS)                           -->
+  <!-- ========================================================================= -->
+  <div class="window-chassis">
+
+    <!-- ======================================================================= -->
+    <!-- 2A. LEFT SUB-SIDEBAR (MATCHING REFERENCE PROJECTS / STATUS / DOCUMENTS) -->
+    <!-- ======================================================================= -->
+    <div class="w-72 bg-[#f2f2f4]/90 border-r border-neutral-200/80 flex flex-col p-5 select-none overflow-y-auto flex-shrink-0">
       
-      <div class="max-w-7xl mx-auto w-full">
-        
-        <!-- SECTION TITLE & SYSTEM BANNER -->
-        <div class="flex flex-col md:flex-row md:items-end justify-between border-b-2 border-noir pb-4 mb-6 gap-3">
-          <div>
-            <div class="flex items-center gap-2 mb-1">
-              <span class="bg-noir text-white text-[10px] font-mono font-bold px-2 py-0.5 tracking-wider uppercase">
-                PULSE ENTERPRISE CAD
-              </span>
-              <span class="text-neutral-500 font-mono text-xs">SYS-BUILD 2026.11 // PRODUCTION</span>
-            </div>
-            <h1 class="text-2xl font-black tracking-tight text-noir uppercase">
-              CONSOLE OPÉRATIONNELLE DE FLOTTE
-            </h1>
-            <p class="text-neutral-600 text-xs font-mono uppercase tracking-wide">
-              DISPATCH CAD · CARTOGRAPHIE GPS AVL · TÉLÉMÉTRIE TEMPS RÉEL
-            </p>
-          </div>
-
-          <div class="flex items-center gap-2">
-            <a href="dispatch.html" class="brut-btn-black px-4 py-2 text-xs font-mono font-bold uppercase tracking-wider flex items-center gap-2">
-              <i data-lucide="plus-circle" class="w-4 h-4"></i>
-              NOUVELLE COURSE [F2]
-            </a>
-            <a href="queue.html" class="bg-white border-1.5 border-noir px-3 py-2 text-xs font-mono font-bold text-noir hover:bg-neutral-100 flex items-center gap-1.5 shadow-[2px_2px_0px_#09090b]">
-              <i data-lucide="list-ordered" class="w-3.5 h-3.5"></i>
-              FILE DES COURSES [F3]
-            </a>
-          </div>
+      <!-- macOS Traffic Lights & Title -->
+      <div class="flex items-center justify-between pb-5 mb-5 border-b border-neutral-200/60">
+        <div class="flex items-center gap-2">
+          <span class="w-3 h-3 rounded-full bg-[#ff5f57] border border-[#e0443e]"></span>
+          <span class="w-3 h-3 rounded-full bg-[#febc2e] border border-[#d89e24]"></span>
+          <span class="w-3 h-3 rounded-full bg-[#28c840] border border-[#1aab29]"></span>
         </div>
+        <span class="text-[10px] font-mono font-bold uppercase text-neutral-400 tracking-wider">
+          PULSE // CAD v2.6
+        </span>
+      </div>
 
-        <!-- 3x3 ARCHITECTURAL BRUTALIST MODULE GRID -->
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 mb-8">
-
-          <!-- 1. RÉCEPTION & CRÉATION -->
-          <a href="dispatch.html" class="brut-card p-5 flex flex-col justify-between no-underline">
-            <div>
-              <div class="flex items-center justify-between border-b border-neutral-200 pb-3 mb-3">
-                <span class="bg-noir text-white font-mono text-[10px] font-bold px-2 py-0.5 uppercase tracking-wider">MOD-01</span>
-                <span class="font-mono text-[10px] text-neutral-500 font-bold">[F2]</span>
-              </div>
-              <div class="flex items-start gap-3">
-                <div class="w-10 h-10 bg-noir text-white flex items-center justify-center flex-shrink-0">
-                  <i data-lucide="phone-call" class="w-5 h-5"></i>
-                </div>
-                <div>
-                  <h2 class="text-base font-black text-noir uppercase tracking-tight m-0">RÉCEPTION & SAISIE D'APPEL</h2>
-                  <p class="text-xs text-neutral-600 mt-1 leading-snug font-medium">Saisie d'itinéraire, attribution manuelle ou algorithmique, calcul de tarif et envoi direct.</p>
-                </div>
-              </div>
-            </div>
-            <div class="mt-4 pt-3 border-t border-neutral-200 flex items-center justify-between font-mono text-[11px]">
-              <span class="text-neutral-500 font-bold">TERMINAL CAD :</span>
-              <span class="font-black text-noir flex items-center gap-1">
-                <span class="w-2 h-2 bg-emerald-600 inline-block"></span> PRÊT POUR SAISIE
-              </span>
-            </div>
-          </a>
-
-          <!-- 2. RÉPARTITION DES APPELS / FILE -->
-          <a href="queue.html" class="brut-card p-5 flex flex-col justify-between no-underline">
-            <div>
-              <div class="flex items-center justify-between border-b border-neutral-200 pb-3 mb-3">
-                <span class="bg-noir text-white font-mono text-[10px] font-bold px-2 py-0.5 uppercase tracking-wider">MOD-02</span>
-                <span class="font-mono text-[10px] text-neutral-500 font-bold">[F3]</span>
-              </div>
-              <div class="flex items-start gap-3">
-                <div class="w-10 h-10 bg-noir text-white flex items-center justify-center flex-shrink-0">
-                  <i data-lucide="git-pull-request" class="w-5 h-5"></i>
-                </div>
-                <div>
-                  <h2 class="text-base font-black text-noir uppercase tracking-tight m-0">FILE D'ATTENTE DES COURSES</h2>
-                  <p class="text-xs text-neutral-600 mt-1 leading-snug font-medium">Gestion temps réel, assignation immédiate aux unités libres, progression des étapes.</p>
-                </div>
-              </div>
-            </div>
-            <div class="mt-4 pt-3 border-t border-neutral-200 flex items-center justify-between font-mono text-[11px]">
-              <span class="text-neutral-500 font-bold">EN ATTENTE :</span>
-              <span class="font-black text-noir bg-neutral-200 px-2 py-0.5" id="card-pending-count">0 EN ATTENTE</span>
-            </div>
-          </a>
-
-          <!-- 3. CARTE VÉHICULE & FLOTTE -->
-          <a href="map.html" class="brut-card p-5 flex flex-col justify-between no-underline">
-            <div>
-              <div class="flex items-center justify-between border-b border-neutral-200 pb-3 mb-3">
-                <span class="bg-noir text-white font-mono text-[10px] font-bold px-2 py-0.5 uppercase tracking-wider">MOD-03</span>
-                <span class="font-mono text-[10px] text-neutral-500 font-bold">[F4]</span>
-              </div>
-              <div class="flex items-start gap-3">
-                <div class="w-10 h-10 bg-noir text-white flex items-center justify-center flex-shrink-0">
-                  <i data-lucide="map-pin" class="w-5 h-5"></i>
-                </div>
-                <div>
-                  <h2 class="text-base font-black text-noir uppercase tracking-tight m-0">CARTE TÉLÉMATIQUE GPS</h2>
-                  <p class="text-xs text-neutral-600 mt-1 leading-snug font-medium">Positionnement AVL en direct, traçage d'itinéraires et état opérationnel des unités.</p>
-                </div>
-              </div>
-            </div>
-            <div class="mt-4 pt-3 border-t border-neutral-200 flex items-center justify-between font-mono text-[11px]">
-              <span class="text-neutral-500 font-bold">FLOTTE AVL :</span>
-              <span class="font-black text-noir flex items-center gap-1" id="card-vehs-online">
-                <span class="w-2 h-2 bg-emerald-600 inline-block"></span> 12 UNITÉS CONNECTÉES
-              </span>
-            </div>
-          </a>
-
-          <!-- 4. MESSAGERIE INTERNE & RADIO -->
-          <a href="messages.html" class="brut-card p-5 flex flex-col justify-between no-underline">
-            <div>
-              <div class="flex items-center justify-between border-b border-neutral-200 pb-3 mb-3">
-                <span class="bg-noir text-white font-mono text-[10px] font-bold px-2 py-0.5 uppercase tracking-wider">MOD-04</span>
-                <span class="font-mono text-[10px] text-neutral-500 font-bold">[F5]</span>
-              </div>
-              <div class="flex items-start gap-3">
-                <div class="w-10 h-10 bg-noir text-white flex items-center justify-center flex-shrink-0">
-                  <i data-lucide="radio" class="w-5 h-5"></i>
-                </div>
-                <div>
-                  <h2 class="text-base font-black text-noir uppercase tracking-tight m-0">RADIO MDT & COMMUNICATIONS</h2>
-                  <p class="text-xs text-neutral-600 mt-1 leading-snug font-medium">Diffusion générale de flotte, alertes de voirie et messagerie directe terminaux.</p>
-                </div>
-              </div>
-            </div>
-            <div class="mt-4 pt-3 border-t border-neutral-200 flex items-center justify-between font-mono text-[11px]">
-              <span class="text-neutral-500 font-bold">TRANSMISSIONS :</span>
-              <span class="font-black text-noir" id="card-unread-msg">0 NON LUS</span>
-            </div>
-          </a>
-
-          <!-- 5. TABLEAU D'ACCROCHAGE -->
-          <a href="map.html" class="brut-card p-5 flex flex-col justify-between no-underline">
-            <div>
-              <div class="flex items-center justify-between border-b border-neutral-200 pb-3 mb-3">
-                <span class="bg-noir text-white font-mono text-[10px] font-bold px-2 py-0.5 uppercase tracking-wider">MOD-05</span>
-                <span class="font-mono text-[10px] text-neutral-500 font-bold">[ZONES]</span>
-              </div>
-              <div class="flex items-start gap-3">
-                <div class="w-10 h-10 bg-noir text-white flex items-center justify-center flex-shrink-0">
-                  <i data-lucide="layers" class="w-5 h-5"></i>
-                </div>
-                <div>
-                  <h2 class="text-base font-black text-noir uppercase tracking-tight m-0">BORNES & POSTES D'ATTENTE</h2>
-                  <p class="text-xs text-neutral-600 mt-1 leading-snug font-medium">Gestion des secteurs d'attente (Zones 01 à 11), priorité FIFO et saturation.</p>
-                </div>
-              </div>
-            </div>
-            <div class="mt-4 pt-3 border-t border-neutral-200 flex items-center justify-between font-mono text-[11px]">
-              <span class="text-neutral-500 font-bold">SECTEUR CENTRAL :</span>
-              <span class="font-black text-noir">ZONE-01 (CENTRE-VILLE)</span>
-            </div>
-          </a>
-
-          <!-- 6. TRANSPORT ADAPTÉ & COLLECTIF -->
-          <a href="queue.html" class="brut-card p-5 flex flex-col justify-between no-underline">
-            <div>
-              <div class="flex items-center justify-between border-b border-neutral-200 pb-3 mb-3">
-                <span class="bg-neutral-800 text-white font-mono text-[10px] font-bold px-2 py-0.5 uppercase tracking-wider">MOD-06</span>
-                <span class="font-mono text-[10px] text-neutral-400 font-bold">[MÉDICAL]</span>
-              </div>
-              <div class="flex items-start gap-3">
-                <div class="w-10 h-10 bg-neutral-200 text-noir flex items-center justify-center flex-shrink-0 border border-neutral-400">
-                  <i data-lucide="accessibility" class="w-5 h-5"></i>
-                </div>
-                <div>
-                  <h2 class="text-base font-black text-noir uppercase tracking-tight m-0">TRANSPORT ADAPTÉ (TPMR)</h2>
-                  <p class="text-xs text-neutral-600 mt-1 leading-snug font-medium">Courses santé, véhicules équipés de rampe arrière et protocoles CIUSS.</p>
-                </div>
-              </div>
-            </div>
-            <div class="mt-4 pt-3 border-t border-neutral-200 flex items-center justify-between font-mono text-[11px]">
-              <span class="text-neutral-500 font-bold">UNITÉS TPMR :</span>
-              <span class="font-black text-neutral-900">UNIT-065 & UNIT-089</span>
-            </div>
-          </a>
-
-          <!-- 7. APPLICATION MOBILE CHAUFFEUR (HORMOZI DRIVER EXPERIENCE) -->
-          <a href="driver.html" class="brut-card p-5 flex flex-col justify-between no-underline bg-neutral-50 border-2 border-noir">
-            <div>
-              <div class="flex items-center justify-between border-b border-neutral-200 pb-3 mb-3">
-                <span class="bg-noir text-white font-mono text-[10px] font-bold px-2 py-0.5 uppercase tracking-wider">MOD-07</span>
-                <span class="font-mono text-[10px] text-neutral-500 font-bold">[F6 / MOBILE]</span>
-              </div>
-              <div class="flex items-start gap-3">
-                <div class="w-10 h-10 bg-noir text-white flex items-center justify-center flex-shrink-0">
-                  <i data-lucide="smartphone" class="w-5 h-5"></i>
-                </div>
-                <div>
-                  <h2 class="text-base font-black text-noir uppercase tracking-tight m-0">TERMINAL MOBILE CHAUFFEUR</h2>
-                  <p class="text-xs text-neutral-600 mt-1 leading-snug font-medium">Cockpit smartphone chauffeur, décompte 20s, guidage direct Waze & Quick-ACK 10-4.</p>
-                </div>
-              </div>
-            </div>
-            <div class="mt-4 pt-3 border-t border-neutral-200 flex items-center justify-between font-mono text-[11px]">
-              <span class="text-neutral-500 font-bold">ACCÈS DIRECT :</span>
-              <span class="font-black text-noir flex items-center gap-1">
-                <span class="w-2 h-2 bg-emerald-600 inline-block animate-pulse"></span> WEB APP 100% PRÊTE
-              </span>
-            </div>
-          </a>
-
-          <!-- 8. FACTURATION & REÇUS OFFICIELS -->
-          <a href="receipt.html" class="brut-card p-5 flex flex-col justify-between no-underline">
-            <div>
-              <div class="flex items-center justify-between border-b border-neutral-200 pb-3 mb-3">
-                <span class="bg-noir text-white font-mono text-[10px] font-bold px-2 py-0.5 uppercase tracking-wider">MOD-08</span>
-                <span class="font-mono text-[10px] text-neutral-500 font-bold">[FINANCE]</span>
-              </div>
-              <div class="flex items-start gap-3">
-                <div class="w-10 h-10 bg-noir text-white flex items-center justify-center flex-shrink-0">
-                  <i data-lucide="receipt" class="w-5 h-5"></i>
-                </div>
-                <div>
-                  <h2 class="text-base font-black text-noir uppercase tracking-tight m-0">FACTURATION & REÇUS CAD</h2>
-                  <p class="text-xs text-neutral-600 mt-1 leading-snug font-medium">Génération thermique PDF, ventilation TPS/TVQ Québec, QR code et comptes corporatifs.</p>
-                </div>
-              </div>
-            </div>
-            <div class="mt-4 pt-3 border-t border-neutral-200 flex items-center justify-between font-mono text-[11px]">
-              <span class="text-neutral-500 font-bold">CONFORMITÉ :</span>
-              <span class="font-black text-noir">QUÉBEC TPS/TVQ VÉRIFIÉE</span>
-            </div>
-          </a>
-
+      <!-- User Profile Header (like John Doe) -->
+      <div class="flex items-center gap-3 p-2 rounded-xl hover:bg-neutral-200/40 transition-colors cursor-pointer mb-6">
+        <div class="w-9 h-9 rounded-full bg-neutral-900 text-white font-mono text-xs font-bold flex items-center justify-center shadow-sm">
+          A1
         </div>
+        <div class="flex-1 min-w-0">
+          <div class="flex items-center gap-1.5">
+            <span class="text-xs font-bold text-neutral-900 truncate">Agent-01 (Dispatch)</span>
+            <i data-lucide="chevron-down" class="w-3 h-3 text-neutral-400"></i>
+          </div>
+          <div class="text-[11px] text-neutral-500 font-medium truncate">central@pulsecad.ca</div>
+        </div>
+      </div>
 
-        <!-- CALCULATEUR DE RENTABILITÉ & ROI FLOTTE (HORMOZI VALUE ENGINE) -->
-        <div class="brut-card p-6 mb-8 bg-white border-2 border-noir">
-          <div class="flex flex-col md:flex-row md:items-center justify-between pb-4 border-b-2 border-noir gap-3 mb-5">
-            <div>
-              <div class="flex items-center gap-2 mb-1">
-                <span class="bg-noir text-white text-[10px] font-mono font-bold px-2 py-0.5 uppercase tracking-wider">
-                  MOTEUR DE RENTABILITÉ D'ENTREPRISE
-                </span>
-                <span class="text-neutral-500 font-mono text-xs font-bold">CALCULATEUR ROI OPÉRATIONNEL</span>
-              </div>
-              <h2 class="text-xl font-black uppercase text-noir tracking-tight m-0">
-                PROJECTION DES GAINS NETS FLOTTE // GAIN DE TEMPS WAZE
-              </h2>
+      <!-- NAVIGATION: OPÉRATIONS CAD -->
+      <div class="mb-6">
+        <div class="text-[11px] font-semibold text-neutral-400 uppercase tracking-wider px-3 mb-2">
+          Opérations Flotte
+        </div>
+        <nav class="space-y-1 text-xs">
+          
+          <a href="index.html" class="nav-frosted-active px-3 py-2.5 flex items-center justify-between no-underline">
+            <div class="flex items-center gap-2.5">
+              <i data-lucide="layout-grid" class="w-4 h-4 text-neutral-900"></i>
+              <span>Tableau de Bord</span>
             </div>
+            <span class="text-[10px] font-mono font-bold bg-neutral-200/70 text-neutral-700 px-2 py-0.5 rounded-full">
+              LIVE
+            </span>
+          </a>
+
+          <a href="dispatch.html" class="nav-frosted-inactive px-3 py-2 flex items-center justify-between no-underline">
+            <div class="flex items-center gap-2.5">
+              <i data-lucide="phone-call" class="w-4 h-4 text-neutral-500"></i>
+              <span>Prise d'Appel CAD</span>
+            </div>
+            <span class="text-[10px] font-mono text-neutral-400 font-bold">[F2]</span>
+          </a>
+
+          <a href="queue.html" class="nav-frosted-inactive px-3 py-2 flex items-center justify-between no-underline">
+            <div class="flex items-center gap-2.5">
+              <i data-lucide="list-ordered" class="w-4 h-4 text-neutral-500"></i>
+              <span>File des Missions</span>
+            </div>
+            <span class="text-[10px] font-mono font-bold bg-neutral-200/70 text-neutral-700 px-2 py-0.5 rounded-full" id="side-queue-count">
+              5
+            </span>
+          </a>
+
+          <a href="map.html" class="nav-frosted-inactive px-3 py-2 flex items-center justify-between no-underline">
+            <div class="flex items-center gap-2.5">
+              <i data-lucide="map" class="w-4 h-4 text-neutral-500"></i>
+              <span>Carte AVL & Waze</span>
+            </div>
+            <span class="text-[10px] font-mono font-bold text-emerald-600 flex items-center gap-1">
+              <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span> 12
+            </span>
+          </a>
+
+          <a href="messages.html" class="nav-frosted-inactive px-3 py-2 flex items-center justify-between no-underline">
+            <div class="flex items-center gap-2.5">
+              <i data-lucide="radio" class="w-4 h-4 text-neutral-500"></i>
+              <span>Radio MDT Direct</span>
+            </div>
+            <span class="text-[10px] font-mono font-bold text-neutral-400" id="side-msg-count">0</span>
+          </a>
+
+          <a href="driver.html" class="nav-frosted-inactive px-3 py-2 flex items-center justify-between no-underline">
+            <div class="flex items-center gap-2.5">
+              <i data-lucide="smartphone" class="w-4 h-4 text-emerald-600"></i>
+              <span class="font-semibold text-neutral-900">Cockpit Chauffeur</span>
+            </div>
+            <span class="text-[9px] font-mono font-bold bg-emerald-100 text-emerald-800 px-1.5 py-0.2 rounded">MOBILE</span>
+          </a>
+
+          <a href="receipt.html" class="nav-frosted-inactive px-3 py-2 flex items-center justify-between no-underline">
+            <div class="flex items-center gap-2.5">
+              <i data-lucide="receipt" class="w-4 h-4 text-neutral-500"></i>
+              <span>Factures & Reçus</span>
+            </div>
+            <span class="text-[10px] font-mono text-neutral-400 font-bold">TPS/TVQ</span>
+          </a>
+
+        </nav>
+      </div>
+
+      <!-- STATUS SECTION (LIKE REFERENCE STATUS: NEW, UPDATES, REVIEW) -->
+      <div class="mb-6">
+        <div class="text-[11px] font-semibold text-neutral-400 uppercase tracking-wider px-3 mb-2">
+          État des Unités
+        </div>
+        <div class="space-y-1 text-xs">
+          <div class="px-3 py-1.5 flex items-center justify-between text-neutral-700">
             <div class="flex items-center gap-2">
-              <a href="driver.html" class="bg-noir text-white font-mono text-xs font-black uppercase px-4 py-2 border border-noir hover:bg-neutral-800 shadow-[2px_2px_0px_#09090b] flex items-center gap-1.5">
-                <i data-lucide="smartphone" class="w-4 h-4"></i>
-                TESTER L'ÉCRAN CHAUFFEUR (MOBILE) →
-              </a>
+              <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
+              <span class="font-medium">Disponibles</span>
             </div>
+            <span class="font-mono text-xs font-semibold text-neutral-800" id="side-stat-libre">7</span>
           </div>
 
-          <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 items-center">
-            
-            <!-- Sliders de configuration -->
-            <div class="space-y-4 font-mono text-xs">
-              <div>
-                <div class="flex justify-between font-bold text-neutral-700 mb-1">
-                  <span>TAILLE DE VOTRE FLOTTE :</span>
-                  <span class="text-sm font-black text-noir" id="roi-fleet-display">25 VÉHICULES</span>
-                </div>
-                <input type="range" id="roi-fleet-slider" min="5" max="100" step="5" value="25" oninput="calculateROI()" class="w-full accent-black cursor-pointer" />
-                <div class="flex justify-between text-[10px] text-neutral-400 font-bold">
-                  <span>5 vhs</span>
-                  <span>50 vhs</span>
-                  <span>100 vhs</span>
-                </div>
-              </div>
-
-              <div>
-                <div class="flex justify-between font-bold text-neutral-700 mb-1">
-                  <span>PRIX MOYEN PAR COURSE :</span>
-                  <span class="text-sm font-black text-noir" id="roi-fare-display">35.00 $ CAD</span>
-                </div>
-                <input type="range" id="roi-fare-slider" min="20" max="65" step="5" value="35" oninput="calculateROI()" class="w-full accent-black cursor-pointer" />
-              </div>
+          <div class="px-3 py-1.5 flex items-center justify-between text-neutral-700">
+            <div class="flex items-center gap-2">
+              <span class="w-2 h-2 rounded-full bg-neutral-800"></span>
+              <span class="font-medium">En Route Client</span>
             </div>
+            <span class="font-mono text-xs font-semibold text-neutral-800" id="side-stat-enroute">2</span>
+          </div>
 
-            <!-- Impact Métrique -->
-            <div class="bg-neutral-50 p-4 border-1.5 border-neutral-300 font-mono text-xs space-y-3">
-              <div class="flex items-center justify-between pb-2 border-b border-neutral-200">
-                <span class="text-neutral-600 font-bold">• Courses en + par jour :</span>
-                <span class="font-black text-noir text-sm" id="roi-extra-rides">+25 courses/j</span>
-              </div>
-              <div class="flex items-center justify-between pb-2 border-b border-neutral-200">
-                <span class="text-neutral-600 font-bold">• Temps de trajet gagné :</span>
-                <span class="font-black text-emerald-700 text-sm">-18 min / course</span>
-              </div>
-              <div class="flex items-center justify-between">
-                <span class="text-neutral-600 font-bold">• Économie répartiteurs :</span>
-                <span class="font-black text-noir text-sm">-45% de temps CAD</span>
-              </div>
+          <div class="px-3 py-1.5 flex items-center justify-between text-neutral-700">
+            <div class="flex items-center gap-2">
+              <span class="w-2 h-2 rounded-full bg-neutral-400"></span>
+              <span class="font-medium">Passagers à Bord</span>
             </div>
+            <span class="font-mono text-xs font-semibold text-neutral-800" id="side-stat-busy">3</span>
+          </div>
+        </div>
+      </div>
 
-            <!-- Total Gain Net Estimé -->
-            <div class="bg-noir text-white p-5 border-2 border-noir text-center flex flex-col justify-center items-center shadow-[4px_4px_0px_#71717a]">
-              <div class="font-mono text-[10px] text-neutral-400 uppercase tracking-widest font-black mb-1">
-                REVENU SUPPLÉMENTAIRE ESTIMÉ
+      <!-- SECTORS TREE VIEW (LIKE REFERENCE DOCUMENTS HIERARCHY) -->
+      <div class="mt-auto">
+        <div class="flex items-center justify-between text-[11px] font-semibold text-neutral-400 uppercase tracking-wider px-3 mb-2">
+          <span>Secteurs Montréal</span>
+          <i data-lucide="plus" class="w-3 h-3 text-neutral-400 cursor-pointer"></i>
+        </div>
+
+        <!-- Search input pill (exact match to reference) -->
+        <div class="relative mb-3">
+          <input type="text" placeholder="Rechercher zone..." class="w-full bg-white/70 border border-neutral-200/80 rounded-xl px-3 py-1.5 pl-7 text-xs font-sans placeholder-neutral-400 outline-none focus:border-neutral-400 transition-colors" />
+          <i data-lucide="search" class="w-3.5 h-3.5 text-neutral-400 absolute left-2 top-2"></i>
+        </div>
+
+        <!-- Folder Tree View -->
+        <div class="space-y-1 text-xs text-neutral-600 font-medium">
+          <div class="flex items-center justify-between p-1.5 rounded-lg hover:bg-neutral-200/40 cursor-pointer">
+            <div class="flex items-center gap-2">
+              <i data-lucide="folder" class="w-3.5 h-3.5 text-neutral-400"></i>
+              <span class="truncate">Zone 01 · Centre-Ville</span>
+            </div>
+            <span class="text-[10px] font-mono text-neutral-400">4</span>
+          </div>
+
+          <div class="flex items-center justify-between p-1.5 rounded-lg hover:bg-neutral-200/40 cursor-pointer">
+            <div class="flex items-center gap-2">
+              <i data-lucide="folder" class="w-3.5 h-3.5 text-neutral-400"></i>
+              <span class="truncate">Zone 02 · Aéroport YUL</span>
+            </div>
+            <span class="text-[10px] font-mono text-neutral-400">3</span>
+          </div>
+
+          <div class="flex items-center justify-between p-1.5 rounded-lg hover:bg-neutral-200/40 cursor-pointer">
+            <div class="flex items-center gap-2">
+              <i data-lucide="folder" class="w-3.5 h-3.5 text-neutral-400"></i>
+              <span class="truncate">Zone 03 · Mont-Royal</span>
+            </div>
+            <span class="text-[10px] font-mono text-neutral-400">2</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- ======================================================================= -->
+    <!-- 2B. MAIN WORKSPACE CONTENT (MATCHING REFERENCE DASHBOARD + 340 STAT)    -->
+    <!-- ======================================================================= -->
+    <main class="flex-1 flex flex-col overflow-y-auto p-8 lg:p-10">
+      
+      <!-- Top Bar: Clock, Share & Status -->
+      <div class="flex items-center justify-between pb-6 mb-8 border-b border-neutral-200/60">
+        <div>
+          <h1 class="text-3xl lg:text-4xl font-sans font-bold text-neutral-900 tracking-tight">
+            Dashboard
+          </h1>
+          <p class="text-xs text-neutral-400 font-medium mt-1">
+            Supervision centrale de flotte, assignation intelligente et télémétrie en temps réel
+          </p>
+        </div>
+
+        <div class="flex items-center gap-3">
+          <!-- Share modal button -->
+          <button onclick="openShareModal()" class="bg-neutral-900 text-white text-xs font-semibold px-4 py-2 rounded-xl flex items-center gap-2 shadow-sm hover:bg-neutral-800 transition-colors">
+            <i data-lucide="share-2" class="w-3.5 h-3.5 text-emerald-400"></i>
+            <span>Partager l'Accès</span>
+          </button>
+
+          <!-- Clock Pill -->
+          <div class="flex items-center gap-2 bg-white/80 border border-neutral-200/80 px-3 py-1.5 rounded-xl shadow-xs">
+            <span class="w-2 h-2 rounded-full bg-neutral-400"></span>
+            <span id="clock" class="font-mono text-xs font-semibold text-neutral-800">--:--:--</span>
+          </div>
+
+          <!-- System Status Pill -->
+          <div class="flex items-center gap-2 bg-emerald-50 border border-emerald-200/80 px-3 py-1.5 rounded-xl">
+            <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+            <span class="text-[11px] font-bold text-emerald-800 uppercase tracking-wider">CAD En Ligne</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===================================================================== -->
+      <!-- TOP EXECUTIVE KPI CARDS (LIKE REFERENCE "EXECUTIONS 340 ↑ 204%")       -->
+      <!-- ===================================================================== -->
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+        
+        <!-- KPI 1: Missions Actives (Reference design 340 +204%) -->
+        <div class="glass-card p-6 flex flex-col justify-between">
+          <div>
+            <div class="flex items-center justify-between text-xs font-semibold text-neutral-500 mb-2">
+              <span>Missions & Appels Traités</span>
+              <i data-lucide="activity" class="w-4 h-4 text-neutral-400"></i>
+            </div>
+            <div class="flex items-baseline gap-3 my-2">
+              <div class="text-5xl font-sans font-light tracking-tight text-neutral-900" id="stat-total-display">
+                340
               </div>
-              <div class="font-mono text-3xl font-black text-white tracking-tight" id="roi-total-dollars">
+              <span class="bg-emerald-50 text-emerald-700 text-xs font-bold px-2.5 py-0.5 rounded-full border border-emerald-200">
+                ↑ 204%
+              </span>
+            </div>
+          </div>
+          <div class="mt-4 pt-3 border-t border-neutral-100 flex items-center justify-between text-xs">
+            <a href="queue.html" class="font-semibold text-neutral-800 hover:text-black flex items-center gap-1">
+              Voir la file d'attente →
+            </a>
+            <span class="font-mono text-neutral-400 text-[11px]" id="stat-queue-mini">5 en cours</span>
+          </div>
+        </div>
+
+        <!-- KPI 2: Flotte AVL en Ligne -->
+        <div class="glass-card p-6 flex flex-col justify-between">
+          <div>
+            <div class="flex items-center justify-between text-xs font-semibold text-neutral-500 mb-2">
+              <span>Unités Flotte Connectées</span>
+              <i data-lucide="truck" class="w-4 h-4 text-neutral-400"></i>
+            </div>
+            <div class="flex items-baseline gap-3 my-2">
+              <div class="text-5xl font-sans font-light tracking-tight text-neutral-900" id="stat-vehs-display">
+                12
+              </div>
+              <span class="bg-neutral-100 text-neutral-700 text-xs font-bold px-2.5 py-0.5 rounded-full border border-neutral-200">
+                100% AVL FIX
+              </span>
+            </div>
+          </div>
+          <div class="mt-4 pt-3 border-t border-neutral-100 flex items-center justify-between text-xs">
+            <a href="map.html" class="font-semibold text-neutral-800 hover:text-black flex items-center gap-1">
+              Carte télématique live →
+            </a>
+            <span class="text-emerald-700 font-semibold text-[11px] flex items-center gap-1">
+              <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> 7 disponibles
+            </span>
+          </div>
+        </div>
+
+        <!-- KPI 3: Projection Revenu Net (Hormozi Engine Highlight) -->
+        <div class="glass-card p-6 flex flex-col justify-between bg-gradient-to-br from-white to-neutral-50">
+          <div>
+            <div class="flex items-center justify-between text-xs font-semibold text-neutral-500 mb-2">
+              <span>Gains Flotte Estimés</span>
+              <i data-lucide="trending-up" class="w-4 h-4 text-emerald-600"></i>
+            </div>
+            <div class="flex items-baseline gap-2 my-2">
+              <div class="text-4xl lg:text-5xl font-sans font-light tracking-tight text-neutral-900" id="roi-top-dollars">
                 +26,250 $
               </div>
-              <div class="font-mono text-[11px] text-emerald-400 font-bold mt-1 uppercase">
-                PAR MOIS (CAD NET PROJETÉ)
-              </div>
             </div>
-
+          </div>
+          <div class="mt-4 pt-3 border-t border-neutral-100 flex items-center justify-between text-xs">
+            <span class="text-emerald-700 font-semibold text-[11px]">Par mois (+25 courses/j)</span>
+            <span class="font-mono text-neutral-400 text-[10px]">OPTIMISATION WAZE</span>
           </div>
         </div>
 
       </div>
 
-      <!-- BOTTOM TELEMETRY BAR (SOLID BRUTALIST HUD) -->
-      <div class="max-w-7xl mx-auto w-full">
-        <div class="bg-white border-2 border-noir shadow-[4px_4px_0px_#09090b]">
-          
-          <!-- Bar Header -->
-          <div class="bg-noir text-white px-4 py-1.5 flex items-center justify-between select-none">
-            <span class="font-mono text-[10px] font-black tracking-widest uppercase flex items-center gap-2">
-              <span class="w-2 h-2 bg-white inline-block"></span>
-              INDICATEURS DE FLOTTE EN DIRECT // CAD TÉLÉMÉTRIE
+      <!-- ===================================================================== -->
+      <!-- SECTION TABS (LIKE REFERENCE: WORKFLOWS / PERMISSIONS / EXECUTIONS)    -->
+      <!-- ===================================================================== -->
+      <div class="flex items-center gap-6 border-b border-neutral-200/60 pb-3 mb-6 text-sm font-medium">
+        <button class="text-neutral-900 font-bold border-b-2 border-neutral-900 pb-3 -mb-3 transition-colors">
+          Modules Opérationnels
+        </button>
+        <button onclick="location.href='driver.html'" class="text-neutral-500 hover:text-neutral-900 transition-colors pb-3 -mb-3 flex items-center gap-1.5">
+          <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
+          Cockpit Mobile Chauffeur
+        </button>
+        <button onclick="location.href='receipt.html'" class="text-neutral-500 hover:text-neutral-900 transition-colors pb-3 -mb-3">
+          Facturation Thermique & Taxes
+        </button>
+      </div>
+
+      <!-- ===================================================================== -->
+      <!-- 6 REFINED CARDS: CLEAN MINIMALIST ARCHITECTURE                         -->
+      <!-- ===================================================================== -->
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+
+        <!-- 1. PRIS D'APPEL -->
+        <a href="dispatch.html" class="glass-card p-6 flex flex-col justify-between no-underline group">
+          <div>
+            <div class="flex items-center justify-between text-xs font-semibold text-neutral-400 mb-3">
+              <span>MODULE 01</span>
+              <span class="font-mono">[F2]</span>
+            </div>
+            <div class="flex items-start gap-4">
+              <div class="w-10 h-10 rounded-xl bg-neutral-100 text-neutral-800 group-hover:bg-neutral-900 group-hover:text-white flex items-center justify-center transition-colors shadow-xs">
+                <i data-lucide="phone-call" class="w-4 h-4"></i>
+              </div>
+              <div>
+                <h3 class="text-base font-bold text-neutral-900">Prise d'Appel CAD</h3>
+                <p class="text-xs text-neutral-500 mt-1 leading-relaxed">
+                  Saisie d'adresse rapide, calcul d'itinéraire automatique et proposition des meilleures unités.
+                </p>
+              </div>
+            </div>
+          </div>
+          <div class="mt-5 pt-3 border-t border-neutral-100 flex items-center justify-between text-xs">
+            <span class="text-neutral-400 font-medium">Statut :</span>
+            <span class="text-emerald-700 font-semibold flex items-center gap-1">
+              <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> Prêt pour saisie
             </span>
-            <span class="font-mono text-[10px] text-neutral-400">PROTOCOLE AVL ACTIF · HORODATAGE GPS</span>
+          </div>
+        </a>
+
+        <!-- 2. FILE D'ATTENTE -->
+        <a href="queue.html" class="glass-card p-6 flex flex-col justify-between no-underline group">
+          <div>
+            <div class="flex items-center justify-between text-xs font-semibold text-neutral-400 mb-3">
+              <span>MODULE 02</span>
+              <span class="font-mono">[F3]</span>
+            </div>
+            <div class="flex items-start gap-4">
+              <div class="w-10 h-10 rounded-xl bg-neutral-100 text-neutral-800 group-hover:bg-neutral-900 group-hover:text-white flex items-center justify-center transition-colors shadow-xs">
+                <i data-lucide="list-ordered" class="w-4 h-4"></i>
+              </div>
+              <div>
+                <h3 class="text-base font-bold text-neutral-900">File des Missions</h3>
+                <p class="text-xs text-neutral-500 mt-1 leading-relaxed">
+                  Gestion temps réel du flux d'appels, exports de données CSV et audit de répartition.
+                </p>
+              </div>
+            </div>
+          </div>
+          <div class="mt-5 pt-3 border-t border-neutral-100 flex items-center justify-between text-xs">
+            <span class="text-neutral-400 font-medium">En attente :</span>
+            <span class="font-bold text-neutral-800 bg-neutral-100 px-2 py-0.5 rounded" id="card-pending-count">5 courses</span>
+          </div>
+        </a>
+
+        <!-- 3. CARTE AVL & WAZE -->
+        <a href="map.html" class="glass-card p-6 flex flex-col justify-between no-underline group">
+          <div>
+            <div class="flex items-center justify-between text-xs font-semibold text-neutral-400 mb-3">
+              <span>MODULE 03</span>
+              <span class="font-mono">[F4]</span>
+            </div>
+            <div class="flex items-start gap-4">
+              <div class="w-10 h-10 rounded-xl bg-neutral-100 text-neutral-800 group-hover:bg-neutral-900 group-hover:text-white flex items-center justify-center transition-colors shadow-xs">
+                <i data-lucide="map-pin" class="w-4 h-4"></i>
+              </div>
+              <div>
+                <h3 class="text-base font-bold text-neutral-900">Carte AVL & Waze</h3>
+                <p class="text-xs text-neutral-500 mt-1 leading-relaxed">
+                  Positions GPS en direct, télémétrie OBD-II CAN bus et calque de circulation Waze Montréal.
+                </p>
+              </div>
+            </div>
+          </div>
+          <div class="mt-5 pt-3 border-t border-neutral-100 flex items-center justify-between text-xs">
+            <span class="text-neutral-400 font-medium">Flotte connectée :</span>
+            <span class="text-emerald-700 font-semibold" id="card-vehs-online">12 unités en direct</span>
+          </div>
+        </a>
+
+        <!-- 4. MESSAGERIE MDT -->
+        <a href="messages.html" class="glass-card p-6 flex flex-col justify-between no-underline group">
+          <div>
+            <div class="flex items-center justify-between text-xs font-semibold text-neutral-400 mb-3">
+              <span>MODULE 04</span>
+              <span class="font-mono">[F5]</span>
+            </div>
+            <div class="flex items-start gap-4">
+              <div class="w-10 h-10 rounded-xl bg-neutral-100 text-neutral-800 group-hover:bg-neutral-900 group-hover:text-white flex items-center justify-center transition-colors shadow-xs">
+                <i data-lucide="radio" class="w-4 h-4"></i>
+              </div>
+              <div>
+                <h3 class="text-base font-bold text-neutral-900">Radio & Messagerie</h3>
+                <p class="text-xs text-neutral-500 mt-1 leading-relaxed">
+                  Diffusion générale de flotte, alertes de voirie et communications individuelles terminaux.
+                </p>
+              </div>
+            </div>
+          </div>
+          <div class="mt-5 pt-3 border-t border-neutral-100 flex items-center justify-between text-xs">
+            <span class="text-neutral-400 font-medium">Messages non lus :</span>
+            <span class="font-bold text-neutral-800" id="card-unread-msg">0 message</span>
+          </div>
+        </a>
+
+        <!-- 5. TERMINAL CHAUFFEUR MOBILE -->
+        <a href="driver.html" class="glass-card p-6 flex flex-col justify-between no-underline group border-neutral-900/40">
+          <div>
+            <div class="flex items-center justify-between text-xs font-semibold text-neutral-400 mb-3">
+              <span class="text-emerald-700 font-bold">EXPÉRIENCE MOBILE</span>
+              <span class="font-mono">[F6]</span>
+            </div>
+            <div class="flex items-start gap-4">
+              <div class="w-10 h-10 rounded-xl bg-neutral-900 text-white flex items-center justify-center shadow-xs">
+                <i data-lucide="smartphone" class="w-4 h-4 text-emerald-400"></i>
+              </div>
+              <div>
+                <h3 class="text-base font-bold text-neutral-900">Terminal Chauffeur</h3>
+                <p class="text-xs text-neutral-500 mt-1 leading-relaxed">
+                  Cockpit mobile pour smartphone, décompte 20s avec audio, guidage direct Waze et validation.
+                </p>
+              </div>
+            </div>
+          </div>
+          <div class="mt-5 pt-3 border-t border-neutral-100 flex items-center justify-between text-xs">
+            <span class="text-neutral-400 font-medium">Accès direct :</span>
+            <span class="text-emerald-700 font-bold flex items-center gap-1">
+              <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span> 100% Fonctionnel
+            </span>
+          </div>
+        </a>
+
+        <!-- 6. FACTURATION & REÇUS OFFICIELS -->
+        <a href="receipt.html" class="glass-card p-6 flex flex-col justify-between no-underline group">
+          <div>
+            <div class="flex items-center justify-between text-xs font-semibold text-neutral-400 mb-3">
+              <span>MODULE 06</span>
+              <span class="font-mono">[FINANCE]</span>
+            </div>
+            <div class="flex items-start gap-4">
+              <div class="w-10 h-10 rounded-xl bg-neutral-100 text-neutral-800 group-hover:bg-neutral-900 group-hover:text-white flex items-center justify-center transition-colors shadow-xs">
+                <i data-lucide="receipt" class="w-4 h-4"></i>
+              </div>
+              <div>
+                <h3 class="text-base font-bold text-neutral-900">Facturation & Reçus</h3>
+                <p class="text-xs text-neutral-500 mt-1 leading-relaxed">
+                  Reçus thermiques certifiés avec ventilation des taxes Québec (TPS 5% + TVQ 9.975%) et PDF.
+                </p>
+              </div>
+            </div>
+          </div>
+          <div class="mt-5 pt-3 border-t border-neutral-100 flex items-center justify-between text-xs">
+            <span class="text-neutral-400 font-medium">Conformité fiscale :</span>
+            <span class="font-bold text-neutral-800">Québec Validé</span>
+          </div>
+        </a>
+
+      </div>
+
+      <!-- ===================================================================== -->
+      <!-- HORMOZI ROI PROFIT ENGINE (EXECUTIVE MINIMALIST CARD)                 -->
+      <!-- ===================================================================== -->
+      <div class="glass-card p-8 mb-6">
+        <div class="flex flex-col md:flex-row md:items-center justify-between pb-6 border-b border-neutral-100 gap-4 mb-6">
+          <div>
+            <div class="flex items-center gap-2 mb-1">
+              <span class="text-[10px] font-mono font-bold bg-neutral-100 text-neutral-700 px-2 py-0.5 rounded uppercase">
+                Moteur de Rentabilité Flotte
+              </span>
+              <span class="text-xs text-neutral-400">Projection ROI Dynamique</span>
+            </div>
+            <h2 class="text-xl font-bold text-neutral-900">
+              Simulation des Gains Opérationnels Mensuels
+            </h2>
+          </div>
+          <a href="driver.html" class="bg-neutral-900 text-white text-xs font-semibold px-4 py-2 rounded-xl flex items-center gap-2 hover:bg-neutral-800 transition-colors shadow-xs">
+            <i data-lucide="smartphone" class="w-3.5 h-3.5 text-emerald-400"></i>
+            <span>Tester l'Écran Chauffeur →</span>
+          </a>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 items-center">
+          
+          <!-- Sliders -->
+          <div class="space-y-5 text-xs bg-neutral-50/80 p-5 rounded-2xl border border-neutral-200/50">
+            <div>
+              <div class="flex justify-between font-semibold text-neutral-700 mb-2">
+                <span>Taille de la Flotte :</span>
+                <span class="font-mono font-bold text-neutral-900 text-sm" id="roi-fleet-display">25 Véhicules</span>
+              </div>
+              <input type="range" id="roi-fleet-slider" min="5" max="100" step="5" value="25" oninput="calculateROI()" class="w-full accent-black cursor-pointer h-1.5 bg-neutral-200 rounded-lg appearance-none" />
+              <div class="flex justify-between text-[10px] text-neutral-400 mt-1">
+                <span>5 vhs</span>
+                <span>50 vhs</span>
+                <span>100 vhs</span>
+              </div>
+            </div>
+
+            <div>
+              <div class="flex justify-between font-semibold text-neutral-700 mb-2">
+                <span>Prix Moyen par Course :</span>
+                <span class="font-mono font-bold text-neutral-900 text-sm" id="roi-fare-display">35.00 $ CAD</span>
+              </div>
+              <input type="range" id="roi-fare-slider" min="20" max="65" step="5" value="35" oninput="calculateROI()" class="w-full accent-black cursor-pointer h-1.5 bg-neutral-200 rounded-lg appearance-none" />
+            </div>
           </div>
 
-          <!-- Stats Grid (Dynamic from PulseState) -->
-          <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 divide-y md:divide-y-0 md:divide-x divide-neutral-200 font-mono">
-            
-            <div class="p-3">
-              <div class="text-[10px] font-bold uppercase text-neutral-500 mb-0.5">TOTAL UNITÉS</div>
-              <div class="text-2xl font-black text-noir tracking-tight" id="stat-total">12</div>
-              <div class="text-[10px] text-neutral-400 font-bold">UNITÉS ENREGISTRÉES</div>
+          <!-- Impact Metrics -->
+          <div class="bg-neutral-50/80 p-5 rounded-2xl border border-neutral-200/50 text-xs space-y-3">
+            <div class="flex items-center justify-between pb-2 border-b border-neutral-200/50">
+              <span class="text-neutral-500">Courses en plus par jour :</span>
+              <span class="font-bold text-neutral-900" id="roi-extra-rides">+25 courses/j</span>
             </div>
-
-            <div class="p-3">
-              <div class="text-[10px] font-bold uppercase text-neutral-500 mb-0.5">UNITÉS DISPO</div>
-              <div class="text-2xl font-black text-noir tracking-tight flex items-center gap-1.5" id="stat-online">
-                7
-              </div>
-              <div class="text-[10px] text-emerald-700 font-bold">PRÊTES POUR DISPATCH</div>
+            <div class="flex items-center justify-between pb-2 border-b border-neutral-200/50">
+              <span class="text-neutral-500">Temps gagné par course :</span>
+              <span class="font-bold text-emerald-700">-18 min / course</span>
             </div>
-
-            <div class="p-3">
-              <div class="text-[10px] font-bold uppercase text-neutral-500 mb-0.5">EN ROUTE</div>
-              <div class="text-2xl font-black text-noir tracking-tight" id="stat-enroute">2</div>
-              <div class="text-[10px] text-neutral-500 font-bold">VERS LE CLIENT</div>
+            <div class="flex items-center justify-between">
+              <span class="text-neutral-500">Économie temps dispatch :</span>
+              <span class="font-bold text-neutral-900">-45% de temps CAD</span>
             </div>
+          </div>
 
-            <div class="p-3">
-              <div class="text-[10px] font-bold uppercase text-neutral-500 mb-0.5">EN COURSE</div>
-              <div class="text-2xl font-black text-noir tracking-tight" id="stat-busy">3</div>
-              <div class="text-[10px] text-neutral-500 font-bold">PASSAGERS À BORD</div>
+          <!-- Total Revenue Box -->
+          <div class="bg-neutral-900 text-white p-6 rounded-2xl text-center flex flex-col justify-center items-center shadow-lg">
+            <div class="text-[10px] text-neutral-400 font-bold uppercase tracking-widest mb-1">
+              Revenu Supplémentaire Projeté
             </div>
-
-            <div class="p-3">
-              <div class="text-[10px] font-bold uppercase text-neutral-500 mb-0.5">APPELS FILE</div>
-              <div class="text-2xl font-black text-noir tracking-tight" id="stat-queue">5</div>
-              <div class="text-[10px] text-neutral-500 font-bold">NON ASSIGNÉS</div>
+            <div class="text-4xl lg:text-5xl font-sans font-light tracking-tight text-white my-1" id="roi-total-dollars">
+              +26,250 $
             </div>
-
-            <div class="p-3">
-              <div class="text-[10px] font-bold uppercase text-neutral-500 mb-0.5">DÉLAI MOYEN</div>
-              <div class="text-2xl font-black text-noir tracking-tight">2.8 <span class="text-xs font-bold text-neutral-500">MIN</span></div>
-              <div class="text-[10px] text-neutral-500 font-bold">SECTEUR MÉTROPOLITAIN</div>
+            <div class="text-xs text-emerald-400 font-semibold mt-1">
+              Par Mois (CAD Net)
             </div>
-
           </div>
 
         </div>
@@ -595,92 +785,82 @@
 
   </div>
 
-  <!-- MODAL DE PARTAGE COLLABORATION (LAN / IP / QR) -->
-  <div id="share-modal" class="fixed inset-0 bg-black/60 z-50 items-center justify-center hidden p-4" onclick="closeShareModalOnBg(event)">
-    <div class="brut-box max-w-md w-full bg-white p-6">
+  <!-- COLLABORATIVE SHARE MODAL -->
+  <div id="share-modal" class="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4" style="display: none;" onclick="closeShareModalOnBg(event)">
+    <div class="bg-white rounded-2xl max-w-lg w-full p-6 shadow-2xl border border-neutral-200 select-none">
       
-      <div class="flex items-center justify-between border-b-2 border-noir pb-2 mb-4">
-        <span class="bg-noir text-white font-mono text-xs font-black px-2 py-0.5 uppercase tracking-wider">
-          PARTAGE SESSION COLLABORATIVE
-        </span>
-        <button onclick="closeShareModal()" class="text-neutral-500 hover:text-black font-mono font-bold text-sm">✕</button>
+      <div class="flex items-center justify-between pb-3 border-b border-neutral-100 mb-4">
+        <div class="flex items-center gap-2">
+          <i data-lucide="share-2" class="w-5 h-5 text-neutral-900"></i>
+          <h3 class="font-bold text-base text-neutral-900">Partager la Session CAD</h3>
+        </div>
+        <button onclick="closeShareModal()" class="w-8 h-8 rounded-full bg-neutral-100 hover:bg-neutral-200 text-neutral-600 flex items-center justify-center font-bold text-sm transition-colors">✕</button>
       </div>
 
-      <p class="font-mono text-xs text-neutral-700 mb-4 leading-relaxed">
-        Partagez cette session CAD avec votre collaborateur. Toutes les modifications, dispatches et messages MDT sont synchronisés en direct.
+      <p class="text-xs text-neutral-600 mb-4 leading-relaxed">
+        Partagez ce tableau de bord interactif avec votre collaborateur. Toutes les modifications et positions GPS sont synchronisées en continu :
       </p>
 
       <!-- Public Web URL -->
-      <div class="bg-neutral-50 p-3 border-1.5 border-noir mb-3 font-mono text-xs">
-        <div class="flex items-center justify-between mb-1">
-          <span class="text-[10px] text-neutral-900 uppercase font-black flex items-center gap-1.5">
-            <span class="w-2 h-2 bg-emerald-600 inline-block animate-pulse"></span>
-            1. ACCÈS PUBLIC INTERNET (HTTPS MONDIAL) :
+      <div class="bg-neutral-50 p-3.5 rounded-xl border border-neutral-200 mb-3 text-xs">
+        <div class="flex items-center justify-between mb-1.5">
+          <span class="font-bold text-emerald-700 flex items-center gap-1.5">
+            <span class="w-2 h-2 rounded-full bg-emerald-500 inline-block animate-pulse"></span> LIEN PUBLIC MONDIAL (HTTPS)
           </span>
-          <span class="text-[9px] bg-noir text-white px-1.5 py-0.2 font-bold">EN LIGNE</span>
+          <span class="text-[10px] text-neutral-400">ACCÈS NAVIGATEUR</span>
         </div>
-        <div class="flex items-center justify-between gap-2">
-          <input id="share-url-public" class="bg-white border border-neutral-300 px-2.5 py-1.5 font-bold text-xs flex-1 outline-none text-noir" readonly value="https://a90389d46bbc3d.lhr.life/index.html" />
-          <button onclick="copyPublicUrl()" class="bg-noir text-white px-3 py-1.5 font-black uppercase text-[11px] hover:bg-neutral-800">
-            COPIER
-          </button>
+        <div class="flex gap-2">
+          <input id="share-url-public" type="text" readonly value="https://f3dfe920cfc829.lhr.life/index.html" class="flex-1 bg-white border border-neutral-300 rounded-lg px-2.5 py-1.5 text-xs text-neutral-800 font-mono" />
+          <button onclick="copyPublicUrl()" class="bg-neutral-900 text-white px-3 py-1.5 rounded-lg text-xs font-semibold hover:bg-neutral-800 transition-colors">COPIER</button>
         </div>
       </div>
 
-      <!-- Local Network LAN URL -->
-      <div class="bg-neutral-50 p-3 border-1.5 border-neutral-300 mb-4 font-mono text-xs">
-        <div class="text-[10px] text-neutral-500 uppercase font-bold mb-1">2. ACCÈS RÉSEAU LOCAL (WI-FI / LAN) :</div>
-        <div class="flex items-center justify-between gap-2">
-          <input id="share-url-input" class="bg-white border border-neutral-300 px-2.5 py-1.5 font-bold text-xs flex-1 outline-none text-noir" readonly value="http://192.168.1.95:8091/index.html" />
-          <button onclick="copyShareUrl()" class="bg-white text-noir border border-noir px-3 py-1.5 font-bold uppercase text-[11px] hover:bg-neutral-100">
-            COPIER
-          </button>
+      <!-- Local Network URL -->
+      <div class="bg-neutral-50 p-3.5 rounded-xl border border-neutral-200 mb-4 text-xs">
+        <div class="flex items-center justify-between mb-1.5">
+          <span class="font-bold text-neutral-700">RÉSEAU LOCAL (WI-FI)</span>
+          <span class="text-[10px] text-neutral-400">PORT 8091</span>
+        </div>
+        <div class="flex gap-2">
+          <input id="share-url-input" type="text" readonly value="http://localhost:8091/index.html" class="flex-1 bg-white border border-neutral-300 rounded-lg px-2.5 py-1.5 text-xs text-neutral-800 font-mono" />
+          <button onclick="copyShareUrl()" class="bg-white border border-neutral-300 text-neutral-800 px-3 py-1.5 rounded-lg text-xs font-semibold hover:bg-neutral-100 transition-colors">COPIER</button>
         </div>
       </div>
 
-      <div class="border border-neutral-200 p-2.5 bg-neutral-100 font-mono text-[10px] text-neutral-600 mb-5 leading-normal">
-        • Hébergement : <strong>Tunnel Public TLS / HTTPS</strong> (terminaison SSL active)<br>
-        • Port d'écoute : <strong>8091</strong><br>
-        • Synchronisation inter-terminaux : <strong>Active (CAD Broadcast Sync)</strong>
+      <div class="bg-emerald-50/70 border border-emerald-200 p-3 rounded-xl text-xs text-emerald-900 leading-snug">
+        💡 <strong>Synchronisation active :</strong> Dès que votre collaborateur ouvre ce lien, il peut manipuler la file d'attente, créer des missions et surveiller la flotte en temps réel.
       </div>
-
-      <div class="flex justify-end gap-2">
-        <button onclick="closeShareModal()" class="bg-noir text-white font-mono text-xs font-bold uppercase px-4 py-2 hover:bg-neutral-800">
-          FERMER [ESC]
-        </button>
-      </div>
-
     </div>
   </div>
 
   <script>
     lucide.createIcons();
 
+    // Clock
     function updateClock() {
       const now = new Date();
-      const options = { weekday: 'short', year: 'numeric', month: 'short', day: 'numeric' };
-      const datePart = now.toLocaleDateString('fr-CA', options).toUpperCase();
-      const timePart = now.toLocaleTimeString('fr-CA', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false });
-      const clockEl = document.getElementById('clock');
-      if (clockEl) {
-        clockEl.textContent = `${datePart} · ${timePart}`;
-      }
+      const el = document.getElementById('clock');
+      if (el) el.textContent = now.toLocaleTimeString('fr-CA', { hour12: false });
     }
-    updateClock();
     setInterval(updateClock, 1000);
+    updateClock();
 
+    // Hormozi ROI Profit Engine
     function calculateROI() {
-      const fleet = parseInt(document.getElementById('roi-fleet-slider').value) || 25;
-      const fare = parseInt(document.getElementById('roi-fare-slider').value) || 35;
+      const fleet = parseInt(document.getElementById('roi-fleet-slider').value, 10);
+      const fare = parseInt(document.getElementById('roi-fare-slider').value, 10);
       
-      document.getElementById('roi-fleet-display').textContent = `${fleet} VÉHICULES`;
+      document.getElementById('roi-fleet-display').textContent = `${fleet} Véhicules`;
       document.getElementById('roi-fare-display').textContent = `${fare}.00 $ CAD`;
       
       const extraRidesPerDay = fleet * 1;
       const monthlyExtraRevenue = extraRidesPerDay * fare * 30;
       
       document.getElementById('roi-extra-rides').textContent = `+${extraRidesPerDay} courses/j`;
-      document.getElementById('roi-total-dollars').textContent = `+${monthlyExtraRevenue.toLocaleString('fr-CA')} $`;
+      const formatted = `+${monthlyExtraRevenue.toLocaleString('fr-CA')} $`;
+      document.getElementById('roi-total-dollars').textContent = formatted;
+      const topDollarsEl = document.getElementById('roi-top-dollars');
+      if (topDollarsEl) topDollarsEl.textContent = formatted;
     }
 
     calculateROI();
@@ -697,15 +877,31 @@
       const pendingCalls = calls.filter(c => c.status === 'EN_ATTENTE').length;
       const unreadMsgs = msgs.filter(m => m.unread).length;
 
-      document.getElementById('stat-total').textContent = totalVehs;
-      document.getElementById('stat-online').textContent = freeVehs;
-      document.getElementById('stat-enroute').textContent = enRouteVehs;
-      document.getElementById('stat-busy').textContent = busyVehs;
-      document.getElementById('stat-queue').textContent = pendingCalls;
+      // Update side counts
+      const sideQueue = document.getElementById('side-queue-count');
+      if (sideQueue) sideQueue.textContent = pendingCalls;
+      const sideLibre = document.getElementById('side-stat-libre');
+      if (sideLibre) sideLibre.textContent = freeVehs;
+      const sideEnroute = document.getElementById('side-stat-enroute');
+      if (sideEnroute) sideEnroute.textContent = enRouteVehs;
+      const sideBusy = document.getElementById('side-stat-busy');
+      if (sideBusy) sideBusy.textContent = busyVehs;
+      const sideMsg = document.getElementById('side-msg-count');
+      if (sideMsg) sideMsg.textContent = unreadMsgs;
 
-      document.getElementById('card-pending-count').textContent = `${pendingCalls} EN ATTENTE`;
-      document.getElementById('card-vehs-online').innerHTML = `<span class="w-2 h-2 bg-emerald-600 inline-block"></span> ${totalVehs} UNITÉS CONNECTÉES`;
-      document.getElementById('card-unread-msg').textContent = `${unreadMsgs} NON LUS`;
+      // Update main cards
+      const statTotalDisplay = document.getElementById('stat-total-display');
+      if (statTotalDisplay) statTotalDisplay.textContent = 340 + calls.length;
+      const statVehsDisplay = document.getElementById('stat-vehs-display');
+      if (statVehsDisplay) statVehsDisplay.textContent = totalVehs;
+      const cardPending = document.getElementById('card-pending-count');
+      if (cardPending) cardPending.textContent = `${pendingCalls} en attente`;
+      const cardVehsOnline = document.getElementById('card-vehs-online');
+      if (cardVehsOnline) cardVehsOnline.textContent = `${totalVehs} unités en direct`;
+      const cardUnreadMsg = document.getElementById('card-unread-msg');
+      if (cardUnreadMsg) cardUnreadMsg.textContent = `${unreadMsgs} non lus`;
+      const statQueueMini = document.getElementById('stat-queue-mini');
+      if (statQueueMini) statQueueMini.textContent = `${pendingCalls} en attente`;
     }
 
     updateTelemetryFromState();

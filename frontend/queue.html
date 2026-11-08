@@ -1,14 +1,14 @@
 <!DOCTYPE html>
-<html lang="fr-CA">
+<html lang="fr-CA" class="h-full">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>PULSE CAD — File des Courses (Système Métropolitain)</title>
 
-  <!-- High-Readability Enterprise Typography: Plus Jakarta Sans + IBM Plex Mono -->
+  <!-- Modern Clean Typography: Plus Jakarta Sans + IBM Plex Mono -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&family=IBM+Plex+Mono:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600;700&display=swap" rel="stylesheet" />
 
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://unpkg.com/lucide@latest"></script>
@@ -19,13 +19,13 @@
       theme: {
         extend: {
           fontFamily: {
-            sans: ['Plus Jakarta Sans', 'sans-serif'],
-            mono: ['IBM Plex Mono', 'monospace'],
+            sans: ['"Plus Jakarta Sans"', '-apple-system', 'BlinkMacSystemFont', 'sans-serif'],
+            mono: ['"IBM Plex Mono"', 'monospace'],
           },
           colors: {
-            noir: '#09090b',
-            charcoal: '#18181b',
-            bordercol: '#d4d4d8',
+            noir: '#111113',
+            studio: '#ebecef',
+            window: '#f5f5f7',
           }
         }
       }
@@ -35,783 +35,414 @@
     * { box-sizing: border-box; }
     body {
       font-family: 'Plus Jakarta Sans', -apple-system, sans-serif;
-      background-color: #f4f4f5;
-      color: #09090b;
+      background-color: #ebecef;
+      color: #111113;
       margin: 0;
       height: 100vh;
       overflow: hidden;
       display: flex;
-      flex-direction: column;
       -webkit-font-smoothing: antialiased;
     }
 
     ::-webkit-scrollbar { width: 5px; height: 5px; }
-    ::-webkit-scrollbar-track { background: #f4f4f5; }
-    ::-webkit-scrollbar-thumb { background: #18181b; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: #d4d4d8; border-radius: 4px; }
+    ::-webkit-scrollbar-thumb:hover { background: #a1a1aa; }
 
-    .brut-box {
-      background: #ffffff;
-      border: 1.5px solid #09090b;
-      box-shadow: 3px 3px 0px #09090b;
+    /* Floating Dock */
+    .dock-pill {
+      background: #1c1c1e;
+      border-radius: 26px;
+      padding: 10px 8px;
+      box-shadow: 0 16px 36px -6px rgba(0, 0, 0, 0.25);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 14px;
     }
 
-    .nav-btn {
-      width: 44px;
-      height: 44px;
+    .dock-btn {
+      width: 38px;
+      height: 38px;
+      border-radius: 14px;
       display: flex;
       align-items: center;
       justify-content: center;
-      color: #52525b;
-      border: 1px solid transparent;
-      transition: all 0.12s ease;
+      color: #8e8e93;
+      transition: all 0.18s cubic-bezier(0.16, 1, 0.3, 1);
       position: relative;
     }
-    .nav-btn:hover {
-      background: #ffffff;
-      color: #09090b;
-      border-color: #09090b;
-    }
-    .nav-btn.active {
-      background: #09090b;
+    .dock-btn:hover {
+      background: rgba(255, 255, 255, 0.12);
       color: #ffffff;
-      border-color: #09090b;
+      transform: scale(1.05);
+    }
+    .dock-btn.active {
+      background: #ffffff;
+      color: #1c1c1e;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
     }
 
-    /* Brutalist Table */
-    table { width: 100%; border-collapse: collapse; }
-    th {
-      background: #09090b;
-      color: #ffffff;
-      font-family: 'IBM Plex Mono', monospace;
-      font-size: 11px;
-      font-weight: 700;
-      letter-spacing: 0.05em;
+    /* Main Window Surface */
+    .window-chassis {
+      background: #f5f5f7;
+      border-radius: 28px;
+      border: 1px solid rgba(255, 255, 255, 0.85);
+      box-shadow: 0 25px 60px -15px rgba(0, 0, 0, 0.08), 0 0 0 1px rgba(0, 0, 0, 0.04);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+      height: calc(100vh - 2rem);
+      margin: 1rem 1rem 1rem 0;
+    }
+
+    .glass-card {
+      background: rgba(255, 255, 255, 0.8);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border-radius: 20px;
+      border: 1px solid rgba(255, 255, 255, 0.9);
+      box-shadow: 0 8px 25px -4px rgba(0, 0, 0, 0.03);
+    }
+
+    /* Modern Table Styles */
+    table {
+      width: 100%;
+      border-collapse: separate;
+      border-spacing: 0;
+      font-size: 12px;
+    }
+    thead th {
+      background: #fafafa;
+      color: #71717a;
+      font-weight: 600;
       text-transform: uppercase;
-      padding: 10px 12px;
+      font-size: 10px;
+      letter-spacing: 0.05em;
+      padding: 12px 16px;
+      border-bottom: 1px solid #e4e4e7;
       text-align: left;
-      border-bottom: 2px solid #09090b;
       position: sticky;
       top: 0;
       z-index: 10;
     }
-    td {
-      padding: 10px 12px;
-      border-bottom: 1px solid #e4e4e7;
-      font-size: 12px;
-      color: #09090b;
-      background: #ffffff;
+    tbody td {
+      padding: 12px 16px;
+      border-bottom: 1px solid #f4f4f5;
+      color: #18181b;
+      vertical-align: middle;
     }
-    tr.data-row:hover td {
-      background: #f4f4f5;
+    tbody tr:hover {
+      background: #fafafa;
     }
 
-    /* Segmented Filter Pills */
+    /* Clean Filter Buttons */
     .filter-btn {
-      display: inline-flex;
-      align-items: center;
-      gap: 5px;
-      font-family: 'IBM Plex Mono', monospace;
-      font-size: 11px;
-      font-weight: 700;
-      padding: 6px 12px;
-      border: 1.5px solid #d4d4d8;
-      background: #ffffff;
-      color: #52525b;
+      font-size: 12px;
+      font-weight: 600;
+      padding: 6px 14px;
+      border-radius: 10px;
+      border: 1px solid transparent;
+      color: #71717a;
+      background: transparent;
       cursor: pointer;
-      user-select: none;
-      transition: all 0.12s ease;
+      transition: all 0.15s ease;
     }
     .filter-btn:hover {
-      border-color: #09090b;
-      color: #09090b;
+      background: rgba(255, 255, 255, 0.6);
+      color: #111113;
     }
     .filter-btn.active {
-      background: #09090b;
-      color: #ffffff;
-      border-color: #09090b;
-      box-shadow: 2px 2px 0px #09090b;
-    }
-
-    /* Tactile Table Action Buttons */
-    .table-act-btn {
-      display: inline-flex;
-      align-items: center;
-      gap: 4px;
-      padding: 5px 9px;
-      font-family: 'IBM Plex Mono', monospace;
-      font-size: 10px;
-      font-weight: 800;
-      text-transform: uppercase;
-      border: 1.5px solid #09090b;
-      cursor: pointer;
-      transition: all 0.1s ease;
-    }
-    .table-act-btn:hover {
-      transform: translate(-1px, -1px);
-      box-shadow: 1px 1px 0px #09090b;
-    }
-    .table-act-btn:active {
-      transform: translate(1px, 1px);
-      box-shadow: none;
-    }
-
-    .chip-mono {
-      font-family: 'IBM Plex Mono', monospace;
-      font-size: 10px;
-      font-weight: 700;
-      text-transform: uppercase;
-      padding: 2px 6px;
-      border: 1px solid #09090b;
+      background: #ffffff;
+      color: #111113;
+      border-color: #e4e4e7;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
     }
   </style>
 </head>
-<body class="bg-neutral-100 text-noir">
+<body class="bg-studio flex items-center p-3">
 
-  <!-- TOP HEADER -->
-  <header class="h-14 bg-white border-b-2 border-noir flex items-center justify-between px-4 z-40 flex-shrink-0 select-none">
+  <!-- LEFT FLOATING DOCK -->
+  <aside class="w-16 flex flex-col items-center justify-between h-[calc(100vh-2rem)] py-2 select-none z-40 flex-shrink-0">
+    <div class="dock-pill">
+      <a href="index.html" class="w-9 h-9 rounded-full bg-white/10 flex items-center justify-center text-white hover:bg-white/20 transition-colors mb-1">
+        <i data-lucide="sparkles" class="w-4 h-4 text-emerald-400"></i>
+      </a>
+      <a href="index.html" class="dock-btn" title="Tableau de bord"><i data-lucide="home" class="w-4 h-4"></i></a>
+      <a href="dispatch.html" class="dock-btn" title="Répartition [F2]"><i data-lucide="radio" class="w-4 h-4"></i></a>
+      <a href="queue.html" class="dock-btn active" title="File des missions [F3]"><i data-lucide="list-ordered" class="w-4 h-4"></i></a>
+      <a href="map.html" class="dock-btn" title="Carte Flotte [F4]"><i data-lucide="globe" class="w-4 h-4"></i></a>
+      <a href="messages.html" class="dock-btn" title="Messages [F5]"><i data-lucide="message-square" class="w-4 h-4"></i></a>
+      <a href="driver.html" class="dock-btn" title="Terminal Chauffeur [F6]"><i data-lucide="smartphone" class="w-4 h-4"></i></a>
+      <a href="receipt.html" class="dock-btn" title="Facturation"><i data-lucide="receipt" class="w-4 h-4"></i></a>
+    </div>
+    <div class="flex flex-col items-center gap-2">
+      <button onclick="PulseState.resetDemoData(); renderAll();" class="w-11 h-11 bg-[#1c1c1e] text-neutral-400 hover:text-white rounded-[16px] flex items-center justify-center shadow-lg transition-transform hover:scale-105" title="Réinitialiser données système">
+        <i data-lucide="settings" class="w-4 h-4"></i>
+      </button>
+    </div>
+  </aside>
+
+  <!-- MAIN WINDOW SURFACE -->
+  <div class="window-chassis">
     
-    <div class="flex items-center gap-4">
-      <a href="index.html" class="flex items-center gap-2 text-decoration-none">
-        <div class="bg-noir text-white font-mono font-black text-sm px-2.5 py-1 tracking-widest flex items-center gap-1.5">
-          <span class="inline-block w-2 h-2 bg-white"></span>
-          PULSE<span class="text-neutral-400">//</span>CAD
+    <!-- TOP WINDOW HEADER -->
+    <header class="h-16 px-8 border-b border-neutral-200/80 flex items-center justify-between flex-shrink-0 select-none bg-white/50 backdrop-blur-md">
+      <div class="flex items-center gap-4">
+        <!-- macOS dots -->
+        <div class="flex items-center gap-2 mr-2">
+          <span class="w-3 h-3 rounded-full bg-[#ff5f57] border border-[#e0443e]"></span>
+          <span class="w-3 h-3 rounded-full bg-[#febc2e] border border-[#d89e24]"></span>
+          <span class="w-3 h-3 rounded-full bg-[#28c840] border border-[#1aab29]"></span>
         </div>
-      </a>
-
-      <div class="h-5 w-px bg-neutral-300"></div>
-
-      <div class="flex items-center gap-2">
-        <span class="font-mono text-[11px] font-bold uppercase bg-neutral-100 border border-neutral-300 px-2 py-0.5 text-neutral-800">
-          FILE DES COURSES
-        </span>
-        <span class="text-neutral-400 text-xs">/</span>
-        <span class="font-mono text-[11px] font-bold text-neutral-900 tracking-wide uppercase">
-          MONITEUR DES ATTRIBUTIONS MÉTROPOLITAINES
-        </span>
-      </div>
-    </div>
-
-    <div class="flex items-center gap-3">
-      <!-- Collaboration Share Button -->
-      <button onclick="openShareModal()" class="bg-noir text-white font-mono text-xs font-bold uppercase px-3 py-1 flex items-center gap-1.5 border border-noir hover:bg-neutral-800 shadow-[2px_2px_0px_#09090b]">
-        <i data-lucide="share-2" class="w-3.5 h-3.5"></i>
-        PARTAGER AVEC COLLABORATEUR
-      </button>
-
-      <div class="hidden sm:flex items-center gap-2 bg-neutral-50 border border-neutral-300 px-2.5 py-1">
-        <span class="w-1.5 h-1.5 bg-black"></span>
-        <span id="live-clock" class="font-mono text-xs font-semibold text-neutral-900">--:--:--</span>
+        <div>
+          <h1 class="text-xl font-bold text-neutral-900 tracking-tight">File des Missions CAD</h1>
+          <p class="text-xs text-neutral-400">Gestion du flux d'appels et audit des attributions</p>
+        </div>
       </div>
 
-      <div class="font-mono text-[11px] font-bold uppercase border border-neutral-300 px-2.5 py-1 bg-white text-neutral-700">
-        RÉSEAU CENTRAL CAD
+      <div class="flex items-center gap-3">
+        <button onclick="exportCallsCSV()" class="bg-white border border-neutral-200 text-neutral-700 hover:text-black text-xs font-semibold px-3.5 py-2 rounded-xl flex items-center gap-2 shadow-xs transition-colors">
+          <span>📥</span> Export CSV
+        </button>
+
+        <button onclick="exportAuditJSON()" class="bg-white border border-neutral-200 text-neutral-700 hover:text-black text-xs font-semibold px-3.5 py-2 rounded-xl flex items-center gap-2 shadow-xs transition-colors">
+          <span>📊</span> Export JSON
+        </button>
+
+        <a href="dispatch.html" class="bg-neutral-900 text-white text-xs font-semibold px-4 py-2 rounded-xl flex items-center gap-2 shadow-sm hover:bg-neutral-800 transition-colors">
+          <i data-lucide="plus" class="w-3.5 h-3.5 text-emerald-400"></i>
+          <span>Nouvelle Course</span>
+        </a>
       </div>
+    </header>
 
-      <div class="flex items-center gap-2 bg-noir text-white px-2.5 py-1 border border-noir font-mono text-xs font-bold">
-        OP-408
-      </div>
-    </div>
-  </header>
-
-  <!-- BODY LAYOUT -->
-  <div class="flex flex-1 overflow-hidden">
-
-    <!-- LEFT SIDEBAR -->
-    <aside class="w-14 bg-white border-r-2 border-noir flex flex-col items-center py-3 gap-2 flex-shrink-0 select-none z-30">
-      <a href="index.html" class="nav-btn" title="Tableau de bord">
-        <i data-lucide="layout-grid" class="w-5 h-5"></i>
-      </a>
-      <a href="dispatch.html" class="nav-btn" title="Répartition">
-        <i data-lucide="radio" class="w-5 h-5"></i>
-      </a>
-      <a href="queue.html" class="nav-btn active" title="File des courses">
-        <i data-lucide="list-ordered" class="w-5 h-5"></i>
-      </a>
-      <a href="map.html" class="nav-btn" title="Carte Flotte">
-        <i data-lucide="map" class="w-5 h-5"></i>
-      </a>
-      <a href="messages.html" class="nav-btn" title="Messages Radio MDT">
-        <i data-lucide="message-square" class="w-5 h-5"></i>
-      </a>
-      <a href="receipt.html" class="nav-btn" title="Facturation & Reçus CAD">
-        <i data-lucide="receipt" class="w-5 h-5"></i>
-      </a>
-      <a href="driver.html" class="nav-btn" title="Terminal Mobile Chauffeur MDT">
-        <i data-lucide="smartphone" class="w-5 h-5"></i>
-      </a>
-      <div class="flex-1"></div>
-      <button onclick="PulseState.resetDemoData(); renderAll();" class="nav-btn" title="Réinitialiser données démo">
-        <i data-lucide="rotate-ccw" class="w-5 h-5"></i>
-      </button>
-    </aside>
-
-    <!-- MAIN QUEUE WORKSPACE -->
-    <main class="flex-1 flex flex-col overflow-hidden p-5">
+    <!-- CONTENT BODY -->
+    <main class="flex-1 flex flex-col p-8 overflow-hidden">
       
-      <!-- TOP STATUS & DYNAMIC HUD BAR -->
-      <div class="brut-box p-3 mb-4 bg-white flex flex-wrap items-center justify-between gap-3 flex-shrink-0">
+      <!-- KPI STATS PILLS & SEARCH -->
+      <div class="flex flex-wrap items-center justify-between gap-4 mb-6">
         
-        <div class="flex items-center gap-4">
-          <!-- Metric 1: Pending -->
-          <div class="flex items-center gap-2 border-r border-neutral-300 pr-4">
-            <span class="w-2.5 h-2.5 bg-black"></span>
-            <div>
-              <div class="font-mono text-[10px] text-neutral-500 font-bold uppercase">EN ATTENTE ASSIGNATION</div>
-              <div class="font-mono text-lg font-black text-noir leading-none" id="hud-pending">0</div>
-            </div>
+        <!-- Metrics -->
+        <div class="flex items-center gap-6">
+          <div class="flex items-baseline gap-2">
+            <span class="text-2xl font-light text-neutral-900" id="hud-pending">0</span>
+            <span class="text-xs font-semibold text-neutral-400">en attente</span>
           </div>
-
-          <!-- Metric 2: In route -->
-          <div class="flex items-center gap-2 border-r border-neutral-300 pr-4">
-            <div>
-              <div class="font-mono text-[10px] text-neutral-500 font-bold uppercase">COURSES EN PROGRESSION</div>
-              <div class="font-mono text-lg font-black text-noir leading-none" id="hud-enroute">0</div>
-            </div>
+          <div class="h-4 w-px bg-neutral-300"></div>
+          <div class="flex items-baseline gap-2">
+            <span class="text-2xl font-light text-neutral-900" id="hud-enroute">0</span>
+            <span class="text-xs font-semibold text-neutral-400">en progression</span>
           </div>
-
-          <!-- Metric 3: Ready units -->
-          <div class="flex items-center gap-2">
-            <div>
-              <div class="font-mono text-[10px] text-neutral-500 font-bold uppercase">UNITÉS DISPONIBLES</div>
-              <div class="font-mono text-lg font-black text-neutral-800 leading-none" id="hud-free-units">0</div>
-            </div>
+          <div class="h-4 w-px bg-neutral-300"></div>
+          <div class="flex items-baseline gap-2">
+            <span class="text-2xl font-light text-emerald-600" id="hud-free-units">0</span>
+            <span class="text-xs font-semibold text-emerald-700">unités libres</span>
           </div>
         </div>
 
-        <div class="flex items-center gap-2 flex-wrap">
-          <!-- Search input -->
-          <div class="relative">
-            <input id="queue-search" oninput="applyFilters()" class="border-1.5 border-neutral-300 font-mono text-xs px-2.5 py-2 pl-8 outline-none focus:border-noir bg-neutral-50 w-60 font-bold" type="text" placeholder="RECHERCHE CLIENT / RUE..." />
-            <i data-lucide="search" class="w-3.5 h-3.5 text-neutral-500 absolute left-2.5 top-2.5"></i>
-          </div>
-
-          <a href="dispatch.html" class="bg-noir text-white font-mono text-xs font-bold uppercase px-3 py-2 flex items-center gap-1.5 border border-noir hover:bg-neutral-800 shadow-[2px_2px_0px_#09090b]">
-            <i data-lucide="plus" class="w-3.5 h-3.5"></i>
-            NOUVELLE COURSE [F2]
-          </a>
-
-          <!-- Tactical Fleet Export & Audit Tools -->
-          <button onclick="exportCallsCSV()" title="Exporter toutes les courses en format CSV" class="bg-white text-noir font-mono text-xs font-bold uppercase px-3 py-2 border-1.5 border-noir hover:bg-neutral-100 flex items-center gap-1.5 shadow-[2px_2px_0px_#09090b] cursor-pointer transition-all active:translate-x-[1px] active:translate-y-[1px]">
-            <span>📥</span> EXPORT CSV COURSES
-          </button>
-
-          <button onclick="exportAuditJSON()" title="Exporter l'audit système complet en format JSON" class="bg-white text-noir font-mono text-xs font-bold uppercase px-3 py-2 border-1.5 border-noir hover:bg-neutral-100 flex items-center gap-1.5 shadow-[2px_2px_0px_#09090b] cursor-pointer transition-all active:translate-x-[1px] active:translate-y-[1px]">
-            <span>📊</span> EXPORT JSON AUDIT CAD
-          </button>
-
-          <button onclick="renderAll()" class="bg-white text-noir font-mono text-xs font-bold uppercase px-3 py-2 border border-neutral-300 hover:border-noir flex items-center gap-1">
-            <i data-lucide="refresh-cw" class="w-3.5 h-3.5"></i>
-            ACTUALISER
-          </button>
+        <!-- Search -->
+        <div class="relative">
+          <input id="queue-search" oninput="applyFilters()" type="text" placeholder="Recherche client ou adresse..." class="w-72 bg-white border border-neutral-200/80 rounded-xl px-3.5 py-2 pl-9 text-xs outline-none focus:border-neutral-900 transition-colors shadow-xs" />
+          <i data-lucide="search" class="w-4 h-4 text-neutral-400 absolute left-3 top-2.5"></i>
         </div>
 
       </div>
 
-      <!-- FILTER TOOLBAR (RESTRUCTURED SEGMENTED RACK) -->
-      <div class="flex items-center justify-between pb-3 flex-shrink-0">
-        <div class="flex items-center gap-2" id="filter-rack">
-          <button class="filter-btn active" data-filter="ALL" onclick="setFilter('ALL', this)">TOUTES (<span id="count-all">0</span>)</button>
-          <button class="filter-btn" data-filter="EN_ATTENTE" onclick="setFilter('EN_ATTENTE', this)">EN ATTENTE (<span id="count-pending">0</span>)</button>
-          <button class="filter-btn" data-filter="ASSIGNÉ" onclick="setFilter('ASSIGNÉ', this)">ASSIGNÉES / EN ROUTE (<span id="count-active">0</span>)</button>
-          <button class="filter-btn" data-filter="TERMINÉ" onclick="setFilter('TERMINÉ', this)">TERMINÉES (<span id="count-done">0</span>)</button>
+      <!-- FILTER PILLS -->
+      <div class="flex items-center justify-between pb-3 mb-4 border-b border-neutral-200/60">
+        <div class="flex items-center gap-1 bg-neutral-200/50 p-1 rounded-xl">
+          <button class="filter-btn active" data-filter="ALL" onclick="setFilter('ALL', this)">Toutes (<span id="count-all">0</span>)</button>
+          <button class="filter-btn" data-filter="EN_ATTENTE" onclick="setFilter('EN_ATTENTE', this)">En attente (<span id="count-pending">0</span>)</button>
+          <button class="filter-btn" data-filter="ASSIGNÉ" onclick="setFilter('ASSIGNÉ', this)">En route (<span id="count-active">0</span>)</button>
+          <button class="filter-btn" data-filter="TERMINÉ" onclick="setFilter('TERMINÉ', this)">Terminées (<span id="count-done">0</span>)</button>
         </div>
-        <div class="font-mono text-xs text-neutral-500 font-bold">
-          SYNCHRONISATION INTER-TERMINAUX : ACTIVE
+        <div class="text-xs text-neutral-400 font-mono">
+          Synchronisation CAD active
         </div>
       </div>
 
-      <!-- COURSES TABLE WORKSPACE -->
-      <div class="flex-1 brut-box overflow-hidden flex flex-col bg-white">
-        
+      <!-- TABLE CONTAINER -->
+      <div class="flex-1 glass-card overflow-hidden flex flex-col">
         <div class="flex-1 overflow-y-auto">
           <table>
             <thead>
               <tr>
-                <th style="width:85px;">#COURSE</th>
-                <th style="width:90px;">HORODATAGE</th>
-                <th>IDENTIFIANT / COMPTE</th>
-                <th>PRISE EN CHARGE</th>
-                <th>DESTINATION</th>
-                <th>VÉHICULE REQUIS</th>
-                <th>UNITÉ ATTRIBUÉE</th>
-                <th>STATUT ACTUEL</th>
-                <th style="text-align:right; width:260px;">ACTIONS OPÉRATEUR</th>
+                <th style="width:90px;">#Course</th>
+                <th style="width:90px;">Heure</th>
+                <th>Client / Compte</th>
+                <th>Prise en Charge</th>
+                <th>Destination</th>
+                <th>Véhicule</th>
+                <th>Unité Attribuée</th>
+                <th>Statut</th>
+                <th style="text-align:right; width:240px;">Actions</th>
               </tr>
             </thead>
             <tbody id="queue-table-body">
-              <!-- Dynamically populated from PulseState -->
+              <!-- Injected by JavaScript -->
             </tbody>
           </table>
         </div>
 
-        <div class="p-3 bg-neutral-50 border-t border-neutral-300 flex items-center justify-between font-mono text-[11px]">
-          <span class="text-neutral-500 font-bold">SYSTÈME OPÉRATIONNEL : <strong class="text-noir">PULSE CAD ENGINE</strong></span>
-          <span class="font-bold text-noir" id="queue-status-footer">DONNÉES EN DIRECT</span>
+        <div class="p-3.5 bg-white/70 border-t border-neutral-100 flex items-center justify-between text-xs text-neutral-500 font-medium">
+          <span>PULSE CAD OPERATIONAL QUEUE ENGINE</span>
+          <span class="font-bold text-neutral-800" id="queue-status-footer">Données en direct</span>
         </div>
-
       </div>
 
     </main>
 
   </div>
 
-  <!-- MODAL D'ASSIGNATION RAPIDE D'UNITÉ SYSTÈME -->
-  <div id="assign-modal" class="fixed inset-0 bg-black/60 z-50 items-center justify-center hidden p-4" onclick="closeModalOnBg(event)">
-    <div class="brut-box max-w-lg w-full bg-white p-6">
-      
-      <div class="flex items-center justify-between border-b-2 border-noir pb-2 mb-4">
-        <span class="bg-noir text-white font-mono text-xs font-black px-2 py-0.5 uppercase tracking-wider">
-          ATTRIBUTION CAD // COURSE <span id="modal-call-id">#0000</span>
-        </span>
-        <button onclick="closeAssignModal()" class="font-mono text-xs font-bold text-neutral-600 hover:text-black">
-          [FERMER X]
-        </button>
-      </div>
-
-      <div class="mb-4 bg-neutral-50 p-3 border border-neutral-200 font-mono text-xs">
-        <div class="text-neutral-500 uppercase font-bold">POINT DE DÉPART :</div>
-        <div class="font-black text-noir text-sm mb-1" id="modal-pickup-text">1250 René-Lévesque Ouest</div>
-        <div class="text-neutral-500 uppercase font-bold">COMPTE : <span class="text-noir font-black" id="modal-client-text">CORP-AIR-CANADA</span></div>
-      </div>
-
-      <label class="block font-mono text-xs font-bold uppercase text-neutral-700 mb-2">Sélectionner une Unité Flotte Disponible</label>
-      <div id="modal-units-list" class="flex flex-col gap-1.5 max-h-60 overflow-y-auto mb-5 border border-neutral-200 p-2">
-        <!-- Injected via JavaScript from PulseState.getVehicles() -->
-      </div>
-
-      <div class="flex justify-end gap-2 pt-2 border-t border-neutral-200">
-        <button onclick="closeAssignModal()" class="px-4 py-2 border border-neutral-300 font-mono font-bold text-xs uppercase hover:bg-neutral-100">
-          ANNULER
-        </button>
-      </div>
-
-    </div>
-  </div>
-
-  <!-- MODAL DE PARTAGE COLLABORATION (LAN / IP / QR) -->
-  <div id="share-modal" class="fixed inset-0 bg-black/60 z-50 items-center justify-center hidden p-4" onclick="closeShareModalOnBg(event)">
-    <div class="brut-box max-w-md w-full bg-white p-6">
-      
-      <div class="flex items-center justify-between border-b-2 border-noir pb-2 mb-4">
-        <span class="bg-noir text-white font-mono text-xs font-black px-2 py-0.5 uppercase tracking-wider">
-          PARTAGE SESSION COLLABORATIVE
-        </span>
-        <button onclick="closeShareModal()" class="font-mono text-xs font-bold text-neutral-600 hover:text-black">
-          [FERMER X]
-        </button>
-      </div>
-
-      <p class="font-mono text-xs text-neutral-600 mb-4 leading-relaxed font-semibold">
-        Partagez cette session CAD avec votre collaborateur. Toutes les modifications, dispatches et messages MDT sont synchronisés en direct :
-      </p>
-
-      <!-- Public Web URL -->
-      <div class="bg-neutral-50 p-3 border-1.5 border-noir mb-3 font-mono text-xs">
-        <div class="flex items-center justify-between mb-1">
-          <span class="text-[10px] text-neutral-900 uppercase font-black flex items-center gap-1.5">
-            <span class="w-2 h-2 bg-emerald-600 inline-block animate-pulse"></span>
-            1. ACCÈS PUBLIC INTERNET (HTTPS MONDIAL) :
-          </span>
-          <span class="text-[9px] bg-noir text-white px-1.5 py-0.2 font-bold">EN LIGNE</span>
-        </div>
-        <div class="flex items-center justify-between gap-2">
-          <input id="share-url-public" class="bg-white border border-neutral-300 px-2.5 py-1.5 font-bold text-xs flex-1 outline-none text-noir" readonly value="https://a90389d46bbc3d.lhr.life/queue.html" />
-          <button onclick="copyPublicUrl()" class="bg-noir text-white px-3 py-1.5 font-black uppercase text-[11px] hover:bg-neutral-800">
-            COPIER
-          </button>
-        </div>
-      </div>
-
-      <!-- Local Network LAN URL -->
-      <div class="bg-neutral-50 p-3 border-1.5 border-neutral-300 mb-4 font-mono text-xs">
-        <div class="text-[10px] text-neutral-500 uppercase font-bold mb-1">2. ACCÈS RÉSEAU LOCAL (WI-FI / LAN) :</div>
-        <div class="flex items-center justify-between gap-2">
-          <input id="share-url-input" class="bg-white border border-neutral-300 px-2.5 py-1.5 font-bold text-xs flex-1 outline-none text-noir" readonly value="http://192.168.1.95:8091/queue.html" />
-          <button onclick="copyShareUrl()" class="bg-white text-noir border border-noir px-3 py-1.5 font-bold uppercase text-[11px] hover:bg-neutral-100">
-            COPIER
-          </button>
-        </div>
-      </div>
-
-      <div class="border border-neutral-200 p-2.5 bg-neutral-100 font-mono text-[10px] text-neutral-600 mb-5 leading-normal">
-        • Hébergement : <strong>Tunnel Public TLS / HTTPS</strong> (terminaison SSL active)<br>
-        • Port d'écoute : <strong>8091</strong><br>
-        • Synchronisation inter-terminaux : <strong>Active (CAD Broadcast Sync)</strong>
-      </div>
-
-      <div class="flex justify-end">
-        <button onclick="closeShareModal()" class="px-4 py-2 bg-noir text-white font-mono font-bold text-xs uppercase">
-          FERMER
-        </button>
-      </div>
-
-    </div>
-  </div>
-
   <script>
+    lucide.createIcons();
+
     let currentFilter = 'ALL';
-    let targetAssignCallId = null;
-
-    document.addEventListener('DOMContentLoaded', () => {
-      lucide.createIcons();
-      initClock();
-      renderAll();
-
-      PULSE_CHANNEL.onmessage = (e) => {
-        if (e.data.type === 'CALLS_UPDATED' || e.data.type === 'VEHICLES_UPDATED') {
-          renderAll();
-        }
-      };
-    });
-
-    function initClock() {
-      const update = () => {
-        const now = new Date();
-        const timeStr = now.toLocaleTimeString('fr-CA', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false });
-        const el = document.getElementById('live-clock');
-        if (el) el.textContent = timeStr;
-      };
-      update();
-      setInterval(update, 1000);
-    }
 
     function setFilter(filter, btn) {
       currentFilter = filter;
-      document.querySelectorAll('#filter-rack .filter-btn').forEach(b => b.classList.remove('active'));
+      document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
       btn.classList.add('active');
-      renderTable();
+      renderAll();
     }
 
     function applyFilters() {
-      renderTable();
-    }
-
-    function renderAll() {
-      updateHUD();
-      renderTable();
-    }
-
-    function updateHUD() {
-      const calls = PulseState.getCalls();
-      const vehicles = PulseState.getVehicles();
-
-      const pending = calls.filter(c => c.status === 'EN_ATTENTE').length;
-      const enroute = calls.filter(c => c.status === 'ASSIGNÉ' || c.status === 'EN_ROUTE').length;
-      const done = calls.filter(c => c.status === 'TERMINÉ').length;
-      const freeUnits = vehicles.filter(v => v.status === 'LIBRE').length;
-
-      document.getElementById('hud-pending').textContent = `${pending} APPELS`;
-      document.getElementById('hud-enroute').textContent = `${enroute} COURSES`;
-      document.getElementById('hud-free-units').textContent = `${freeUnits} UNITÉS`;
-
-      document.getElementById('count-all').textContent = calls.length;
-      document.getElementById('count-pending').textContent = pending;
-      document.getElementById('count-active').textContent = enroute;
-      document.getElementById('count-done').textContent = done;
-    }
-
-    function renderTable() {
-      const tbody = document.getElementById('queue-table-body');
-      tbody.innerHTML = '';
-      const query = (document.getElementById('queue-search').value || '').toLowerCase().trim();
-
-      let calls = PulseState.getCalls();
-
-      if (currentFilter === 'EN_ATTENTE') {
-        calls = calls.filter(c => c.status === 'EN_ATTENTE');
-      } else if (currentFilter === 'ASSIGNÉ') {
-        calls = calls.filter(c => c.status === 'ASSIGNÉ' || c.status === 'EN_ROUTE');
-      } else if (currentFilter === 'TERMINÉ') {
-        calls = calls.filter(c => c.status === 'TERMINÉ');
-      }
-
-      if (query) {
-        calls = calls.filter(c => 
-          c.id.toLowerCase().includes(query) ||
-          c.client.toLowerCase().includes(query) ||
-          c.pickup.toLowerCase().includes(query) ||
-          c.dest.toLowerCase().includes(query) ||
-          (c.assignedUnit && String(c.assignedUnit).includes(query))
-        );
-      }
-
-      if (calls.length === 0) {
-        tbody.innerHTML = `
-          <tr>
-            <td colspan="9" class="p-8 text-center font-mono text-neutral-500 font-bold">
-              AUCUNE COURSE CORRESPONDANTE DANS LA FILE DE RÉPARTITION
-            </td>
-          </tr>
-        `;
-        return;
-      }
-
-      calls.forEach(call => {
-        const tr = document.createElement('tr');
-        tr.className = 'data-row';
-
-        const statusPill = call.status === 'EN_ATTENTE'
-          ? `<span class="chip-mono bg-neutral-100 text-noir font-bold">EN ATTENTE</span>`
-          : call.status === 'ASSIGNÉ'
-          ? `<span class="chip-mono bg-noir text-white font-bold">ASSIGNÉ</span>`
-          : call.status === 'EN_ROUTE'
-          ? `<span class="chip-mono bg-neutral-800 text-white font-bold">EN ROUTE</span>`
-          : call.status === 'TERMINÉ'
-          ? `<span class="chip-mono bg-emerald-100 text-emerald-800 border-emerald-600 font-bold">TERMINÉ</span>`
-          : `<span class="chip-mono bg-neutral-200 text-neutral-700 font-bold">${call.status}</span>`;
-
-        const unitDisplay = call.assignedUnit
-          ? `<span class="font-mono font-black text-xs bg-noir text-white px-2 py-0.5">UNIT-${String(call.assignedUnit).padStart(3, '0')}</span>`
-          : `<span class="font-mono text-neutral-400 font-bold">— AUCUNE —</span>`;
-
-        tr.innerHTML = `
-          <td class="font-mono font-black text-xs text-noir">#${call.id}</td>
-          <td class="font-mono text-xs text-neutral-600 font-bold">${call.createdAt}</td>
-          <td>
-            <div class="font-black text-noir font-mono text-xs">${call.client}</div>
-            <div class="font-mono text-[10px] text-neutral-500">${call.phone}</div>
-          </td>
-          <td>
-            <div class="font-bold text-neutral-900">${call.pickup}</div>
-            <div class="text-[10px] text-neutral-500 font-mono">${call.suite || call.zone}</div>
-          </td>
-          <td>
-            <div class="font-bold text-neutral-900 truncate max-w-xs" title="${call.dest}">${call.dest}</div>
-          </td>
-          <td><span class="chip-mono bg-neutral-100 text-noir">${call.vehType}</span></td>
-          <td>${unitDisplay}</td>
-          <td>${statusPill}</td>
-          <td style="text-align:right;">
-            <div class="flex items-center justify-end gap-1">
-              ${call.status === 'EN_ATTENTE' ? `
-                <button onclick="openAssignModal('${call.id}')" class="table-act-btn bg-noir text-white hover:bg-neutral-800">
-                  <i data-lucide="user-plus" class="w-3 h-3"></i> ASSIGNER
-                </button>
-              ` : `
-                <button onclick="advanceCallStatus('${call.id}')" class="table-act-btn bg-neutral-100 text-noir hover:bg-neutral-200">
-                  <i data-lucide="check" class="w-3 h-3"></i> ÉTAPE
-                </button>
-              `}
-              <a href="receipt.html?call=${call.id}" title="Générer Facture / Reçu" class="table-act-btn bg-white text-noir border-noir hover:bg-neutral-100 text-decoration-none">
-                🧾 FACTURE
-              </a>
-              <button onclick="cancelCallAction('${call.id}')" class="table-act-btn bg-white text-rose-700 border-rose-700 hover:bg-rose-50" title="Annuler">
-                <i data-lucide="x" class="w-3 h-3"></i>
-              </button>
-            </div>
-          </td>
-        `;
-
-        tbody.appendChild(tr);
-      });
-
-      lucide.createIcons();
-    }
-
-    function openAssignModal(callId) {
-      targetAssignCallId = callId;
-      const call = PulseState.getCalls().find(c => String(c.id) === String(callId));
-      if (!call) return;
-
-      document.getElementById('modal-call-id').textContent = `#${call.id}`;
-      document.getElementById('modal-pickup-text').textContent = call.pickup;
-      document.getElementById('modal-client-text').textContent = `${call.client} · [${call.vehType}]`;
-
-      const listContainer = document.getElementById('modal-units-list');
-      listContainer.innerHTML = '';
-
-      const vehicles = PulseState.getVehicles();
-      vehicles.forEach(v => {
-        const div = document.createElement('div');
-        div.className = 'p-2 border border-neutral-200 hover:border-black bg-white hover:bg-neutral-50 cursor-pointer flex items-center justify-between font-mono text-xs';
-        div.innerHTML = `
-          <div>
-            <span class="font-black text-noir">${v.code}</span>
-            <span class="text-neutral-500 text-[10px] ml-2">(${v.type} · ${v.zone})</span>
-          </div>
-          <span class="font-mono text-[10px] font-bold px-1.5 py-0.5 ${v.status === 'LIBRE' ? 'bg-emerald-100 text-emerald-800' : 'bg-neutral-200 text-neutral-700'}">
-            ${v.status}
-          </span>
-        `;
-        div.addEventListener('click', () => {
-          confirmAssignToUnit(v.id);
-        });
-        listContainer.appendChild(div);
-      });
-
-      document.getElementById('assign-modal').style.display = 'flex';
-    }
-
-    function closeAssignModal() {
-      document.getElementById('assign-modal').style.display = 'none';
-      targetAssignCallId = null;
-    }
-
-    function closeModalOnBg(e) {
-      if (e.target === document.getElementById('assign-modal')) closeAssignModal();
-    }
-
-    function confirmAssignToUnit(unitId) {
-      if (!targetAssignCallId) return;
-      PulseState.assignCall(targetAssignCallId, unitId);
-      closeAssignModal();
       renderAll();
-    }
-
-    function advanceCallStatus(callId) {
-      const call = PulseState.getCalls().find(c => String(c.id) === String(callId));
-      if (!call) return;
-      let nextStatus = 'TERMINÉ';
-      if (call.status === 'ASSIGNÉ') nextStatus = 'EN_ROUTE';
-      else if (call.status === 'EN_ROUTE') nextStatus = 'SUR_PLACE';
-      else if (call.status === 'SUR_PLACE') nextStatus = 'TERMINÉ';
-      else if (call.status === 'TERMINÉ') nextStatus = 'EN_ATTENTE';
-
-      PulseState.updateCallStatus(callId, nextStatus);
-      renderAll();
-    }
-
-    function cancelCallAction(callId) {
-      if (confirm(`ANNULER LA COURSE #${callId} ET LIBÉRER L'UNITÉ ?`)) {
-        PulseState.updateCallStatus(callId, 'ANNULÉ');
-        renderAll();
-      }
-    }
-
-    // --- FLEET DATA EXPORT & AUDIT TOOLS ---
-    function getExportDateStr() {
-      const now = new Date();
-      const yyyy = now.getFullYear();
-      const mm = String(now.getMonth() + 1).padStart(2, '0');
-      const dd = String(now.getDate()).padStart(2, '0');
-      return `${yyyy}-${mm}-${dd}`;
     }
 
     function exportCallsCSV() {
       const calls = PulseState.getCalls();
-      const headers = [
-        'ID_COURSE',
-        'DATE_HEURE',
-        'CLIENT',
-        'TELEPHONE',
-        'PRISE_EN_CHARGE',
-        'DESTINATION',
-        'ZONE',
-        'VEHICULE',
-        'STATUT',
-        'UNITE_ASSIGNEE',
-        'RESTRICTIONS',
-        'NOTES'
-      ];
+      const headers = ['ID', 'Client', 'Heure', 'PriseEnCharge', 'Destination', 'TypeVehicule', 'Statut', 'UniteAssignee', 'TarifEstime'];
+      const rows = calls.map(c => [
+        c.id,
+        `"${c.client.replace(/"/g, '""')}"`,
+        c.time,
+        `"${c.pickup.replace(/"/g, '""')}"`,
+        `"${c.dest.replace(/"/g, '""')}"`,
+        c.vehType,
+        c.status,
+        c.assignedVeh || 'AUCUNE',
+        `${c.price || 35.00} CAD`
+      ]);
 
-      const escapeCSV = (val) => {
-        if (val === null || val === undefined) return '""';
-        const str = String(val).replace(/"/g, '""');
-        return `"${str}"`;
-      };
-
-      const rows = calls.map(c => {
-        const pickupStr = c.suite ? `${c.pickup} (${c.suite})` : (c.pickup || '');
-        const unitStr = c.assignedUnit ? `UNIT-${String(c.assignedUnit).padStart(3, '0')}` : 'AUCUNE';
-        const restrictionsStr = Array.isArray(c.restrictions) ? c.restrictions.join(' | ') : (c.restrictions || '');
-        
-        return [
-          escapeCSV(c.id),
-          escapeCSV(c.createdAt || ''),
-          escapeCSV(c.client || ''),
-          escapeCSV(c.phone || ''),
-          escapeCSV(pickupStr),
-          escapeCSV(c.dest || ''),
-          escapeCSV(c.zone || ''),
-          escapeCSV(c.vehType || ''),
-          escapeCSV(c.status || ''),
-          escapeCSV(unitStr),
-          escapeCSV(restrictionsStr),
-          escapeCSV(c.notes || '')
-        ].join(',');
-      });
-
-      const csvContent = [headers.join(','), ...rows].join('\r\n');
-      const blob = new Blob(["\uFEFF" + csvContent], { type: 'text/csv;charset=utf-8;' });
-      const filename = `pulse_cad_courses_${getExportDateStr()}.csv`;
-      
-      triggerDownload(blob, filename);
-      showToast("EXPORT CSV TÉLÉCHARGÉ DANS VOS FICHIERS");
+      const csvContent = 'data:text/csv;charset=utf-8,\uFEFF' + [headers.join(','), ...rows.map(e => e.join(','))].join('\n');
+      const encodedUri = encodeURI(csvContent);
+      const link = document.createElement('a');
+      link.setAttribute('href', encodedUri);
+      link.setAttribute('download', `PULSE_CAD_COURSES_${new Date().toISOString().slice(0, 10)}.csv`);
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
     }
 
     function exportAuditJSON() {
-      const snapshot = {
-        exportDate: new Date().toISOString(),
-        operator: "OP-408",
-        network: "CENTRAL CAD MONTRÉAL",
-        vehicles: PulseState.getVehicles(),
+      const stateDump = {
+        exportedAt: new Date().toISOString(),
+        version: "CAD-2026.11-PROD",
+        operator: "AGENT-01 // OP-408",
+        fleet: PulseState.getVehicles(),
         calls: PulseState.getCalls(),
         messages: PulseState.getMessages()
       };
 
-      const jsonStr = JSON.stringify(snapshot, null, 2);
-      const blob = new Blob([jsonStr], { type: 'application/json;charset=utf-8;' });
-      const filename = `pulse_cad_audit_${getExportDateStr()}.json`;
-
-      triggerDownload(blob, filename);
-      showToast("EXPORT AUDIT JSON COMPLET GÉNÉRÉ");
+      const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(stateDump, null, 2));
+      const downloadAnchor = document.createElement('a');
+      downloadAnchor.setAttribute("href", dataStr);
+      downloadAnchor.setAttribute("download", `PULSE_AUDIT_CAD_${new Date().toISOString().slice(0, 10)}.json`);
+      document.body.appendChild(downloadAnchor);
+      downloadAnchor.click();
+      downloadAnchor.remove();
     }
 
-    function triggerDownload(blob, filename) {
-      const url = URL.createObjectURL(blob);
-      const link = document.createElement('a');
-      link.href = url;
-      link.download = filename;
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-      setTimeout(() => URL.revokeObjectURL(url), 1000);
+    function renderAll() {
+      const calls = PulseState.getCalls();
+      const vehs = PulseState.getVehicles();
+      const tbody = document.getElementById('queue-table-body');
+      const query = (document.getElementById('queue-search').value || '').toLowerCase().trim();
+
+      // Counts
+      const total = calls.length;
+      const pending = calls.filter(c => c.status === 'EN_ATTENTE').length;
+      const active = calls.filter(c => c.status === 'ATTRIBUÉ' || c.status === 'EN_ROUTE' || c.status === 'EN_COURSE').length;
+      const done = calls.filter(c => c.status === 'TERMINÉ').length;
+      const freeUnits = vehs.filter(v => v.status === 'LIBRE').length;
+
+      document.getElementById('hud-pending').textContent = pending;
+      document.getElementById('hud-enroute').textContent = active;
+      document.getElementById('hud-free-units').textContent = freeUnits;
+
+      document.getElementById('count-all').textContent = total;
+      document.getElementById('count-pending').textContent = pending;
+      document.getElementById('count-active').textContent = active;
+      document.getElementById('count-done').textContent = done;
+
+      let filtered = calls;
+      if (currentFilter === 'EN_ATTENTE') filtered = calls.filter(c => c.status === 'EN_ATTENTE');
+      else if (currentFilter === 'ASSIGNÉ') filtered = calls.filter(c => c.status === 'ATTRIBUÉ' || c.status === 'EN_ROUTE' || c.status === 'EN_COURSE');
+      else if (currentFilter === 'TERMINÉ') filtered = calls.filter(c => c.status === 'TERMINÉ');
+
+      if (query) {
+        filtered = filtered.filter(c => 
+          c.id.toLowerCase().includes(query) ||
+          c.client.toLowerCase().includes(query) ||
+          c.pickup.toLowerCase().includes(query) ||
+          c.dest.toLowerCase().includes(query)
+        );
+      }
+
+      tbody.innerHTML = '';
+      if (filtered.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="9" class="text-center py-8 text-neutral-400 font-medium">Aucune mission ne correspond aux critères sélectionnés.</td></tr>`;
+        return;
+      }
+
+      filtered.forEach(call => {
+        const tr = document.createElement('tr');
+        
+        // Status styling
+        let statusBadge = '';
+        if (call.status === 'EN_ATTENTE') {
+          statusBadge = `<span class="bg-amber-50 text-amber-800 border border-amber-200 px-2 py-0.5 rounded text-[11px] font-semibold">EN ATTENTE</span>`;
+        } else if (call.status === 'EN_ROUTE') {
+          statusBadge = `<span class="bg-neutral-900 text-white px-2 py-0.5 rounded text-[11px] font-semibold">EN ROUTE</span>`;
+        } else if (call.status === 'EN_COURSE') {
+          statusBadge = `<span class="bg-emerald-50 text-emerald-800 border border-emerald-200 px-2 py-0.5 rounded text-[11px] font-semibold">EN COURSE</span>`;
+        } else if (call.status === 'TERMINÉ') {
+          statusBadge = `<span class="bg-neutral-100 text-neutral-600 px-2 py-0.5 rounded text-[11px] font-semibold">TERMINÉ</span>`;
+        } else {
+          statusBadge = `<span class="bg-neutral-100 text-neutral-800 px-2 py-0.5 rounded text-[11px] font-semibold">${call.status}</span>`;
+        }
+
+        tr.innerHTML = `
+          <td class="font-mono font-bold text-neutral-900">#${call.id}</td>
+          <td class="font-mono text-neutral-500">${call.time}</td>
+          <td class="font-semibold text-neutral-900">${call.client}</td>
+          <td class="text-neutral-700 truncate max-w-xs">${call.pickup}</td>
+          <td class="text-neutral-700 truncate max-w-xs">${call.dest}</td>
+          <td class="text-neutral-500 text-xs">${call.vehType}</td>
+          <td class="font-mono font-semibold">${call.assignedVeh ? `UNIT-${call.assignedVeh}` : '<span class="text-neutral-400">NON ASSIGNÉ</span>'}</td>
+          <td>${statusBadge}</td>
+          <td style="text-align:right;">
+            <div class="flex items-center justify-end gap-1.5">
+              <a href="receipt.html?call=${call.id}" target="_blank" class="bg-neutral-100 hover:bg-neutral-200 text-neutral-800 px-2.5 py-1 rounded-lg text-xs font-semibold no-underline transition-colors">
+                🧾 Facture
+              </a>
+              ${call.status === 'EN_ATTENTE' ? `
+                <a href="dispatch.html" class="bg-neutral-900 text-white px-2.5 py-1 rounded-lg text-xs font-semibold no-underline hover:bg-neutral-800 transition-colors">
+                  Assigner
+                </a>
+              ` : ''}
+            </div>
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
     }
 
-    function showToast(msg) {
-      const existing = document.getElementById('pulse-toast');
-      if (existing) existing.remove();
-
-      const toast = document.createElement('div');
-      toast.id = 'pulse-toast';
-      toast.className = 'fixed bottom-5 right-5 z-50 bg-noir text-white border-2 border-noir p-3 font-mono text-xs font-black uppercase tracking-wider shadow-[4px_4px_0px_#71717a] transition-all flex items-center gap-2';
-      toast.innerHTML = `<span class="w-2 h-2 bg-emerald-400 inline-block animate-ping"></span> ${msg}`;
-      document.body.appendChild(toast);
-      setTimeout(() => {
-        toast.style.opacity = '0';
-        toast.style.transform = 'translateY(6px)';
-      }, 2200);
-      setTimeout(() => {
-        if (toast.parentNode) toast.parentNode.removeChild(toast);
-      }, 2600);
-    }
-
-    // Share Modal
-    function openShareModal() {
-      const currentOrigin = window.location.origin.includes('lhr.life') ? window.location.origin : 'https://f3dfe920cfc829.lhr.life';
-      const page = window.location.pathname.split('/').pop() || 'queue.html';
-      const pubInput = document.getElementById('share-url-public');
-      if (pubInput) pubInput.value = `${currentOrigin}/${page}`;
-      document.getElementById('share-modal').style.display = 'flex';
-    }
-    function closeShareModal() {
-      document.getElementById('share-modal').style.display = 'none';
-    }
-    function closeShareModalOnBg(e) {
-      if (e.target === document.getElementById('share-modal')) closeShareModal();
-    }
-    function copyShareUrl() {
-      const input = document.getElementById('share-url-input');
-      input.select();
-      navigator.clipboard.writeText(input.value);
-      alert("LIEN LOCAL COPIÉ DANS LE PRESSE-PAPIER !");
-    }
-    function copyPublicUrl() {
-      const input = document.getElementById('share-url-public');
-      input.select();
-      navigator.clipboard.writeText(input.value);
-      alert("LIEN PUBLIC MONDIAL (HTTPS) COPIÉ ! Votre collaborateur peut l'ouvrir de n'importe où.");
-    }
+    renderAll();
+    PULSE_CHANNEL.onmessage = () => renderAll();
   </script>
 </body>
 </html>
