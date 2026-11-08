@@ -1,26 +1,19 @@
 <!DOCTYPE html>
-<html lang="fr-CA">
+<html lang="fr-CA" class="h-full">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>PULSE CAD — Répartition & Saisie d'Appel</title>
 
-  <!-- High-Readability Enterprise Typography: Plus Jakarta Sans + IBM Plex Mono -->
+  <!-- Modern Clean Typography -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&family=IBM+Plex+Mono:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600;700&display=swap" rel="stylesheet" />
 
-  <!-- Tailwind -->
   <script src="https://cdn.tailwindcss.com"></script>
-
-  <!-- Leaflet -->
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-
-  <!-- Lucide Icons -->
   <script src="https://unpkg.com/lucide@latest"></script>
-
-  <!-- State Management Engine -->
   <script src="state.js"></script>
 
   <script>
@@ -28,13 +21,17 @@
       theme: {
         extend: {
           fontFamily: {
-            sans: ['Plus Jakarta Sans', 'sans-serif'],
-            mono: ['IBM Plex Mono', 'monospace'],
+            sans: ['"Plus Jakarta Sans"', '-apple-system', 'BlinkMacSystemFont', 'sans-serif'],
+            mono: ['"IBM Plex Mono"', 'monospace'],
           },
           colors: {
-            noir: '#09090b',
-            charcoal: '#18181b',
-            bordercol: '#d4d4d8',
+            royal: {
+              950: '#0e1013',
+              900: '#14171c',
+              850: '#1a1d24',
+              800: '#22262f',
+              700: '#2d333f',
+            }
           }
         }
       }
@@ -45,401 +42,321 @@
     * { box-sizing: border-box; }
     body {
       font-family: 'Plus Jakarta Sans', -apple-system, sans-serif;
-      background-color: #f4f4f5;
-      color: #09090b;
-      min-height: 100vh;
+      background: radial-gradient(130% 130% at 50% 0%, #2b303a 0%, #1b1e25 45%, #101216 100%);
+      color: #f4f4f6;
       margin: 0;
+      height: 100vh;
+      overflow: hidden;
+      display: flex;
       -webkit-font-smoothing: antialiased;
     }
 
     ::-webkit-scrollbar { width: 5px; height: 5px; }
-    ::-webkit-scrollbar-track { background: #f4f4f5; }
-    ::-webkit-scrollbar-thumb { background: #18181b; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: #3d4453; border-radius: 4px; }
+    ::-webkit-scrollbar-thumb:hover { background: #525b6e; }
 
-    /* Brutalist Box with High Structural Contrast */
-    .brut-box {
-      background: #ffffff;
-      border: 1.5px solid #09090b;
-      box-shadow: 3px 3px 0px #09090b;
-    }
-
-    .form-label-brut {
-      display: block;
-      font-family: 'IBM Plex Mono', monospace;
-      font-size: 11px;
-      font-weight: 700;
-      color: #52525b;
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
-      margin-bottom: 4px;
+    /* Outer Floating Dock */
+    .dock-pill {
+      background: rgba(18, 20, 24, 0.92);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border-radius: 26px;
+      padding: 10px 8px;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 14px;
     }
 
-    .form-input-brut {
-      width: 100%;
-      background: #ffffff;
-      border: 1.5px solid #d4d4d8;
-      color: #09090b;
-      font-size: 13px;
-      font-weight: 700;
-      padding: 9px 12px;
-      outline: none;
-      transition: all 0.12s ease;
-      border-radius: 0;
-    }
-    .form-input-brut:focus {
-      border-color: #09090b;
-      background: #ffffff;
-      box-shadow: 2px 2px 0px #09090b;
-    }
-    .form-input-brut::placeholder {
-      color: #a1a1aa;
-      font-weight: 400;
-    }
-
-    .nav-btn {
-      width: 44px;
-      height: 44px;
+    .dock-btn {
+      width: 38px;
+      height: 38px;
+      border-radius: 14px;
       display: flex;
       align-items: center;
       justify-content: center;
-      color: #52525b;
-      border: 1px solid transparent;
-      transition: all 0.12s ease;
+      color: #9499a5;
+      transition: all 0.18s cubic-bezier(0.16, 1, 0.3, 1);
       position: relative;
     }
-    .nav-btn:hover {
-      background: #ffffff;
-      color: #09090b;
-      border-color: #09090b;
-    }
-    .nav-btn.active {
-      background: #09090b;
+    .dock-btn:hover {
+      background: rgba(255, 255, 255, 0.1);
       color: #ffffff;
-      border-color: #09090b;
+      transform: scale(1.05);
+    }
+    .dock-btn.active {
+      background: #ffffff;
+      color: #111317;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
     }
 
-    /* Tactile Toolbar Action Buttons */
-    .btn-brut {
-      display: inline-flex;
-      align-items: center;
-      gap: 7px;
-      padding: 8px 14px;
+    /* Main Window Chassis */
+    .window-chassis {
+      background: linear-gradient(170deg, rgba(28, 31, 38, 0.95) 0%, rgba(18, 20, 25, 0.97) 100%);
+      border-radius: 28px;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      box-shadow: 0 30px 80px -15px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+      height: calc(100vh - 2rem);
+      margin: 1rem 1rem 1rem 0;
+      position: relative;
+    }
+
+    .glass-card {
+      background: linear-gradient(135deg, rgba(255, 255, 255, 0.04) 0%, rgba(255, 255, 255, 0.015) 100%);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border-radius: 20px;
+      border: 1px solid rgba(255, 255, 255, 0.07);
+      box-shadow: 0 8px 30px -4px rgba(0, 0, 0, 0.3);
+    }
+
+    .form-label-royal {
+      display: block;
       font-family: 'IBM Plex Mono', monospace;
       font-size: 11px;
-      font-weight: 700;
+      font-weight: 600;
+      color: #9499a5;
       text-transform: uppercase;
-      cursor: pointer;
-      border: 1.5px solid #09090b;
-      transition: all 0.12s ease;
-      user-select: none;
-      white-space: nowrap;
-    }
-    .btn-brut:hover {
-      transform: translate(-1px, -1px);
-      box-shadow: 2px 2px 0px #09090b;
-    }
-    .btn-brut:active {
-      transform: translate(1px, 1px);
-      box-shadow: none;
+      letter-spacing: 0.05em;
+      margin-bottom: 5px;
     }
 
-    /* Segmented Control Bar */
-    .segmented-bar {
-      display: flex;
-      border: 1.5px solid #09090b;
-      background: #ffffff;
-      padding: 2px;
-      gap: 2px;
+    .form-input-royal {
+      width: 100%;
+      background: rgba(0, 0, 0, 0.4);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      color: #ffffff;
+      font-size: 13px;
+      font-weight: 600;
+      padding: 10px 14px;
+      outline: none;
+      border-radius: 12px;
+      transition: all 0.15s ease;
     }
+    .form-input-royal:focus {
+      border-color: #10b981;
+      background: rgba(0, 0, 0, 0.55);
+      box-shadow: 0 0 12px rgba(16, 185, 129, 0.2);
+    }
+
+    .option-rack-btn {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 12px;
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 11px;
+      font-weight: 600;
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 10px;
+      color: #c4c7cf;
+      cursor: pointer;
+      user-select: none;
+      transition: all 0.15s ease;
+      text-align: left;
+    }
+    .option-rack-btn:hover {
+      background: rgba(255, 255, 255, 0.07);
+      color: #ffffff;
+    }
+    .option-rack-btn.active {
+      background: rgba(16, 185, 129, 0.15);
+      border-color: #10b981;
+      color: #ffffff;
+    }
+
     .segmented-opt {
       flex: 1;
       display: flex;
       align-items: center;
       justify-content: center;
       gap: 6px;
-      padding: 7px 10px;
-      font-family: 'IBM Plex Mono', monospace;
-      font-size: 11px;
-      font-weight: 700;
-      text-transform: uppercase;
-      cursor: pointer;
-      background: #f4f4f5;
-      color: #52525b;
-      border: 1px solid transparent;
-      transition: all 0.12s ease;
-      user-select: none;
-    }
-    .segmented-opt:hover {
-      color: #09090b;
-      background: #e4e4e7;
-    }
-    .segmented-opt.selected {
-      background: #09090b;
-      color: #ffffff;
-      border-color: #09090b;
-      box-shadow: 1px 1px 0px #09090b;
-    }
-
-    /* Categorized Option Racks */
-    .option-rack-btn {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      padding: 7px 10px;
+      padding: 8px 12px;
       font-family: 'IBM Plex Mono', monospace;
       font-size: 11px;
       font-weight: 600;
-      background: #ffffff;
-      border: 1px solid #d4d4d8;
-      color: #27272a;
+      border-radius: 10px;
       cursor: pointer;
+      background: transparent;
+      color: #9499a5;
+      transition: all 0.15s ease;
       user-select: none;
-      transition: all 0.12s ease;
-      text-align: left;
     }
-    .option-rack-btn:hover {
-      border-color: #09090b;
-      background: #f4f4f5;
-      transform: translateY(-1px);
-    }
-    .option-rack-btn.active {
-      background: #09090b;
-      color: #ffffff;
-      border-color: #09090b;
+    .segmented-opt:hover { color: #ffffff; background: rgba(255, 255, 255, 0.05); }
+    .segmented-opt.selected {
+      background: #ffffff;
+      color: #0e1013;
       font-weight: 700;
-      box-shadow: 2px 2px 0px #71717a;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
     }
 
-    /* Number Spinner */
     .spinner-box {
       display: flex;
-      border: 1.5px solid #d4d4d8;
-      background: #ffffff;
+      align-items: center;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 12px;
+      background: rgba(0, 0, 0, 0.4);
+      overflow: hidden;
     }
     .spinner-btn {
-      width: 38px;
+      width: 40px;
       height: 40px;
-      background: #f4f4f5;
+      background: rgba(255, 255, 255, 0.05);
       border: none;
       cursor: pointer;
       font-size: 16px;
       font-weight: 900;
-      color: #09090b;
+      color: #ffffff;
       display: flex;
       align-items: center;
       justify-content: center;
       transition: background 0.12s ease;
     }
-    .spinner-btn:hover {
-      background: #09090b;
-      color: #ffffff;
-    }
+    .spinner-btn:hover { background: rgba(255, 255, 255, 0.15); }
     .spinner-input {
       flex: 1;
       text-align: center;
+      background: transparent;
       border: none;
       outline: none;
       font-family: 'IBM Plex Mono', monospace;
       font-size: 14px;
-      font-weight: 800;
-      color: #09090b;
+      font-weight: 700;
+      color: #ffffff;
     }
 
     #dispatch-map {
-      height: 230px;
-      border: 1.5px solid #09090b;
+      height: 220px;
+      border-radius: 14px;
+      border: 1px solid rgba(255, 255, 255, 0.1);
     }
   </style>
 </head>
-<body class="bg-neutral-100 text-noir">
+<body class="flex items-center p-3 select-none">
 
-  <!-- TOP HEADER -->
-  <header class="h-14 bg-white border-b-2 border-noir flex items-center justify-between px-4 fixed top-0 left-0 right-0 z-40 select-none">
+  <!-- LEFT FLOATING DOCK -->
+  <aside class="w-16 flex flex-col items-center justify-between h-[calc(100vh-2rem)] py-2 z-40 flex-shrink-0">
+    <div class="dock-pill">
+      <a href="index.html" class="w-9 h-9 rounded-full bg-white/10 flex items-center justify-center text-white hover:bg-white/20 transition-colors mb-1">
+        <i data-lucide="sparkles" class="w-4 h-4 text-emerald-400"></i>
+      </a>
+      <a href="index.html" class="dock-btn" title="Tableau de bord"><i data-lucide="home" class="w-4 h-4"></i></a>
+      <a href="dispatch.html" class="dock-btn active" title="Prise d'Appel CAD [F2]"><i data-lucide="radio" class="w-4 h-4"></i></a>
+      <a href="queue.html" class="dock-btn" title="File des missions [F3]"><i data-lucide="list-ordered" class="w-4 h-4"></i></a>
+      <a href="map.html" class="dock-btn" title="Carte Flotte [F4]"><i data-lucide="globe" class="w-4 h-4"></i></a>
+      <a href="messages.html" class="dock-btn" title="Radio MDT Direct [F5]"><i data-lucide="message-square" class="w-4 h-4"></i></a>
+      <a href="driver.html" class="dock-btn" title="Cockpit Chauffeur [F6]"><i data-lucide="smartphone" class="w-4 h-4"></i></a>
+      <a href="receipt.html" class="dock-btn" title="Facturation"><i data-lucide="receipt" class="w-4 h-4"></i></a>
+    </div>
+    <div class="flex flex-col items-center gap-2">
+      <button onclick="PulseState.resetDemoData(); location.reload();" class="w-11 h-11 bg-royal-900/90 hover:bg-royal-800 text-zinc-400 hover:text-white rounded-[16px] border border-white/10 flex items-center justify-center shadow-lg transition-transform hover:scale-105" title="Réinitialiser données système">
+        <i data-lucide="settings" class="w-4 h-4"></i>
+      </button>
+    </div>
+  </aside>
+
+  <!-- MAIN WINDOW CHASSIS -->
+  <div class="window-chassis">
     
-    <!-- Brand & Section -->
-    <div class="flex items-center gap-4">
-      <a href="index.html" class="flex items-center gap-2 text-decoration-none">
-        <div class="bg-noir text-white font-mono font-black text-sm px-2.5 py-1 tracking-widest flex items-center gap-1.5">
-          <span class="inline-block w-2 h-2 bg-white"></span>
-          PULSE<span class="text-neutral-400">//</span>CAD
+    <!-- TOP WINDOW HEADER -->
+    <header class="h-16 px-6 border-b border-white/5 flex items-center justify-between flex-shrink-0 select-none bg-royal-950/60 backdrop-blur-md z-30">
+      <div class="flex items-center gap-4">
+        <!-- macOS dots -->
+        <div class="flex items-center gap-2 mr-2">
+          <span class="w-3 h-3 rounded-full bg-[#ff5f57] border border-[#e0443e]"></span>
+          <span class="w-3 h-3 rounded-full bg-[#febc2e] border border-[#d89e24]"></span>
+          <span class="w-3 h-3 rounded-full bg-[#28c840] border border-[#1aab29]"></span>
         </div>
-      </a>
-
-      <div class="h-5 w-px bg-neutral-300"></div>
-
-      <div class="flex items-center gap-2">
-        <span class="font-mono text-[11px] font-bold uppercase bg-neutral-100 border border-neutral-300 px-2 py-0.5 text-neutral-800">
-          DISPATCH TERMINAL
-        </span>
-        <span class="text-neutral-400 text-xs">/</span>
-        <span class="font-mono text-[11px] font-bold text-neutral-900 tracking-wide uppercase">
-          PRISE D'APPEL & ATTRIBUTION DIRECTE
-        </span>
-      </div>
-    </div>
-
-    <!-- Right Controls -->
-    <div class="flex items-center gap-3">
-      <!-- Collaboration Share Button -->
-      <button onclick="openShareModal()" class="bg-noir text-white font-mono text-xs font-bold uppercase px-3 py-1 flex items-center gap-1.5 border border-noir hover:bg-neutral-800 shadow-[2px_2px_0px_#09090b]">
-        <i data-lucide="share-2" class="w-3.5 h-3.5"></i>
-        PARTAGER AVEC COLLABORATEUR
-      </button>
-
-      <div class="hidden sm:flex items-center gap-2 bg-neutral-50 border border-neutral-300 px-2.5 py-1">
-        <span class="w-1.5 h-1.5 bg-black"></span>
-        <span id="topbar-clock" class="font-mono text-xs font-semibold text-neutral-900">--:--:--</span>
+        <div>
+          <h1 class="text-xl font-bold text-white tracking-tight">Prise d'Appel & Dispatch Immédiat</h1>
+          <p class="text-xs text-zinc-400">Saisie d'itinéraire, attribution algorithmique et diffusion de flotte</p>
+        </div>
       </div>
 
-      <div class="font-mono text-[11px] font-bold uppercase border border-neutral-300 px-2.5 py-1 bg-white text-neutral-700">
-        RÉSEAU CENTRAL CAD
+      <div class="flex items-center gap-3">
+        <div class="flex items-center gap-2 bg-white/[0.04] border border-white/10 px-3 py-1.5 rounded-xl font-mono text-xs">
+          <span class="text-zinc-500 uppercase">DURÉE APPEL :</span>
+          <span id="call-timer" class="font-bold text-emerald-400">00:00</span>
+        </div>
+
+        <button onclick="openShareModal()" class="bg-white/10 hover:bg-white/15 text-white text-xs font-semibold px-3.5 py-1.5 rounded-xl border border-white/10 flex items-center gap-2 transition-colors">
+          <i data-lucide="share-2" class="w-3.5 h-3.5 text-emerald-400"></i>
+          <span>Partager</span>
+        </button>
+
+        <div class="flex items-center gap-1.5 bg-emerald-950/60 border border-emerald-500/30 px-3 py-1.5 rounded-xl text-xs font-mono text-emerald-300">
+          <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+          EN ÉCOUTE
+        </div>
       </div>
-
-      <div class="flex items-center gap-2 bg-noir text-white px-2.5 py-1 border border-noir font-mono text-xs font-bold">
-        OP-408
-      </div>
-    </div>
-  </header>
-
-  <!-- SIDEBAR + MAIN CONTAINER -->
-  <div class="flex pt-14 min-h-screen">
-
-    <!-- LEFT SIDEBAR -->
-    <aside class="w-14 bg-white border-r-2 border-noir fixed top-14 bottom-0 left-0 flex flex-col items-center py-3 gap-2 flex-shrink-0 select-none z-30">
-      <a href="index.html" class="nav-btn" title="Tableau de bord">
-        <i data-lucide="layout-grid" class="w-5 h-5"></i>
-      </a>
-      <a href="dispatch.html" class="nav-btn active" title="Répartition">
-        <i data-lucide="radio" class="w-5 h-5"></i>
-      </a>
-      <a href="queue.html" class="nav-btn" title="File des courses">
-        <i data-lucide="list-ordered" class="w-5 h-5"></i>
-      </a>
-      <a href="map.html" class="nav-btn" title="Carte Flotte">
-        <i data-lucide="map" class="w-5 h-5"></i>
-      </a>
-      <a href="messages.html" class="nav-btn" title="Messages Radio MDT">
-        <i data-lucide="message-square" class="w-5 h-5"></i>
-      </a>
-      <a href="receipt.html" class="nav-btn" title="Facturation & Reçus CAD">
-        <i data-lucide="receipt" class="w-5 h-5"></i>
-      </a>
-      <a href="driver.html" class="nav-btn" title="Terminal Mobile Chauffeur MDT">
-        <i data-lucide="smartphone" class="w-5 h-5"></i>
-      </a>
-      <div class="flex-1"></div>
-      <button onclick="PulseState.resetDemoData(); location.reload();" class="nav-btn" title="Réinitialiser données système">
-        <i data-lucide="rotate-ccw" class="w-5 h-5"></i>
-      </button>
-    </aside>
+    </header>
 
     <!-- MAIN DISPATCH FORM AREA -->
-    <main class="ml-14 flex-1 p-5 overflow-y-auto">
+    <main class="flex-1 p-6 overflow-y-auto">
 
-      <!-- PRE-ASSIGNED VEHICLE BANNER (IF LOADED FROM MAP) -->
-      <div id="assign-banner" class="brut-box p-3 mb-4 bg-noir text-white flex items-center justify-between hidden">
+      <!-- PRE-ASSIGNED VEHICLE BANNER -->
+      <div id="assign-banner" class="glass-card p-3 mb-4 bg-emerald-950/40 border-emerald-500/30 flex items-center justify-between hidden">
         <div class="flex items-center gap-3">
-          <span class="bg-white text-noir font-mono text-xs font-black px-2 py-0.5 uppercase">UNITÉ PRÉ-ASSIGNÉE</span>
-          <span id="assign-banner-text" class="font-mono text-xs font-bold">UNIT-232 · ZONE-01 (CENTRE-VILLE)</span>
+          <span class="bg-emerald-500 text-royal-950 font-mono text-xs font-bold px-2 py-0.5 rounded">UNITÉ PRÉ-ASSIGNÉE</span>
+          <span id="assign-banner-text" class="font-mono text-xs font-bold text-emerald-300">UNIT-232 · ZONE-01 (CENTRE-VILLE)</span>
         </div>
-        <button onclick="clearPreAssign()" class="font-mono text-[11px] underline text-neutral-300 hover:text-white uppercase font-bold">
+        <button onclick="clearPreAssign()" class="font-mono text-[11px] underline text-zinc-400 hover:text-white uppercase font-bold">
           DÉTACHER L'UNITÉ
         </button>
       </div>
 
-      <!-- UPGRADED ACTION TOOLBAR -->
-      <div class="brut-box p-3 mb-5 bg-white flex flex-wrap items-center justify-between gap-3">
-        
-        <!-- Primary Action Group -->
-        <div class="flex items-center gap-2 flex-wrap">
-          <button id="btn-f5" class="btn-brut bg-noir text-white" onclick="actionF5()">
-            <i data-lucide="phone-incoming" class="w-4 h-4"></i>
-            PRISE D'APPEL [F5]
-          </button>
-          
-          <button id="btn-f7" class="btn-brut bg-white text-noir hover:bg-neutral-100" onclick="actionF7()">
-            <i data-lucide="eraser" class="w-4 h-4"></i>
-            EFFACER FORMULAIRE [F7]
-          </button>
-          
-          <button id="btn-f8" class="btn-brut bg-white text-rose-700 border-rose-700 hover:bg-rose-50" onclick="actionF8()">
-            <i data-lucide="x-circle" class="w-4 h-4"></i>
-            ANNULER [F8]
-          </button>
-
-          <a href="queue.html" class="btn-brut bg-neutral-100 text-neutral-800 border-neutral-300 hover:border-black">
-            <i data-lucide="list" class="w-4 h-4"></i>
-            VOIR FILE DES COURSES [F3]
-          </a>
-        </div>
-
-        <!-- Telemetry & Call Timer -->
-        <div class="flex items-center gap-3">
-          <div class="flex items-center gap-2 bg-neutral-100 border border-neutral-300 px-3 py-1 font-mono text-xs">
-            <span class="text-neutral-500 font-bold uppercase">DURÉE APPEL :</span>
-            <span id="call-timer" class="font-black text-noir text-sm">00:00</span>
-          </div>
-
-          <div class="flex items-center gap-1.5 bg-noir text-white px-3 py-1 font-mono text-xs font-bold uppercase">
-            <span class="w-2 h-2 bg-emerald-400 inline-block"></span>
-            DISPATCH EN ÉCOUTE
-          </div>
-        </div>
-
-      </div>
-
       <!-- TWO-COLUMN WORKFLOW GRID -->
-      <div class="grid grid-cols-1 lg:grid-cols-12 gap-5">
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
 
-        <!-- ══════════════════════════════════════════
-             LEFT / PRIMARY DISPATCH FORM (7 COLS)
-        ═══════════════════════════════════════════ -->
-        <div class="lg:col-span-7 flex flex-col gap-4">
+        <!-- LEFT COLUMN (7 COLS) -->
+        <div class="lg:col-span-7 flex flex-col gap-6">
 
           <!-- CARD: FICHE DE PRISE EN CHARGE -->
-          <div class="brut-box p-5 bg-white">
+          <div class="glass-card p-6">
             
-            <div class="flex items-center justify-between border-b-2 border-noir pb-2.5 mb-4">
+            <div class="flex items-center justify-between border-b border-white/5 pb-3 mb-5">
               <div class="flex items-center gap-2">
-                <span class="bg-noir text-white font-mono text-[10px] font-bold px-2 py-0.5 uppercase tracking-wider">SEC-01</span>
-                <h2 class="text-sm font-black uppercase tracking-tight text-noir m-0">FICHE D'APPEL ET ITINÉRAIRE SYSTÈME</h2>
+                <span class="bg-white/10 text-white font-mono text-[10px] font-bold px-2 py-0.5 rounded uppercase border border-white/10">SEC-01</span>
+                <h2 class="text-sm font-bold uppercase tracking-wider text-white m-0">Fiche d'Itinéraire & Client</h2>
               </div>
-              <span class="font-mono text-[11px] text-neutral-500 font-bold uppercase">HORODATÉ AUTOMATIQUE</span>
+              <span class="font-mono text-[11px] text-zinc-500 font-medium uppercase">HORODATÉ AUTOMATIQUE</span>
             </div>
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-              
-              <!-- Date -->
               <div>
-                <label class="form-label-brut">Date Opération</label>
-                <input id="field-date" class="form-input-brut font-mono bg-neutral-50" type="text" readonly />
+                <label class="form-label-royal">Date Opération</label>
+                <input id="field-date" class="form-input-royal font-mono" type="text" readonly />
               </div>
 
-              <!-- Heure -->
               <div>
-                <label class="form-label-brut">Horodatage Système</label>
-                <input id="field-heure" class="form-input-brut font-mono font-bold bg-neutral-50 text-noir" type="text" readonly />
+                <label class="form-label-royal">Horodatage Système</label>
+                <input id="field-heure" class="form-input-royal font-mono font-bold text-emerald-400" type="text" readonly />
               </div>
 
-              <!-- Adresse de prise en charge (FULL WIDTH) -->
               <div class="md:col-span-2">
-                <label class="form-label-brut">Adresse de Prise en Charge *</label>
+                <label class="form-label-royal">Adresse de Prise en Charge *</label>
                 <div class="relative">
-                  <input id="field-adresse" class="form-input-brut font-mono text-sm pl-9" type="text" value="1250 Boulevard René-Lévesque Ouest, Montréal" />
-                  <i data-lucide="map-pin" class="w-4 h-4 text-noir absolute left-2.5 top-3"></i>
+                  <input id="field-adresse" class="form-input-royal font-mono text-sm pl-10" type="text" value="1250 Boulevard René-Lévesque Ouest, Montréal" />
+                  <i data-lucide="map-pin" class="w-4 h-4 text-emerald-400 absolute left-3 top-3"></i>
                 </div>
               </div>
 
-              <!-- Porte / Suite / Repère -->
               <div>
-                <label class="form-label-brut">Porte / Suite / Repère</label>
-                <input id="field-suite" class="form-input-brut font-mono" type="text" value="Tour Bell / Entrée Sud" />
+                <label class="form-label-royal">Porte / Suite / Repère</label>
+                <input id="field-suite" class="form-input-royal font-mono" type="text" value="Tour Bell / Entrée Sud" />
               </div>
 
-              <!-- Secteur Métropolitain -->
               <div>
-                <label class="form-label-brut">Secteur / Zone CAD</label>
-                <select id="field-zone" class="form-input-brut font-mono font-bold cursor-pointer">
+                <label class="form-label-royal">Secteur / Zone CAD</label>
+                <select id="field-zone" class="form-input-royal font-mono font-bold cursor-pointer">
                   <option value="ZONE-01 (CENTRE-VILLE)" selected>ZONE-01 (CENTRE-VILLE)</option>
                   <option value="ZONE-02 (PLATEAU)">ZONE-02 (PLATEAU MONT-ROYAL)</option>
                   <option value="ZONE-03 (AÉROPORT-YUL)">ZONE-03 (AÉROPORT TRUDEAU YUL)</option>
@@ -451,36 +368,32 @@
                 </select>
               </div>
 
-              <!-- Destination (FULL WIDTH) -->
               <div class="md:col-span-2">
-                <label class="form-label-brut">Destination (Arrivée) *</label>
+                <label class="form-label-royal">Destination (Arrivée) *</label>
                 <div class="relative">
-                  <input id="field-dest" class="form-input-brut font-mono text-sm pl-9" type="text" value="Aéroport International Montréal-Trudeau (YUL)" />
-                  <i data-lucide="navigation" class="w-4 h-4 text-neutral-500 absolute left-2.5 top-3"></i>
+                  <input id="field-dest" class="form-input-royal font-mono text-sm pl-10" type="text" value="Aéroport International Montréal-Trudeau (YUL)" />
+                  <i data-lucide="navigation" class="w-4 h-4 text-cyan-400 absolute left-3 top-3"></i>
                 </div>
               </div>
 
-              <!-- Téléphone Client -->
               <div>
-                <label class="form-label-brut">Téléphone Contact *</label>
+                <label class="form-label-royal">Téléphone Contact *</label>
                 <div class="relative">
-                  <input id="field-tel" class="form-input-brut font-mono font-bold text-sm pl-9" type="tel" value="(514) 872-4091" oninput="formatPhone(this)" maxlength="14" />
-                  <i data-lucide="phone" class="w-4 h-4 text-neutral-500 absolute left-2.5 top-3"></i>
+                  <input id="field-tel" class="form-input-royal font-mono font-bold text-sm pl-10" type="tel" value="(514) 872-4091" oninput="formatPhone(this)" maxlength="14" />
+                  <i data-lucide="phone" class="w-4 h-4 text-zinc-500 absolute left-3 top-3"></i>
                 </div>
               </div>
 
-              <!-- Nom Client / Compte -->
               <div>
-                <label class="form-label-brut">Identifiant Client / Compte</label>
+                <label class="form-label-royal">Identifiant Client / Compte</label>
                 <div class="relative">
-                  <input id="field-client" class="form-input-brut font-mono text-sm pl-9" type="text" value="CORP-AIR-CANADA // AC-882" />
-                  <i data-lucide="user" class="w-4 h-4 text-neutral-500 absolute left-2.5 top-3"></i>
+                  <input id="field-client" class="form-input-royal font-mono text-sm pl-10" type="text" value="CORP-AIR-CANADA // AC-882" />
+                  <i data-lucide="user" class="w-4 h-4 text-zinc-500 absolute left-3 top-3"></i>
                 </div>
               </div>
 
-              <!-- Nombre de Passagers -->
               <div>
-                <label class="form-label-brut">Nombre de Passagers</label>
+                <label class="form-label-royal">Passagers</label>
                 <div class="spinner-box">
                   <button class="spinner-btn" onclick="spinnerChange(-1)" type="button">−</button>
                   <input id="nb-passagers" class="spinner-input" type="number" value="2" min="1" max="10" readonly />
@@ -488,9 +401,8 @@
                 </div>
               </div>
 
-              <!-- Nombre de Bagages -->
               <div>
-                <label class="form-label-brut">Bagages / Valises</label>
+                <label class="form-label-royal">Valises / Bagages</label>
                 <div class="spinner-box">
                   <button class="spinner-btn" onclick="spinnerBagChange(-1)" type="button">−</button>
                   <input id="nb-bagages" class="spinner-input" type="number" value="2" min="0" max="10" readonly />
@@ -498,100 +410,99 @@
                 </div>
               </div>
 
-              <!-- Remarque / Consigne Chauffeur -->
               <div class="md:col-span-2">
-                <label class="form-label-brut">Consignes Spécifiques Dispatch</label>
-                <textarea id="field-notes" class="form-input-brut text-sm font-sans" rows="2">Hall principal devant les portes tournantes, 2 valises. Vol international AC882.</textarea>
+                <label class="form-label-royal">Consignes Chauffeur</label>
+                <textarea id="field-notes" class="form-input-royal text-sm" rows="2">Hall principal devant les portes tournantes, 2 valises. Vol international AC882.</textarea>
               </div>
 
             </div>
 
           </div>
 
-          <!-- CARD: OPTIONS & RESTRICTIONS ORGANISÉES PAR RACKS -->
-          <div class="brut-box p-5 bg-white">
+          <!-- CARD: RACKS D'OPTIONS & PROTOCOLES -->
+          <div class="glass-card p-6">
             
-            <div class="flex items-center justify-between border-b-2 border-noir pb-2.5 mb-4">
+            <div class="flex items-center justify-between border-b border-white/5 pb-3 mb-4">
               <div class="flex items-center gap-2">
-                <span class="bg-noir text-white font-mono text-[10px] font-bold px-2 py-0.5 uppercase tracking-wider">SEC-02</span>
-                <h2 class="text-sm font-black uppercase tracking-tight text-noir m-0">RACKS D'OPTIONS & PROTOCOLES EXIGÉS</h2>
+                <span class="bg-white/10 text-white font-mono text-[10px] font-bold px-2 py-0.5 rounded uppercase border border-white/10">SEC-02</span>
+                <h2 class="text-sm font-bold uppercase tracking-wider text-white m-0">Options & Protocoles Exigés</h2>
               </div>
-              <span id="restr-counter" class="font-mono text-[11px] font-bold bg-noir text-white px-2 py-0.5 uppercase">3 SÉLECTIONNÉS</span>
+              <span id="restr-counter" class="font-mono text-[11px] font-bold bg-emerald-950/80 text-emerald-300 border border-emerald-800/80 px-2 py-0.5 rounded uppercase">3 SÉLECTIONNÉS</span>
             </div>
 
-            <!-- Group 1: ÉQUIPEMENT & TPMR -->
+            <!-- Group 1: TPMR -->
             <div class="mb-4">
-              <div class="font-mono text-[10px] font-bold text-neutral-500 uppercase tracking-wider mb-2 flex items-center gap-1.5">
-                <i data-lucide="shield" class="w-3.5 h-3.5"></i>
+              <div class="font-mono text-[10px] font-bold text-zinc-400 uppercase tracking-wider mb-2 flex items-center gap-1.5">
+                <i data-lucide="shield" class="w-3.5 h-3.5 text-emerald-400"></i>
                 1. ÉQUIPEMENT & ACCESSIBILITÉ TPMR
               </div>
               <div class="grid grid-cols-2 sm:grid-cols-3 gap-2">
                 <button type="button" class="option-rack-btn" data-restr="FAUTEUIL ROULANT / TPMR" onclick="toggleOptionRack(this)">
-                  <span class="w-3 h-3 border border-neutral-400 flex items-center justify-center text-[9px] font-bold"></span>
+                  <span class="w-3.5 h-3.5 rounded border border-white/20 flex items-center justify-center text-[9px] font-bold"></span>
                   FAUTEUIL ROULANT
                 </button>
                 <button type="button" class="option-rack-btn" data-restr="RAMPE D'ACCÈS MOTORISÉE" onclick="toggleOptionRack(this)">
-                  <span class="w-3 h-3 border border-neutral-400 flex items-center justify-center text-[9px] font-bold"></span>
+                  <span class="w-3.5 h-3.5 rounded border border-white/20 flex items-center justify-center text-[9px] font-bold"></span>
                   RAMPE MOTORISÉE
                 </button>
                 <button type="button" class="option-rack-btn active" data-restr="COFFRE VOLUMINEUX" onclick="toggleOptionRack(this)">
-                  <span class="w-3 h-3 border border-neutral-400 flex items-center justify-center text-[9px] font-bold">✓</span>
+                  <span class="w-3.5 h-3.5 rounded border border-emerald-400 flex items-center justify-center text-[9px] font-bold text-emerald-400">✓</span>
                   COFFRE VOLUMINEUX
                 </button>
                 <button type="button" class="option-rack-btn" data-restr="BOOSTER / CÂBLES SURVOLTAGE" onclick="toggleOptionRack(this)">
-                  <span class="w-3 h-3 border border-neutral-400 flex items-center justify-center text-[9px] font-bold"></span>
+                  <span class="w-3.5 h-3.5 rounded border border-white/20 flex items-center justify-center text-[9px] font-bold"></span>
                   CÂBLES SURVOLTAGE
                 </button>
                 <button type="button" class="option-rack-btn" data-restr="SIÈGE BÉBÉ / ENFANT" onclick="toggleOptionRack(this)">
-                  <span class="w-3 h-3 border border-neutral-400 flex items-center justify-center text-[9px] font-bold"></span>
-                  SIÈGE BÉBÉ / ENFANT
+                  <span class="w-3.5 h-3.5 rounded border border-white/20 flex items-center justify-center text-[9px] font-bold"></span>
+                  SIÈGE BÉBÉ
                 </button>
                 <button type="button" class="option-rack-btn" data-restr="CLIMATISATION MAXIMUM" onclick="toggleOptionRack(this)">
-                  <span class="w-3 h-3 border border-neutral-400 flex items-center justify-center text-[9px] font-bold"></span>
+                  <span class="w-3.5 h-3.5 rounded border border-white/20 flex items-center justify-center text-[9px] font-bold"></span>
                   CLIMATISATION MAX
                 </button>
               </div>
             </div>
 
-            <!-- Group 2: PAIEMENT & FACTURATION -->
+            <!-- Group 2: PAIEMENT -->
             <div class="mb-4">
-              <div class="font-mono text-[10px] font-bold text-neutral-500 uppercase tracking-wider mb-2 flex items-center gap-1.5">
-                <i data-lucide="credit-card" class="w-3.5 h-3.5"></i>
+              <div class="font-mono text-[10px] font-bold text-zinc-400 uppercase tracking-wider mb-2 flex items-center gap-1.5">
+                <i data-lucide="credit-card" class="w-3.5 h-3.5 text-cyan-400"></i>
                 2. PAIEMENT & FACTURATION
               </div>
               <div class="grid grid-cols-2 sm:grid-cols-3 gap-2">
                 <button type="button" class="option-rack-btn active" data-restr="PAIEMENT DÉBIT/CARTE" onclick="toggleOptionRack(this)">
-                  <span class="w-3 h-3 border border-neutral-400 flex items-center justify-center text-[9px] font-bold">✓</span>
+                  <span class="w-3.5 h-3.5 rounded border border-emerald-400 flex items-center justify-center text-[9px] font-bold text-emerald-400">✓</span>
                   DÉBIT / CARTE
                 </button>
                 <button type="button" class="option-rack-btn" data-restr="FACTURE CORPORATIVE" onclick="toggleOptionRack(this)">
-                  <span class="w-3 h-3 border border-neutral-400 flex items-center justify-center text-[9px] font-bold"></span>
+                  <span class="w-3.5 h-3.5 rounded border border-white/20 flex items-center justify-center text-[9px] font-bold"></span>
                   COMPTE CORPORATIF
                 </button>
                 <button type="button" class="option-rack-btn" data-restr="TRANSPORT MÉDICAL CIUSS" onclick="toggleOptionRack(this)">
-                  <span class="w-3 h-3 border border-neutral-400 flex items-center justify-center text-[9px] font-bold"></span>
+                  <span class="w-3.5 h-3.5 rounded border border-white/20 flex items-center justify-center text-[9px] font-bold"></span>
                   BON SANTÉ CIUSS
                 </button>
               </div>
             </div>
 
-            <!-- Group 3: PROTOCOLES DE COURSE -->
+            <!-- Group 3: PROTOCOLES -->
             <div>
-              <div class="font-mono text-[10px] font-bold text-neutral-500 uppercase tracking-wider mb-2 flex items-center gap-1.5">
-                <i data-lucide="award" class="w-3.5 h-3.5"></i>
-                3. PROTOCOLES & EXIGENCES SPÉCIALES
+              <div class="font-mono text-[10px] font-bold text-zinc-400 uppercase tracking-wider mb-2 flex items-center gap-1.5">
+                <i data-lucide="award" class="w-3.5 h-3.5 text-amber-400"></i>
+                3. PROTOCOLES SPÉCIAUX
               </div>
               <div class="grid grid-cols-2 sm:grid-cols-3 gap-2">
                 <button type="button" class="option-rack-btn active" data-restr="AÉROPORT TRUDEAU (YUL)" onclick="toggleOptionRack(this)">
-                  <span class="w-3 h-3 border border-neutral-400 flex items-center justify-center text-[9px] font-bold">✓</span>
+                  <span class="w-3.5 h-3.5 rounded border border-emerald-400 flex items-center justify-center text-[9px] font-bold text-emerald-400">✓</span>
                   AÉROPORT TRUDEAU
                 </button>
                 <button type="button" class="option-rack-btn" data-restr="PRIORITÉ VIP" onclick="toggleOptionRack(this)">
-                  <span class="w-3 h-3 border border-neutral-400 flex items-center justify-center text-[9px] font-bold"></span>
+                  <span class="w-3.5 h-3.5 rounded border border-white/20 flex items-center justify-center text-[9px] font-bold"></span>
                   PRIORITÉ VIP
                 </button>
                 <button type="button" class="option-rack-btn" data-restr="VÉHICULE 100% ÉLECTRIQUE" onclick="toggleOptionRack(this)">
-                  <span class="w-3 h-3 border border-neutral-400 flex items-center justify-center text-[9px] font-bold"></span>
+                  <span class="w-3.5 h-3.5 rounded border border-white/20 flex items-center justify-center text-[9px] font-bold"></span>
                   100% ÉLECTRIQUE
                 </button>
               </div>
@@ -601,19 +512,17 @@
 
         </div>
 
-        <!-- ══════════════════════════════════════════
-             RIGHT / CONTROLS & MONTRÉAL LEAFLET (5 COLS)
-        ═══════════════════════════════════════════ -->
-        <div class="lg:col-span-5 flex flex-col gap-4">
+        <!-- RIGHT COLUMN (5 COLS) -->
+        <div class="lg:col-span-5 flex flex-col gap-6">
 
-          <!-- MODE D'ATTRIBUTION (SEGMENTED BAR) -->
-          <div class="brut-box p-4 bg-white">
-            <div class="flex items-center justify-between border-b border-neutral-200 pb-2 mb-3">
-              <span class="font-mono text-xs font-bold uppercase tracking-wider text-noir">MODE DE RÉPARTITION</span>
-              <span class="font-mono text-[10px] text-neutral-500">ALGORITHME CAD</span>
+          <!-- MODE DE RÉPARTITION -->
+          <div class="glass-card p-5">
+            <div class="flex items-center justify-between border-b border-white/5 pb-2 mb-3">
+              <span class="font-mono text-xs font-bold uppercase tracking-wider text-white">MODE DE RÉPARTITION</span>
+              <span class="font-mono text-[10px] text-zinc-400">ALGORITHME CAD</span>
             </div>
             
-            <div class="segmented-bar" id="repartition-mode-bar">
+            <div class="flex bg-black/40 p-1 rounded-xl border border-white/10" id="repartition-mode-bar">
               <div class="segmented-opt selected" data-mode="auto" onclick="setRepartMode('auto')">
                 <i data-lucide="cpu" class="w-4 h-4"></i>
                 AUTOMATIQUE (ZONE)
@@ -625,100 +534,70 @@
             </div>
 
             <div id="manual-unit-selector" class="mt-3 hidden">
-              <label class="form-label-brut">Sélectionner l'Unité Système</label>
-              <select id="selected-manual-unit" class="form-input-brut font-mono font-bold cursor-pointer">
-                <!-- Dynamically populated from PulseState.getVehicles() -->
+              <label class="form-label-royal">Sélectionner l'Unité Système</label>
+              <select id="selected-manual-unit" class="form-input-royal font-mono font-bold cursor-pointer">
+                <!-- Dynamically populated -->
               </select>
             </div>
           </div>
 
-          <!-- TYPE DE VÉHICULE (SEGMENTED BAR) -->
-          <div class="brut-box p-4 bg-white">
-            <div class="flex items-center justify-between border-b border-neutral-200 pb-2 mb-3">
-              <span class="font-mono text-xs font-bold uppercase tracking-wider text-noir">CATÉGORIE VÉHICULE REQUISE</span>
-              <span class="font-mono text-[10px] text-neutral-500">NORME FLOTTE</span>
+          <!-- TYPE DE VÉHICULE -->
+          <div class="glass-card p-5">
+            <div class="flex items-center justify-between border-b border-white/5 pb-2 mb-3">
+              <span class="font-mono text-xs font-bold uppercase tracking-wider text-white">CATÉGORIE DE FLOTTE</span>
+              <span class="font-mono text-[10px] text-zinc-400">SÉLECTION</span>
             </div>
 
-            <div class="segmented-bar" id="veh-type-bar">
-              <div class="segmented-opt selected" data-type="BERLINE" onclick="setVehType('BERLINE')">BERLINE</div>
-              <div class="segmented-opt" data-type="VUS" onclick="setVehType('VUS')">VUS</div>
-              <div class="segmented-opt" data-type="FOURGON" onclick="setVehType('FOURGON')">FOURGON</div>
-              <div class="segmented-opt" data-type="TPMR" onclick="setVehType('TPMR')">TPMR ADAPTÉ</div>
+            <div class="grid grid-cols-3 gap-1.5" id="veh-type-bar">
+              <button type="button" class="option-rack-btn active justify-center" data-type="BERLINE" onclick="setVehType('BERLINE')">
+                BERLINE
+              </button>
+              <button type="button" class="option-rack-btn justify-center" data-type="FOURGONNETTE" onclick="setVehType('FOURGONNETTE')">
+                FOURGONNETTE
+              </button>
+              <button type="button" class="option-rack-btn justify-center" data-type="TPMR_RAMPE" onclick="setVehType('TPMR_RAMPE')">
+                TPMR RAMPE
+              </button>
             </div>
           </div>
 
-          <!-- CARTE INTERACTIVE MONTRÉAL LEAFLET -->
-          <div class="brut-box p-3 bg-white">
-            <div class="flex items-center justify-between pb-2 border-b border-neutral-200 mb-2">
-              <div class="flex items-center gap-2">
-                <span class="w-2 h-2 bg-noir inline-block"></span>
-                <span class="font-mono text-xs font-bold uppercase tracking-wider text-noir">CARTE ITINÉRAIRE MONTRÉAL</span>
-              </div>
-              <div class="flex items-center gap-2">
-                <span class="font-mono text-[10px] bg-noir text-white px-2 py-0.5 font-bold uppercase flex items-center gap-1.5">
-                  <span class="w-1.5 h-1.5 bg-rose-500 inline-block animate-pulse"></span>
-                  FLUX TRAFIC WAZE ACTIF
-                </span>
-                <span class="font-mono text-[10px] text-neutral-600 font-bold uppercase">CAD GPS LIVE</span>
-              </div>
+          <!-- CARTE & ROUTE APERÇU -->
+          <div class="glass-card p-5">
+            <div class="flex items-center justify-between border-b border-white/5 pb-2 mb-3">
+              <span class="font-mono text-xs font-bold uppercase tracking-wider text-white">ITINÉRAIRE & TRAFIC EN DIRECT</span>
+              <span class="text-emerald-400 text-[10px] font-mono font-bold flex items-center gap-1">
+                <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span> GPS ACTIF
+              </span>
             </div>
 
             <div id="dispatch-map"></div>
 
-            <div class="mt-2.5 pt-2 border-t border-neutral-200 grid grid-cols-3 gap-2 font-mono text-[11px] text-center">
-              <div class="bg-neutral-50 p-1.5 border border-neutral-200">
-                <div class="text-[9px] text-neutral-500 uppercase">DISTANCE</div>
-                <div class="font-black text-noir">19.2 KM</div>
+            <div class="grid grid-cols-3 gap-2 mt-3 font-mono text-xs text-center">
+              <div class="bg-black/30 p-2 rounded-xl border border-white/5">
+                <div class="text-[9px] text-zinc-400 uppercase">DISTANCE</div>
+                <div class="font-bold text-white text-sm">18.4 KM</div>
               </div>
-              <div class="bg-neutral-50 p-1.5 border border-neutral-200">
-                <div class="text-[9px] text-neutral-500 uppercase">DURÉE EST.</div>
-                <div class="font-black text-noir">22 MIN</div>
+              <div class="bg-black/30 p-2 rounded-xl border border-white/5">
+                <div class="text-[9px] text-zinc-400 uppercase">DURÉE ESTIMÉE</div>
+                <div class="font-bold text-emerald-400 text-sm">22 MIN</div>
               </div>
-              <div class="bg-neutral-50 p-1.5 border border-neutral-200">
-                <div class="text-[9px] text-neutral-500 uppercase">TARIF EST.</div>
-                <div class="font-black text-noir">48.50 $</div>
+              <div class="bg-black/30 p-2 rounded-xl border border-white/5">
+                <div class="text-[9px] text-zinc-400 uppercase">TARIF EST.</div>
+                <div class="font-bold text-white text-sm">48.50 $</div>
               </div>
             </div>
 
-            <!-- WAZE TRAFFIC ADVISORY -->
-            <div class="mt-2 bg-neutral-50 border border-neutral-200 p-2 font-mono text-[10px] flex items-center justify-between">
-              <span class="text-neutral-700">⚠️ <strong>ALERTES WAZE :</strong> A-15 Sud ralentie (14 km/h) · Travaux René-Lévesque angle Peel</span>
-              <span class="font-black text-rose-600 uppercase tracking-wider">+4 MIN RETARD</span>
-            </div>
-          </div>
-
-          <!-- POINTS DE DÉPART FRÉQUENTS MONTRÉAL -->
-          <div class="brut-box p-4 bg-white">
-            <div class="flex items-center justify-between border-b border-neutral-200 pb-2 mb-2">
-              <span class="font-mono text-xs font-bold uppercase tracking-wider text-noir">POINTS D'INTÉRÊT MÉTROPOLITAINS</span>
-              <span class="font-mono text-[10px] text-neutral-500">[CLIC RAPIDE]</span>
-            </div>
-
-            <div class="grid grid-cols-2 gap-1.5">
-              <button type="button" onclick="loadMtlPoint('895 Rue De La Gauchetière O., Montréal', 'Gare Centrale de Montréal')" class="p-2 border border-neutral-200 bg-neutral-50 hover:bg-neutral-100 text-left font-mono text-[10px]">
-                <div class="font-bold text-noir uppercase truncate">Gare Centrale</div>
-                <div class="text-neutral-500 truncate">895 De La Gauchetière O.</div>
-              </button>
-              <button type="button" onclick="loadMtlPoint('1051 Rue Sanguinet, Montréal', 'CHUM - Pavillon Ambulatoire')" class="p-2 border border-neutral-200 bg-neutral-50 hover:bg-neutral-100 text-left font-mono text-[10px]">
-                <div class="font-bold text-noir uppercase truncate">CHUM Montréal</div>
-                <div class="text-neutral-500 truncate">1051 Sanguinet</div>
-              </button>
-              <button type="button" onclick="loadMtlPoint('900 Boulevard René-Lévesque O., Montréal', 'Hôtel Fairmont Le Reine Elizabeth')" class="p-2 border border-neutral-200 bg-neutral-50 hover:bg-neutral-100 text-left font-mono text-[10px]">
-                <div class="font-bold text-noir uppercase truncate">Fairmont Reine Elizabeth</div>
-                <div class="text-neutral-500 truncate">900 René-Lévesque O.</div>
-              </button>
-              <button type="button" onclick="loadMtlPoint('1001 Place Jean-Paul-Riopelle, Montréal', 'Palais des Congrès')" class="p-2 border border-neutral-200 bg-neutral-50 hover:bg-neutral-100 text-left font-mono text-[10px]">
-                <div class="font-bold text-noir uppercase truncate">Palais des Congrès</div>
-                <div class="text-neutral-500 truncate">1001 Jean-Paul-Riopelle</div>
-              </button>
+            <div class="mt-3 bg-black/40 border border-white/5 p-2.5 rounded-xl font-mono text-[11px] flex items-center justify-between text-zinc-300">
+              <span>⚠️ <strong>WAZE :</strong> A-15 Sud ralentie · Travaux René-Lévesque</span>
+              <span class="font-bold text-rose-400 uppercase">+4 MIN</span>
             </div>
           </div>
 
           <!-- PRIMARY SUBMIT BUTTON -->
           <div>
-            <button id="btn-submit-call" onclick="submitDispatchCall()" class="w-full bg-noir text-white py-4 px-4 font-mono font-black text-sm tracking-widest uppercase flex items-center justify-center gap-2 border-2 border-noir hover:bg-neutral-800 transition-all shadow-[3px_3px_0px_#09090b] active:translate-x-0.5 active:translate-y-0.5 active:shadow-none">
+            <button id="btn-submit-call" onclick="submitDispatchCall()" class="w-full bg-emerald-500 hover:bg-emerald-600 text-royal-950 py-4 px-6 rounded-2xl font-bold text-sm tracking-wider uppercase flex items-center justify-center gap-2 shadow-lg transition-transform active:scale-95">
               <i data-lucide="send" class="w-4 h-4"></i>
-              ENREGISTRER & DIFFUSER COURSE [ENTRÉE]
+              ENREGISTRER & DIFFUSER LA MISSION [ENTRÉE]
             </button>
           </div>
 
@@ -728,85 +607,6 @@
 
     </main>
 
-  </div>
-
-  <!-- CONFIRMATION MODAL -->
-  <div id="cancel-modal" class="fixed inset-0 bg-black/60 z-50 items-center justify-center hidden p-4" onclick="closeModal(event)">
-    <div class="brut-box max-w-md w-full bg-white p-6">
-      <div class="bg-noir text-white font-mono text-xs font-bold px-2 py-1 inline-block uppercase mb-3">
-        CONFIRMATION DISPATCH
-      </div>
-      <h3 class="text-lg font-black uppercase tracking-tight text-noir mb-2">RÉINITIALISER L'APPEL EN COURS ?</h3>
-      <p class="text-xs text-neutral-600 font-mono mb-6 leading-relaxed">
-        Le formulaire sera remis à zéro et aucune attribution ne sera envoyée aux unités en service.
-      </p>
-      <div class="flex gap-3">
-        <button onclick="confirmReset()" class="flex-1 bg-noir text-white font-mono text-xs font-bold uppercase py-2.5 hover:bg-neutral-800 border border-noir">
-          RÉINITIALISER
-        </button>
-        <button onclick="document.getElementById('cancel-modal').style.display='none'" class="flex-1 bg-white text-noir font-mono text-xs font-bold uppercase py-2.5 border border-noir hover:bg-neutral-100">
-          CONSERVER
-        </button>
-      </div>
-    </div>
-  </div>
-
-  <!-- MODAL DE PARTAGE COLLABORATION (LAN / IP / QR) -->
-  <div id="share-modal" class="fixed inset-0 bg-black/60 z-50 items-center justify-center hidden p-4" onclick="closeShareModalOnBg(event)">
-    <div class="brut-box max-w-md w-full bg-white p-6">
-      
-      <div class="flex items-center justify-between border-b-2 border-noir pb-2 mb-4">
-        <span class="bg-noir text-white font-mono text-xs font-black px-2 py-0.5 uppercase tracking-wider">
-          PARTAGE SESSION COLLABORATIVE
-        </span>
-        <button onclick="closeShareModal()" class="text-neutral-500 hover:text-black font-mono font-bold text-sm">✕</button>
-      </div>
-
-      <p class="font-mono text-xs text-neutral-700 mb-4 leading-relaxed">
-        Partagez cette session CAD avec votre collaborateur. Toutes les modifications, dispatches et messages MDT sont synchronisés en direct.
-      </p>
-
-      <!-- Public Web URL -->
-      <div class="bg-neutral-50 p-3 border-1.5 border-noir mb-3 font-mono text-xs">
-        <div class="flex items-center justify-between mb-1">
-          <span class="text-[10px] text-neutral-900 uppercase font-black flex items-center gap-1.5">
-            <span class="w-2 h-2 bg-emerald-600 inline-block animate-pulse"></span>
-            1. ACCÈS PUBLIC INTERNET (HTTPS MONDIAL) :
-          </span>
-          <span class="text-[9px] bg-noir text-white px-1.5 py-0.2 font-bold">EN LIGNE</span>
-        </div>
-        <div class="flex items-center justify-between gap-2">
-          <input id="share-url-public" class="bg-white border border-neutral-300 px-2.5 py-1.5 font-bold text-xs flex-1 outline-none text-noir" readonly value="https://bc8b85ebe510c4.lhr.life/dispatch.html" />
-          <button onclick="copyPublicUrl()" class="bg-noir text-white px-3 py-1.5 font-black uppercase text-[11px] hover:bg-neutral-800">
-            COPIER
-          </button>
-        </div>
-      </div>
-
-      <!-- Local Network LAN URL -->
-      <div class="bg-neutral-50 p-3 border-1.5 border-neutral-300 mb-4 font-mono text-xs">
-        <div class="text-[10px] text-neutral-500 uppercase font-bold mb-1">2. ACCÈS RÉSEAU LOCAL (WI-FI / LAN) :</div>
-        <div class="flex items-center justify-between gap-2">
-          <input id="share-url-input" class="bg-white border border-neutral-300 px-2.5 py-1.5 font-bold text-xs flex-1 outline-none text-noir" readonly value="http://192.168.1.95:8091/dispatch.html" />
-          <button onclick="copyShareUrl()" class="bg-white text-noir border border-noir px-3 py-1.5 font-bold uppercase text-[11px] hover:bg-neutral-100">
-            COPIER
-          </button>
-        </div>
-      </div>
-
-      <div class="border border-neutral-200 p-2.5 bg-neutral-100 font-mono text-[10px] text-neutral-600 mb-5 leading-normal">
-        • Hébergement : <strong>Tunnel Public TLS / HTTPS</strong> (terminaison SSL active)<br>
-        • Port d'écoute : <strong>8091</strong><br>
-        • Synchronisation inter-terminaux : <strong>Active (CAD Broadcast Sync)</strong>
-      </div>
-
-      <div class="flex justify-end gap-2">
-        <button onclick="closeShareModal()" class="bg-noir text-white font-mono text-xs font-bold uppercase px-4 py-2 hover:bg-neutral-800">
-          FERMER [ESC]
-        </button>
-      </div>
-
-    </div>
   </div>
 
   <script>
@@ -827,14 +627,11 @@
       updateRestrictionsCounter();
     });
 
-    // Clock & Date
     function initClock() {
       const tick = () => {
         const now = new Date();
         const timeStr = now.toLocaleTimeString('fr-CA', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false });
-        const topClock = document.getElementById('topbar-clock');
         const heureFld = document.getElementById('field-heure');
-        if (topClock) topClock.textContent = timeStr;
         if (heureFld) heureFld.value = timeStr;
       };
       tick();
@@ -858,7 +655,6 @@
       }, 1000);
     }
 
-    // Number Spinners
     function spinnerChange(delta) {
       const el = document.getElementById('nb-passagers');
       el.value = Math.min(10, Math.max(1, parseInt(el.value || 1) + delta));
@@ -868,11 +664,10 @@
       el.value = Math.min(10, Math.max(0, parseInt(el.value || 0) + delta));
     }
 
-    // Segmented Bars
     function setVehType(type) {
       currentVehType = type;
-      document.querySelectorAll('#veh-type-bar .segmented-opt').forEach(opt => {
-        opt.classList.toggle('selected', opt.dataset.type === type);
+      document.querySelectorAll('#veh-type-bar .option-rack-btn').forEach(opt => {
+        opt.classList.toggle('active', opt.dataset.type === type);
       });
     }
 
@@ -882,11 +677,8 @@
         opt.classList.toggle('selected', opt.dataset.mode === mode);
       });
       const manualSelector = document.getElementById('manual-unit-selector');
-      if (mode === 'manual') {
-        manualSelector.classList.remove('hidden');
-      } else {
-        manualSelector.classList.add('hidden');
-      }
+      if (mode === 'manual') manualSelector.classList.remove('hidden');
+      else manualSelector.classList.add('hidden');
     }
 
     function initManualUnitsDropdown() {
@@ -902,21 +694,20 @@
       });
     }
 
-    // Check ?assign= query parameter
     function checkUrlAssign() {
       const params = new URLSearchParams(window.location.search);
-      const assignId = params.get('assign');
-      if (assignId) {
-        assignedUnitId = assignId;
-        setRepartMode('manual');
-        const select = document.getElementById('selected-manual-unit');
-        if (select) select.value = assignId;
-        const banner = document.getElementById('assign-banner');
-        const bannerText = document.getElementById('assign-banner-text');
-        const veh = PulseState.getVehicles().find(v => String(v.id) === String(assignId));
-        if (banner && bannerText && veh) {
+      const assign = params.get('assign');
+      if (assign) {
+        assignedUnitId = parseInt(assign, 10);
+        const veh = PulseState.getVehicles().find(v => v.id === assignedUnitId);
+        if (veh) {
+          const banner = document.getElementById('assign-banner');
+          const text = document.getElementById('assign-banner-text');
           banner.classList.remove('hidden');
-          bannerText.textContent = `${veh.code} · [${veh.type}] · ${veh.zone}`;
+          text.textContent = `${veh.code} · ${veh.zone} (${veh.status})`;
+          setRepartMode('manual');
+          const sel = document.getElementById('selected-manual-unit');
+          if (sel) sel.value = assignedUnitId;
         }
       }
     }
@@ -927,266 +718,96 @@
       setRepartMode('auto');
     }
 
-    // Option Racks Toggle
     function toggleOptionRack(btn) {
       btn.classList.toggle('active');
-      const box = btn.querySelector('span');
+      const check = btn.querySelector('span');
       if (btn.classList.contains('active')) {
-        box.textContent = '✓';
+        check.textContent = '✓';
+        check.className = 'w-3.5 h-3.5 rounded border border-emerald-400 flex items-center justify-center text-[9px] font-bold text-emerald-400';
       } else {
-        box.textContent = '';
+        check.textContent = '';
+        check.className = 'w-3.5 h-3.5 rounded border border-white/20 flex items-center justify-center text-[9px] font-bold';
       }
       updateRestrictionsCounter();
     }
 
     function updateRestrictionsCounter() {
       const count = document.querySelectorAll('.option-rack-btn.active').length;
-      const counter = document.getElementById('restr-counter');
-      if (counter) {
-        counter.textContent = `${count} SÉLECTIONNÉ${count > 1 ? 'S' : ''}`;
-      }
-    }
-
-    function getSelectedRestrictions() {
-      const list = [];
-      document.querySelectorAll('.option-rack-btn.active').forEach(b => {
-        list.push(b.dataset.restr);
-      });
-      return list;
-    }
-
-    // Load Montreal Preset POI
-    function loadMtlPoint(addr, name) {
-      document.getElementById('field-adresse').value = addr;
-      document.getElementById('field-suite').value = name;
-      showToast(`POINT CHARGÉ : ${name}`);
-    }
-
-    // Interactive Leaflet Map Centered on Montréal
-    function initMontrealMap() {
-      const mtlCenter = [45.5017, -73.5673];
-      dispatchMapInstance = L.map('dispatch-map', { zoomControl: false, attributionControl: false })
-        .setView(mtlCenter, 13);
-
-      // Real World Street Map (Full Montreal Streets, Roads & Geography)
-      L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}', {
-        maxZoom: 19,
-        attribution: '© Esri, HERE, Garmin'
-      }).addTo(dispatchMapInstance);
-
-      setTimeout(() => {
-        if (dispatchMapInstance) dispatchMapInstance.invalidateSize();
-      }, 250);
-
-      L.control.zoom({ position: 'bottomright' }).addTo(dispatchMapInstance);
-
-      // Pickup Marker Pin
-      const pickupIcon = L.divIcon({
-        html: `<div style="background:#09090b;color:#fff;border:2px solid #fff;padding:2px 6px;font-family:'IBM Plex Mono',monospace;font-size:10px;font-weight:900;box-shadow:2px 2px 0px #000;">DÉPART</div>`,
-        iconSize: [52, 20],
-        iconAnchor: [26, 10],
-      });
-      const pickupCoord = [45.5019, -73.5674];
-      L.marker(pickupCoord, { icon: pickupIcon }).addTo(dispatchMapInstance).bindPopup("Prise en charge: 1250 René-Lévesque O.");
-
-      // Destination Marker Pin
-      const destIcon = L.divIcon({
-        html: `<div style="background:#18181b;color:#fff;border:2px solid #fff;padding:2px 6px;font-family:'IBM Plex Mono',monospace;font-size:10px;font-weight:900;box-shadow:2px 2px 0px #000;">YUL</div>`,
-        iconSize: [40, 20],
-        iconAnchor: [20, 10],
-      });
-      const destCoord = [45.4705, -73.7408];
-      L.marker(destCoord, { icon: destIcon }).addTo(dispatchMapInstance).bindPopup("Destination: Aéroport Trudeau (YUL)");
-
-      // Route Polyline
-      L.polyline([pickupCoord, [45.488, -73.610], [45.465, -73.685], destCoord], {
-        color: '#09090b',
-        weight: 4,
-        opacity: 0.9,
-        dashArray: '6, 6'
-      }).addTo(dispatchMapInstance);
-
-      // WAZE LIVE TRAFFIC OVERLAYS (Montréal Metro Corridor)
-      // 1. A-15 Sud (Congestion Rouge)
-      L.polyline([[45.550, -73.690], [45.525, -73.665], [45.495, -73.635]], {
-        color: '#dc2626',
-        weight: 5,
-        opacity: 0.85
-      }).addTo(dispatchMapInstance).bindPopup("<b>WAZE TRAFIC: A-15 SUD</b><br>Ralentissement majeur · Vitesse moyenne: 14 km/h");
-
-      // 2. René-Lévesque (Travaux Peel - Jaune/Orange)
-      L.polyline([[45.508, -73.558], [45.5019, -73.5674], [45.495, -73.578]], {
-        color: '#f59e0b',
-        weight: 5,
-        opacity: 0.85
-      }).addTo(dispatchMapInstance).bindPopup("<b>WAZE TRAFIC: BD RENÉ-LÉVESQUE</b><br>Travaux angle Peel · Voie fermée (22 km/h)");
-
-      // 3. A-20 Ouest (Fluide - Vert)
-      L.polyline([[45.485, -73.595], [45.465, -73.655], [45.4705, -73.7408]], {
-        color: '#16a34a',
-        weight: 5,
-        opacity: 0.85
-      }).addTo(dispatchMapInstance).bindPopup("<b>WAZE TRAFIC: A-20 OUEST (VERS YUL)</b><br>Fluide · 78 km/h");
-
-      // 4. Waze Incident Hazard Alert Marker
-      const wazeAlertIcon = L.divIcon({
-        html: `<div style="background:#09090b;color:#f59e0b;border:1.5px solid #f59e0b;padding:1px 5px;font-family:'IBM Plex Mono',monospace;font-size:9px;font-weight:900;box-shadow:2px 2px 0px #000;">⚠️ TRAVAUX PEEL</div>`,
-        iconSize: [110, 18],
-        iconAnchor: [55, 9]
-      });
-      L.marker([45.5019, -73.5674], { icon: wazeAlertIcon }).addTo(dispatchMapInstance)
-        .bindPopup("<b>ALERTE SIGNALEMENT WAZE</b><br>Travaux de voirie angle Peel & René-Lévesque");
-    }
-
-    // Submission & Creation
-    function submitDispatchCall() {
-      const pickup = document.getElementById('field-adresse').value.trim();
-      const dest = document.getElementById('field-dest').value.trim();
-      const client = document.getElementById('field-client').value.trim();
-      const phone = document.getElementById('field-tel').value.trim();
-      const suite = document.getElementById('field-suite').value.trim();
-      const zone = document.getElementById('field-zone').value;
-      const notes = document.getElementById('field-notes').value.trim();
-      const passengers = parseInt(document.getElementById('nb-passagers').value || 1);
-
-      if (!pickup) {
-        alert("VEUILLEZ SAISIR UNE ADRESSE DE PRISE EN CHARGE.");
-        document.getElementById('field-adresse').focus();
-        return;
-      }
-
-      const assignedUnit = currentRepartMode === 'manual' 
-        ? (assignedUnitId || document.getElementById('selected-manual-unit').value)
-        : null;
-
-      const newCallId = String(Math.floor(Math.random() * 900) + 5100);
-      const callData = {
-        id: newCallId,
-        client: client || "CORP-CLIENT // EXÉCUTIF",
-        phone: phone || "(514) 872-0000",
-        pickup,
-        suite,
-        dest: dest || "Destination à définir",
-        zone,
-        vehType: currentVehType,
-        passengers,
-        restrictions: getSelectedRestrictions(),
-        status: assignedUnit ? 'ASSIGNÉ' : 'EN_ATTENTE',
-        assignedUnit: assignedUnit ? Number(assignedUnit) : null,
-        createdAt: new Date().toLocaleTimeString('fr-CA', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false }),
-        notes
-      };
-
-      PulseState.createCall(callData);
-      if (assignedUnit) {
-        PulseState.assignCall(newCallId, assignedUnit);
-      }
-
-      showToast(`COURSE #${newCallId} CRÉÉE // DIFFUSÉE À LA FLOTTE`);
-
-      setTimeout(() => {
-        window.location.href = 'queue.html';
-      }, 700);
-    }
-
-    function actionF5() {
-      callTimerSeconds = 0;
-      showToast("LIGNE RÉCEPTIONNÉE · SAISIE EN COURS");
-      document.getElementById('field-adresse').focus();
-    }
-    function actionF7() {
-      document.getElementById('cancel-modal').style.display = 'flex';
-    }
-    function confirmReset() {
-      document.getElementById('cancel-modal').style.display = 'none';
-      document.getElementById('field-adresse').value = '';
-      document.getElementById('field-suite').value = '';
-      document.getElementById('field-dest').value = '';
-      document.getElementById('field-client').value = '';
-      document.getElementById('field-tel').value = '';
-      document.getElementById('field-notes').value = '';
-      document.querySelectorAll('.option-rack-btn').forEach(b => {
-        b.classList.remove('active');
-        b.querySelector('span').textContent = '';
-      });
-      updateRestrictionsCounter();
-      showToast("FORMULAIRE RÉINITIALISÉ");
-    }
-    function actionF8() {
-      if (confirm("ANNULER ET CLÔTURER L'APPEL EN COURS ?")) {
-        confirmReset();
-      }
-    }
-    function closeModal(e) {
-      if (e.target === document.getElementById('cancel-modal')) {
-        document.getElementById('cancel-modal').style.display = 'none';
-      }
+      const el = document.getElementById('restr-counter');
+      if (el) el.textContent = `${count} SÉLECTIONNÉS`;
     }
 
     function formatPhone(input) {
       let v = input.value.replace(/\D/g, '');
-      if (v.length <= 3) v = v;
-      else if (v.length <= 6) v = `(${v.slice(0, 3)}) ${v.slice(3)}`;
-      else v = `(${v.slice(0, 3)}) ${v.slice(3, 6)}-${v.slice(6, 10)}`;
-      input.value = v;
+      if (v.length > 10) v = v.slice(0, 10);
+      if (v.length > 6) input.value = `(${v.slice(0,3)}) ${v.slice(3,6)}-${v.slice(6)}`;
+      else if (v.length > 3) input.value = `(${v.slice(0,3)}) ${v.slice(3)}`;
+      else if (v.length > 0) input.value = `(${v}`;
     }
 
-    function showToast(msg) {
-      const toast = document.createElement('div');
-      toast.className = 'fixed bottom-5 right-5 z-50 bg-noir text-white border-2 border-noir p-3 font-mono text-xs font-black uppercase tracking-wider shadow-[4px_4px_0px_#71717a] transition-all';
-      toast.textContent = msg;
-      document.body.appendChild(toast);
-      setTimeout(() => {
-        toast.style.opacity = '0';
-        toast.style.transform = 'translateY(6px)';
-      }, 2200);
-      setTimeout(() => document.body.removeChild(toast), 2600);
+    function initMontrealMap() {
+      dispatchMapInstance = L.map('dispatch-map', {
+        center: [45.5019, -73.5674],
+        zoom: 12,
+        zoomControl: false,
+      });
+
+      L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}', {
+        maxZoom: 19
+      }).addTo(dispatchMapInstance);
+
+      // Marker Pickup
+      L.marker([45.5019, -73.5674]).addTo(dispatchMapInstance)
+        .bindPopup("<b>PRISE EN CHARGE</b><br>1250 René-Lévesque O.");
+
+      // Marker Destination
+      L.marker([45.4705, -73.7408]).addTo(dispatchMapInstance)
+        .bindPopup("<b>DESTINATION</b><br>Aéroport YUL");
+
+      // Polyline route
+      L.polyline([
+        [45.5019, -73.5674],
+        [45.485, -73.595],
+        [45.465, -73.655],
+        [45.4705, -73.7408]
+      ], { color: '#10b981', weight: 4 }).addTo(dispatchMapInstance);
     }
 
-    // Keyboard Shortcuts
-    document.addEventListener('keydown', e => {
-      if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA' || e.target.tagName === 'SELECT') {
-        if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) {
-          e.preventDefault();
-          submitDispatchCall();
-        }
+    function submitDispatchCall() {
+      const adresse = document.getElementById('field-adresse').value.trim();
+      const dest = document.getElementById('field-dest').value.trim();
+      const client = document.getElementById('field-client').value.trim();
+      const tel = document.getElementById('field-tel').value.trim();
+
+      if (!adresse || !dest) {
+        alert("Veuillez renseigner l'adresse de prise en charge et la destination.");
         return;
       }
-      if (e.key === 'F5') { e.preventDefault(); actionF5(); }
-      if (e.key === 'F7') { e.preventDefault(); actionF7(); }
-      if (e.key === 'F8') { e.preventDefault(); actionF8(); }
-      if (e.key === 'Enter') { e.preventDefault(); submitDispatchCall(); }
-      if (e.key === 'F3') { e.preventDefault(); window.location.href = 'queue.html'; }
-      if (e.key === 'F4') { e.preventDefault(); window.location.href = 'map.html'; }
-      if (e.key === 'F6') { e.preventDefault(); window.location.href = 'driver.html'; }
-      if (e.key === 'Escape') { closeShareModal(); }
-    });
 
-    // Share Modal
-    function openShareModal() {
-      const currentOrigin = window.location.origin.includes('lhr.life') ? window.location.origin : 'https://bc8b85ebe510c4.lhr.life';
-      const page = window.location.pathname.split('/').pop() || 'dispatch.html';
-      const pubInput = document.getElementById('share-url-public');
-      if (pubInput) pubInput.value = `${currentOrigin}/${page}`;
-      document.getElementById('share-modal').style.display = 'flex';
-    }
-    function closeShareModal() {
-      document.getElementById('share-modal').style.display = 'none';
-    }
-    function closeShareModalOnBg(e) {
-      if (e.target === document.getElementById('share-modal')) closeShareModal();
-    }
-    function copyShareUrl() {
-      const input = document.getElementById('share-url-input');
-      input.select();
-      navigator.clipboard.writeText(input.value);
-      alert("LIEN LOCAL COPIÉ DANS LE PRESSE-PAPIER !");
-    }
-    function copyPublicUrl() {
-      const input = document.getElementById('share-url-public');
-      input.select();
-      navigator.clipboard.writeText(input.value);
-      alert("LIEN PUBLIC MONDIAL (HTTPS) COPIÉ ! Votre collaborateur peut l'ouvrir de n'importe où.");
+      const assignedVeh = currentRepartMode === 'manual' 
+        ? parseInt(document.getElementById('selected-manual-unit').value, 10) 
+        : 232;
+
+      const newCall = PulseState.addCall({
+        client: client || "CLIENT MÉTROPOLITAIN",
+        phone: tel,
+        pickup: adresse,
+        dest: dest,
+        vehType: currentVehType,
+        assignedVeh: assignedVeh,
+        status: 'ATTRIBUÉ',
+        price: 48.50
+      });
+
+      PulseState.addMessage(
+        `DISPATCH`,
+        `NOUVELLE MISSION CAD (#${newCall.id})`,
+        `Assignée à UNIT-${assignedVeh}. Prise en charge: ${adresse}`,
+        'DISP'
+      );
+
+      alert(`COURSE #${newCall.id} ENREGISTRÉE ET DIFFUSÉE À L'UNITÉ ${assignedVeh} !`);
+      window.location.href = 'queue.html';
     }
   </script>
 </body>
