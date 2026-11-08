@@ -1070,10 +1070,15 @@
 
     function updateMapCounters() {
       const vehs = PulseState.getVehicles();
-      document.getElementById('stat-total-vehs').textContent = vehs.length;
-      document.getElementById('stat-libre-vehs').textContent = vehs.filter(v => v.status === 'LIBRE').length;
-      document.getElementById('stat-enroute-vehs').textContent = vehs.filter(v => v.status === 'EN_ROUTE').length;
-      document.getElementById('stat-course-vehs').textContent = vehs.filter(v => v.status === 'EN_COURSE').length;
+      const totalEl = document.getElementById('stat-total-vehs');
+      const libreEl = document.getElementById('stat-libre-vehs');
+      const enrouteEl = document.getElementById('stat-enroute-vehs');
+      const courseEl = document.getElementById('stat-course-vehs');
+
+      if (totalEl) totalEl.textContent = vehs.length;
+      if (libreEl) libreEl.textContent = vehs.filter(v => v.status === 'LIBRE').length;
+      if (enrouteEl) enrouteEl.textContent = vehs.filter(v => v.status === 'EN_ROUTE').length;
+      if (courseEl) courseEl.textContent = vehs.filter(v => v.status === 'EN_COURSE').length;
     }
 
     function updateOBDTerminal() {
@@ -1261,7 +1266,9 @@
       updateOBDTerminal();
       recalculateActiveRoute();
 
-      map.flyTo([v.lat, v.lng], 14, { duration: 0.8 });
+      if (map && typeof map.flyTo === 'function') {
+        map.flyTo([v.lat, v.lng], 14, { duration: 0.8 });
+      }
       setTimeout(() => {
         if (v.marker) v.marker.openPopup();
       }, 900);

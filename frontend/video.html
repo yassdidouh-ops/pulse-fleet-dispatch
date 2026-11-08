@@ -1282,7 +1282,10 @@
     video.addEventListener('ended', () => {
       if (isVideoLooping) {
         video.currentTime = 0;
-        video.play();
+        const p = video.play();
+        if (p !== undefined) {
+          p.catch(err => console.warn('Loop playback prevented:', err));
+        }
       } else {
         updatePlayUI(false);
       }
@@ -1339,12 +1342,12 @@
 
     // Copy video link with current timestamp
     function copyVideoLink() {
-      const origin = window.location.origin.includes('lhr.life') ? window.location.origin : 'https://bc8b85ebe510c4.lhr.life';
+      const origin = (typeof getEffectiveOrigin === 'function') ? getEffectiveOrigin() : window.location.origin;
       const curSec = Math.floor(video.currentTime || 0);
       const url = `${origin}/video.html#t=${curSec}`;
-      navigator.clipboard.writeText(url).then(() => {
+      copyTextToClipboard(url, () => {
         showToast(`Lien copié avec minutage (${formatTime(curSec)}) !`);
-      }).catch(() => {
+      }, () => {
         showToast("Lien copié dans le presse-papier !");
       });
     }

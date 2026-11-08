@@ -374,8 +374,11 @@
       container.innerHTML = '';
 
       let filtered = msgs;
-      if (currentFilter === 'unread') filtered = msgs.filter(m => m.unread);
-      else if (currentFilter === 'urgent') filtered = msgs.filter(m => m.priority === 'URGENTE' || m.subject.toLowerCase().includes('urgent') || m.subject.toLowerCase().includes('alerte'));
+      if (currentFilter === 'unread') {
+        filtered = msgs.filter(m => m.unread);
+      } else if (currentFilter === 'urgent') {
+        filtered = msgs.filter(m => (m.priority === 'URGENTE' || m.prio === 'URGENTE' || (m.subject && (m.subject.toLowerCase().includes('urgent') || m.subject.toLowerCase().includes('alerte')))));
+      }
 
       if (filtered.length === 0) {
         container.innerHTML = `<div class="p-8 text-center text-zinc-500 text-xs">Aucune transmission dans ce filtre.</div>`;
@@ -388,11 +391,11 @@
         div.className = `p-3.5 cursor-pointer transition-colors ${isSelected ? 'bg-white/10 border-l-2 border-emerald-400' : 'hover:bg-white/[0.03]'}`;
         div.innerHTML = `
           <div class="flex items-center justify-between mb-1">
-            <span class="font-bold text-xs ${msg.unread ? 'text-white' : 'text-zinc-400'}">${msg.from}</span>
-            <span class="text-[10px] text-zinc-500 font-mono">${msg.time}</span>
+            <span class="font-bold text-xs ${msg.unread ? 'text-white' : 'text-zinc-400'}">${msg.from || 'DISPATCH'}</span>
+            <span class="text-[10px] text-zinc-500 font-mono">${msg.time || msg.date || '--:--'}</span>
           </div>
-          <div class="text-xs font-semibold ${msg.unread ? 'text-emerald-400' : 'text-zinc-300'} truncate">${msg.subject}</div>
-          <div class="text-[11px] text-zinc-500 truncate mt-0.5">${msg.body}</div>
+          <div class="text-xs font-semibold ${msg.unread ? 'text-emerald-400' : 'text-zinc-300'} truncate">${msg.subject || 'TRANSMISSION'}</div>
+          <div class="text-[11px] text-zinc-500 truncate mt-0.5">${msg.body || ''}</div>
         `;
         div.onclick = () => selectMessage(msg.id);
         container.appendChild(div);
@@ -401,13 +404,17 @@
 
     function selectMessage(id) {
       currentSelectedId = id;
-      PulseState.markMessageRead(id);
+      if (typeof PulseState !== 'undefined' && typeof PulseState.markMessageRead === 'function') {
+        PulseState.markMessageRead(id);
+      }
       renderAll();
     }
 
     function renderPreview() {
       const panel = document.getElementById('preview-panel');
-      const msg = PulseState.getMessages().find(m => m.id === currentSelectedId);
+      if (!panel) return;
+      const msgs = (typeof PulseState !== 'undefined') ? PulseState.getMessages() : [];
+      const msg = msgs.find(m => String(m.id) === String(currentSelectedId));
       if (!msg) {
         panel.innerHTML = `<div class="m-auto text-zinc-500 text-xs">Sélectionnez une transmission pour afficher le détail.</div>`;
         return;
@@ -417,11 +424,11 @@
         <div class="flex items-center justify-between pb-4 border-b border-white/10 mb-4">
           <div>
             <span class="text-[10px] font-mono font-bold bg-white/10 text-emerald-400 px-2 py-0.5 rounded border border-white/10 uppercase">
-              ${msg.category || 'TRANSMISSION MDT'}
+              ${msg.category || msg.prio || msg.priority || 'TRANSMISSION MDT'}
             </span>
-            <h2 class="text-lg font-bold text-white mt-2">${msg.subject}</h2>
+            <h2 class="text-lg font-bold text-white mt-2">${msg.subject || 'TRANSMISSION CAD'}</h2>
           </div>
-          <span class="font-mono text-xs text-zinc-400">${msg.time}</span>
+          <span class="font-mono text-xs text-zinc-400">${msg.time || msg.date || '--:--'}</span>
         </div>
 
         <div class="bg-black/30 p-3 rounded-xl border border-white/5 text-xs space-y-1 mb-4">
