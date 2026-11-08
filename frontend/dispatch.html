@@ -700,11 +700,15 @@
 
     function spinnerChange(delta) {
       const el = document.getElementById('nb-passagers');
-      el.value = Math.min(10, Math.max(1, parseInt(el.value || 1) + delta));
+      if (!el) return;
+      const val = parseInt(el.value, 10);
+      el.value = Math.min(10, Math.max(1, (isNaN(val) ? 1 : val) + delta));
     }
     function spinnerBagChange(delta) {
       const el = document.getElementById('nb-bagages');
-      el.value = Math.min(10, Math.max(0, parseInt(el.value || 0) + delta));
+      if (!el) return;
+      const val = parseInt(el.value, 10);
+      el.value = Math.min(10, Math.max(0, (isNaN(val) ? 0 : val) + delta));
     }
 
     function setVehType(type) {
@@ -789,6 +793,19 @@
     }
 
     function initMontrealMap() {
+      const container = document.getElementById('dispatch-map');
+      if (!container || typeof L === 'undefined') return;
+
+      if (dispatchMapInstance) {
+        try {
+          dispatchMapInstance.remove();
+        } catch (e) {}
+        dispatchMapInstance = null;
+      }
+      if (container._leaflet_id) {
+        container._leaflet_id = null;
+      }
+
       dispatchMapInstance = L.map('dispatch-map', {
         center: [45.5019, -73.5674],
         zoom: 12,
@@ -799,12 +816,26 @@
         maxZoom: 19
       }).addTo(dispatchMapInstance);
 
+      const pickupIcon = L.divIcon({
+        className: '',
+        html: '<div style="background:#10b981;color:#0e1013;font-weight:800;font-size:10px;padding:3px 8px;border-radius:6px;border:1px solid #fff;white-space:nowrap;box-shadow:0 2px 8px rgba(0,0,0,0.4);">📍 PRISE EN CHARGE</div>',
+        iconSize: [120, 24],
+        iconAnchor: [60, 24]
+      });
+
+      const destIcon = L.divIcon({
+        className: '',
+        html: '<div style="background:#3b82f6;color:#fff;font-weight:800;font-size:10px;padding:3px 8px;border-radius:6px;border:1px solid #fff;white-space:nowrap;box-shadow:0 2px 8px rgba(0,0,0,0.4);">🏁 DESTINATION</div>',
+        iconSize: [100, 24],
+        iconAnchor: [50, 24]
+      });
+
       // Marker Pickup
-      L.marker([45.5019, -73.5674]).addTo(dispatchMapInstance)
+      L.marker([45.5019, -73.5674], { icon: pickupIcon }).addTo(dispatchMapInstance)
         .bindPopup("<b>PRISE EN CHARGE</b><br>1250 René-Lévesque O.");
 
       // Marker Destination
-      L.marker([45.4705, -73.7408]).addTo(dispatchMapInstance)
+      L.marker([45.4705, -73.7408], { icon: destIcon }).addTo(dispatchMapInstance)
         .bindPopup("<b>DESTINATION</b><br>Aéroport YUL");
 
       // Polyline route
@@ -817,18 +848,19 @@
     }
 
     function submitDispatchCall() {
-      const adresse = document.getElementById('field-adresse').value.trim();
-      const dest = document.getElementById('field-dest').value.trim();
-      const client = document.getElementById('field-client').value.trim();
-      const tel = document.getElementById('field-tel').value.trim();
+      const adresse = (document.getElementById('field-adresse')?.value || '').trim();
+      const dest = (document.getElementById('field-dest')?.value || '').trim();
+      const client = (document.getElementById('field-client')?.value || '').trim();
+      const tel = (document.getElementById('field-tel')?.value || '').trim();
 
       if (!adresse || !dest) {
         alert("Veuillez renseigner l'adresse de prise en charge et la destination.");
         return;
       }
 
+      const manualSelect = document.getElementById('selected-manual-unit');
       const assignedVeh = currentRepartMode === 'manual' 
-        ? parseInt(document.getElementById('selected-manual-unit').value, 10) 
+        ? (parseInt(manualSelect?.value, 10) || 232)
         : 232;
 
       const newCall = PulseState.addCall({
@@ -838,6 +870,7 @@
         dest: dest,
         vehType: currentVehType,
         assignedVeh: assignedVeh,
+        assignedUnit: assignedVeh,
         status: 'ATTRIBUÉ',
         price: 48.50
       });

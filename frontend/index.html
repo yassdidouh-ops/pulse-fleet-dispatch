@@ -1094,18 +1094,24 @@
 
     // Hormozi ROI Profit Engine
     function calculateROI() {
-      const fleet = parseInt(document.getElementById('roi-fleet-slider').value, 10);
-      const fare = parseInt(document.getElementById('roi-fare-slider').value, 10);
+      const fleetSlider = document.getElementById('roi-fleet-slider');
+      const fareSlider = document.getElementById('roi-fare-slider');
+      const fleet = parseInt(fleetSlider ? fleetSlider.value : '12', 10) || 12;
+      const fare = parseInt(fareSlider ? fareSlider.value : '35', 10) || 35;
       
-      document.getElementById('roi-fleet-display').textContent = `${fleet} Véhicules`;
-      document.getElementById('roi-fare-display').textContent = `${fare}.00 $ CAD`;
+      const fleetDisp = document.getElementById('roi-fleet-display');
+      const fareDisp = document.getElementById('roi-fare-display');
+      if (fleetDisp) fleetDisp.textContent = `${fleet} Véhicules`;
+      if (fareDisp) fareDisp.textContent = `${fare}.00 $ CAD`;
       
       const extraRidesPerDay = fleet * 1;
       const monthlyExtraRevenue = extraRidesPerDay * fare * 30;
       
-      document.getElementById('roi-extra-rides').textContent = `+${extraRidesPerDay} courses/j`;
+      const extraRidesEl = document.getElementById('roi-extra-rides');
+      if (extraRidesEl) extraRidesEl.textContent = `+${extraRidesPerDay} courses/j`;
       const formatted = `+${monthlyExtraRevenue.toLocaleString('fr-CA')} $`;
-      document.getElementById('roi-total-dollars').textContent = formatted;
+      const totalDolEl = document.getElementById('roi-total-dollars');
+      if (totalDolEl) totalDolEl.textContent = formatted;
       const topDollarsEl = document.getElementById('roi-top-dollars');
       if (topDollarsEl) topDollarsEl.textContent = formatted;
     }
