@@ -99,6 +99,24 @@
       color: #111317;
       box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
     }
+    .dock-btn .tip {
+      position: absolute;
+      left: 54px;
+      background: #14171c;
+      color: #ffffff;
+      font-size: 11px;
+      font-weight: 600;
+      white-space: nowrap;
+      padding: 5px 10px;
+      border-radius: 8px;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 0.15s ease;
+      z-index: 100;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+    }
+    .dock-btn:hover .tip { opacity: 1; }
 
     /* Main Window Chassis */
     .window-chassis {
@@ -275,13 +293,38 @@
       <a href="index.html" class="w-9 h-9 rounded-full bg-white/10 flex items-center justify-center text-white hover:bg-white/20 transition-colors mb-1">
         <i data-lucide="sparkles" class="w-4 h-4 text-emerald-400"></i>
       </a>
-      <a href="index.html" class="dock-btn" title="Tableau de bord"><i data-lucide="home" class="w-4 h-4"></i></a>
-      <a href="dispatch.html" class="dock-btn" title="Prise d'Appel CAD [F2]"><i data-lucide="radio" class="w-4 h-4"></i></a>
-      <a href="queue.html" class="dock-btn" title="File des missions [F3]"><i data-lucide="list-ordered" class="w-4 h-4"></i></a>
-      <a href="map.html" class="dock-btn active" title="Carte Flotte [F4]"><i data-lucide="globe" class="w-4 h-4"></i></a>
-      <a href="messages.html" class="dock-btn" title="Radio MDT Direct [F5]"><i data-lucide="message-square" class="w-4 h-4"></i></a>
-      <a href="driver.html" class="dock-btn" title="Cockpit Chauffeur [F6]"><i data-lucide="smartphone" class="w-4 h-4"></i></a>
-      <a href="receipt.html" class="dock-btn" title="Facturation"><i data-lucide="receipt" class="w-4 h-4"></i></a>
+      <a href="index.html" class="dock-btn" title="Tableau de bord">
+        <i data-lucide="home" class="w-4 h-4"></i>
+        <span class="tip">Tableau de Bord [F1]</span>
+      </a>
+      <a href="dispatch.html" class="dock-btn" title="Prise d'Appel CAD [F2]">
+        <i data-lucide="radio" class="w-4 h-4"></i>
+        <span class="tip">Prise d'Appel CAD [F2]</span>
+      </a>
+      <a href="queue.html" class="dock-btn" title="File des missions [F3]">
+        <i data-lucide="list-ordered" class="w-4 h-4"></i>
+        <span class="tip">File des Missions [F3]</span>
+      </a>
+      <a href="map.html" class="dock-btn active" title="Carte Flotte [F4]">
+        <i data-lucide="globe" class="w-4 h-4"></i>
+        <span class="tip">Carte AVL & Waze [F4]</span>
+      </a>
+      <a href="messages.html" class="dock-btn" title="Radio MDT Direct [F5]">
+        <i data-lucide="message-square" class="w-4 h-4"></i>
+        <span class="tip">Radio MDT Direct [F5]</span>
+      </a>
+      <a href="driver.html" class="dock-btn" title="Cockpit Chauffeur [F6]">
+        <i data-lucide="smartphone" class="w-4 h-4"></i>
+        <span class="tip">Cockpit Chauffeur [F6]</span>
+      </a>
+      <a href="receipt.html?call=5081" class="dock-btn" title="Facturation & Reçus">
+        <i data-lucide="receipt" class="w-4 h-4"></i>
+        <span class="tip">Factures & Taxes QC</span>
+      </a>
+      <a href="video.html" class="dock-btn" title="Showcase Vidéo 30s">
+        <i data-lucide="play-circle" class="w-4 h-4"></i>
+        <span class="tip">Showcase Vidéo [F7]</span>
+      </a>
     </div>
     <div class="flex flex-col items-center gap-2">
       <button onclick="PulseState.resetDemoData(); location.reload();" class="w-11 h-11 bg-royal-900/90 hover:bg-royal-800 text-zinc-400 hover:text-white rounded-[16px] border border-white/10 flex items-center justify-center shadow-lg transition-transform hover:scale-105" title="Réinitialiser données système">
@@ -303,8 +346,8 @@
           <span class="w-3 h-3 rounded-full bg-[#28c840] border border-[#1aab29]"></span>
         </div>
         <div>
-          <h1 class="text-xl font-bold text-white tracking-tight">Carte Flotte & Télémétrie AVL</h1>
-          <p class="text-xs text-zinc-400">Positionnement en direct 6-décimales & Calque Waze Montréal</p>
+          <h1 class="text-xl font-bold text-white tracking-tight">Carte AVL</h1>
+          <p class="text-xs text-zinc-400">GPS & Waze direct</p>
         </div>
       </div>
 
@@ -312,7 +355,7 @@
         <!-- Share button -->
         <button onclick="openShareModal()" class="bg-white/10 hover:bg-white/15 text-white text-xs font-semibold px-3.5 py-1.5 rounded-xl border border-white/10 flex items-center gap-2 transition-colors">
           <i data-lucide="share-2" class="w-3.5 h-3.5 text-emerald-400"></i>
-          <span>Partager Carte</span>
+          <span>Partager</span>
         </button>
 
         <!-- Live Clock -->
@@ -332,7 +375,7 @@
       <!-- Waze Toggle -->
       <button id="toggle-waze-btn" onclick="toggleWazeTraffic()" class="status-badge-mono active text-rose-400 border-rose-500/40">
         <span class="w-2 h-2 rounded-full bg-rose-500 inline-block animate-pulse"></span>
-        CALQUE WAZE : ACTIF
+        WAZE : ACTIF
       </button>
 
       <div class="h-4 w-px bg-white/10 mx-1"></div>
@@ -354,10 +397,10 @@
       <div class="hidden sm:flex items-center gap-1 border border-white/10 p-0.5 rounded-lg bg-black/30 mx-2">
         <span class="text-[9px] text-zinc-400 font-bold px-1.5 uppercase">CARTE :</span>
         <button onclick="setBaseLayer('streets', this)" class="base-layer-btn px-2.5 py-0.5 text-[10px] font-bold rounded bg-white text-royal-950">
-          🗺️ RUES (ESRI)
+          Rues
         </button>
         <button onclick="setBaseLayer('satellite', this)" class="base-layer-btn px-2.5 py-0.5 text-[10px] font-semibold text-zinc-400 hover:text-white rounded">
-          🛰️ SATELLITE
+          Satellite
         </button>
         <button onclick="setBaseLayer('voyager', this)" class="base-layer-btn px-2.5 py-0.5 text-[10px] font-semibold text-zinc-400 hover:text-white rounded">
           🏙️ VOYAGER
@@ -438,11 +481,11 @@
       <!-- Drawer Header -->
       <div class="p-4 bg-royal-900/60 border-b border-white/5 flex-shrink-0">
         <div class="flex items-center justify-between mb-2.5">
-          <span class="text-sm font-bold uppercase tracking-wider text-white">Unités Flotte (AVL)</span>
-          <span class="bg-emerald-950/80 text-emerald-300 border border-emerald-800/80 font-mono text-[10px] font-bold px-2 py-0.5 rounded">GPS LIVE 6-DÉC</span>
+          <span class="text-sm font-bold uppercase tracking-wider text-white">Unités AVL</span>
+          <span class="bg-emerald-950/80 text-emerald-300 border border-emerald-800/80 font-mono text-[10px] font-bold px-2 py-0.5 rounded">GPS Live</span>
         </div>
         <div class="relative">
-          <input id="veh-search" oninput="filterDrawerList()" class="w-full bg-black/40 border border-white/10 rounded-xl font-mono text-xs text-white px-3 py-2 pl-8 outline-none focus:border-white/20 transition-colors" type="text" placeholder="Rechercher zone ou unité..." />
+          <input id="veh-search" oninput="filterDrawerList()" class="w-full bg-black/40 border border-white/10 rounded-xl font-mono text-xs text-white px-3 py-2 pl-8 outline-none focus:border-white/20 transition-colors" type="text" placeholder="Rechercher..." />
           <i data-lucide="search" class="w-3.5 h-3.5 text-zinc-500 absolute left-2.5 top-2.5"></i>
         </div>
       </div>
@@ -459,7 +502,7 @@
 
       <!-- Drawer Footer -->
       <div class="p-3 bg-royal-950 border-t border-white/5 font-mono text-[10px] text-zinc-500 flex justify-between">
-        <span>FLUX WAZE : 100% DISPONIBLE</span>
+        <span>Waze Actif</span>
         <span class="font-bold text-zinc-300">PULSE CAD</span>
       </div>
 
@@ -467,31 +510,220 @@
 
   </div>
 
-  <!-- COLLABORATIVE SHARE MODAL -->
-  <div id="share-modal" class="fixed inset-0 bg-black/70 backdrop-blur-md z-50 items-center justify-center hidden p-4" onclick="closeShareModalOnBg(event)">
-    <div class="bg-royal-900 border border-white/10 rounded-2xl max-w-md w-full p-6 shadow-2xl text-white">
-      <div class="flex items-center justify-between border-b border-white/10 pb-3 mb-4">
-        <div class="flex items-center gap-2">
-          <i data-lucide="share-2" class="w-5 h-5 text-emerald-400"></i>
-          <span class="text-base font-bold text-white">Partage Session Carte</span>
+  <!-- UNIFIED MULTI-OPTION COLLABORATIVE SHARE MODAL (ROYAL GREY PALETTE) -->
+  <div id="share-modal" class="fixed inset-0 bg-black/75 backdrop-blur-md z-50 flex items-center justify-center p-4" style="display: none;" onclick="closeShareModalOnBg(event)">
+    <div class="bg-royal-900 border border-white/10 rounded-2xl max-w-2xl w-full p-6 shadow-2xl select-none text-white max-h-[90vh] flex flex-col" onclick="event.stopPropagation()">
+      
+      <!-- Header -->
+      <div class="flex items-center justify-between pb-4 border-b border-white/10 mb-4 flex-shrink-0">
+        <div class="flex items-center gap-3">
+          <div class="w-9 h-9 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400">
+            <i data-lucide="share-2" class="w-5 h-5"></i>
+          </div>
+          <div>
+            <div class="flex items-center gap-2">
+              <h3 class="font-bold text-base text-white">Partage Multi-Modules CAD & Flotte</h3>
+              <span class="px-2 py-0.5 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-[10px] font-mono font-bold flex items-center gap-1">
+                <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>TUNNEL ACTIF
+              </span>
+            </div>
+            <p class="text-xs text-zinc-400 mt-0.5">Accès public chiffré SSL en temps réel. Partagez n'importe quel module avec votre équipe :</p>
+          </div>
         </div>
-        <button onclick="closeShareModal()" class="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 text-zinc-300 flex items-center justify-center font-bold text-sm transition-colors">✕</button>
+        <button onclick="closeShareModal()" class="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 text-zinc-300 flex items-center justify-center font-bold text-sm transition-colors cursor-pointer" title="Fermer (Échap)">✕</button>
       </div>
-      <p class="text-xs text-zinc-400 mb-4 leading-relaxed">
-        Partagez cette carte CAD interactive avec votre collaborateur. Les positions GPS et alertes de trafic sont synchronisées en direct :
-      </p>
-      <div class="bg-black/40 p-3.5 rounded-xl border border-white/10 mb-3 text-xs font-mono">
-        <div class="flex items-center justify-between mb-1.5">
-          <span class="text-emerald-400 font-bold flex items-center gap-1.5">
-            <span class="w-2 h-2 rounded-full bg-emerald-400 inline-block animate-pulse"></span> LIEN PUBLIC MONDIAL (HTTPS) :
-          </span>
-          <span class="text-[10px] bg-emerald-950 text-emerald-300 px-2 py-0.5 rounded font-bold">EN LIGNE</span>
+
+      <!-- Tunnel Status Banner -->
+      <div class="bg-black/40 border border-white/10 rounded-xl p-3 mb-4 flex items-center justify-between flex-shrink-0">
+        <div class="flex items-center gap-2.5 overflow-hidden mr-2">
+          <i data-lucide="shield-check" class="w-4 h-4 text-emerald-400 flex-shrink-0"></i>
+          <div class="truncate">
+            <div class="text-[10px] font-mono text-zinc-500 uppercase tracking-wider">Hôte Actif / Passerelle SSL</div>
+            <div id="share-modal-base-host" class="text-xs font-mono font-bold text-zinc-200 truncate">https://d459b01192e48d.lhr.life</div>
+          </div>
         </div>
-        <div class="flex gap-2">
-          <input id="share-url-public" class="bg-royal-950 border border-white/10 rounded px-2.5 py-1.5 text-xs text-zinc-200 flex-1 outline-none font-mono" readonly value="https://bc8b85ebe510c4.lhr.life/map.html" />
-          <button onclick="copyPublicUrl()" class="bg-emerald-500 hover:bg-emerald-600 text-royal-950 px-3 py-1.5 rounded font-bold uppercase text-[11px] transition-colors">COPIER</button>
+        <div class="text-[11px] font-mono text-emerald-400 font-semibold bg-emerald-950/60 border border-emerald-500/20 px-2.5 py-1 rounded-lg whitespace-nowrap">
+          7 MODULES DISPONIBLES
         </div>
       </div>
+
+      <!-- Modules List -->
+      <div class="space-y-2 overflow-y-auto pr-1 flex-1 text-xs">
+        
+        <!-- 1. Dashboard Exécutif -->
+        <div class="share-option-card bg-royal-950/80 hover:bg-royal-950 border border-white/5 hover:border-white/15 rounded-xl p-3 flex items-center justify-between gap-3 transition-colors">
+          <div class="flex items-center gap-3 min-w-0">
+            <div class="w-8 h-8 rounded-lg bg-blue-500/10 border border-blue-500/20 text-blue-400 flex items-center justify-center flex-shrink-0">
+              <i data-lucide="layout-dashboard" class="w-4 h-4"></i>
+            </div>
+            <div class="min-w-0">
+              <div class="font-bold text-white text-xs truncate">1. Dashboard Exécutif</div>
+              <div class="text-[11px] font-mono text-zinc-400 truncate share-url-label" data-path="/index.html">https://d459b01192e48d.lhr.life/index.html</div>
+            </div>
+          </div>
+          <div class="flex items-center gap-2 flex-shrink-0">
+            <button onclick="copyShareOption(this, '/index.html')" class="copy-btn px-3 py-1.5 rounded-lg bg-white/10 hover:bg-white/20 text-zinc-200 font-semibold text-xs flex items-center gap-1.5 transition-colors cursor-pointer">
+              <i data-lucide="copy" class="w-3.5 h-3.5"></i>
+              <span>Copier</span>
+            </button>
+            <a href="https://d459b01192e48d.lhr.life/index.html" target="_blank" rel="noopener noreferrer" class="share-open-link px-3 py-1.5 rounded-lg bg-emerald-500 hover:bg-emerald-600 text-royal-950 font-bold text-xs flex items-center gap-1.5 transition-colors no-underline">
+              <span>Ouvrir</span>
+              <i data-lucide="external-link" class="w-3.5 h-3.5"></i>
+            </a>
+          </div>
+        </div>
+
+        <!-- 2. Carte AVL & Waze -->
+        <div class="share-option-card bg-royal-950/80 hover:bg-royal-950 border border-white/5 hover:border-white/15 rounded-xl p-3 flex items-center justify-between gap-3 transition-colors">
+          <div class="flex items-center gap-3 min-w-0">
+            <div class="w-8 h-8 rounded-lg bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 flex items-center justify-center flex-shrink-0">
+              <i data-lucide="globe" class="w-4 h-4"></i>
+            </div>
+            <div class="min-w-0">
+              <div class="font-bold text-white text-xs truncate">2. Carte AVL & Waze</div>
+              <div class="text-[11px] font-mono text-zinc-400 truncate share-url-label" data-path="/map.html">https://d459b01192e48d.lhr.life/map.html</div>
+            </div>
+          </div>
+          <div class="flex items-center gap-2 flex-shrink-0">
+            <button onclick="copyShareOption(this, '/map.html')" class="copy-btn px-3 py-1.5 rounded-lg bg-white/10 hover:bg-white/20 text-zinc-200 font-semibold text-xs flex items-center gap-1.5 transition-colors cursor-pointer">
+              <i data-lucide="copy" class="w-3.5 h-3.5"></i>
+              <span>Copier</span>
+            </button>
+            <a href="https://d459b01192e48d.lhr.life/map.html" target="_blank" rel="noopener noreferrer" class="share-open-link px-3 py-1.5 rounded-lg bg-emerald-500 hover:bg-emerald-600 text-royal-950 font-bold text-xs flex items-center gap-1.5 transition-colors no-underline">
+              <span>Ouvrir</span>
+              <i data-lucide="external-link" class="w-3.5 h-3.5"></i>
+            </a>
+          </div>
+        </div>
+
+        <!-- 3. Cockpit Chauffeur -->
+        <div class="share-option-card bg-royal-950/80 hover:bg-royal-950 border border-white/5 hover:border-white/15 rounded-xl p-3 flex items-center justify-between gap-3 transition-colors">
+          <div class="flex items-center gap-3 min-w-0">
+            <div class="w-8 h-8 rounded-lg bg-amber-500/10 border border-amber-500/20 text-amber-400 flex items-center justify-center flex-shrink-0">
+              <i data-lucide="smartphone" class="w-4 h-4"></i>
+            </div>
+            <div class="min-w-0">
+              <div class="font-bold text-white text-xs truncate">3. Cockpit Chauffeur</div>
+              <div class="text-[11px] font-mono text-zinc-400 truncate share-url-label" data-path="/driver.html">https://d459b01192e48d.lhr.life/driver.html</div>
+            </div>
+          </div>
+          <div class="flex items-center gap-2 flex-shrink-0">
+            <button onclick="copyShareOption(this, '/driver.html')" class="copy-btn px-3 py-1.5 rounded-lg bg-white/10 hover:bg-white/20 text-zinc-200 font-semibold text-xs flex items-center gap-1.5 transition-colors cursor-pointer">
+              <i data-lucide="copy" class="w-3.5 h-3.5"></i>
+              <span>Copier</span>
+            </button>
+            <a href="https://d459b01192e48d.lhr.life/driver.html" target="_blank" rel="noopener noreferrer" class="share-open-link px-3 py-1.5 rounded-lg bg-emerald-500 hover:bg-emerald-600 text-royal-950 font-bold text-xs flex items-center gap-1.5 transition-colors no-underline">
+              <span>Ouvrir</span>
+              <i data-lucide="external-link" class="w-3.5 h-3.5"></i>
+            </a>
+          </div>
+        </div>
+
+        <!-- 4. File CAD & Audit -->
+        <div class="share-option-card bg-royal-950/80 hover:bg-royal-950 border border-white/5 hover:border-white/15 rounded-xl p-3 flex items-center justify-between gap-3 transition-colors">
+          <div class="flex items-center gap-3 min-w-0">
+            <div class="w-8 h-8 rounded-lg bg-purple-500/10 border border-purple-500/20 text-purple-400 flex items-center justify-center flex-shrink-0">
+              <i data-lucide="list-ordered" class="w-4 h-4"></i>
+            </div>
+            <div class="min-w-0">
+              <div class="font-bold text-white text-xs truncate">4. File CAD & Audit</div>
+              <div class="text-[11px] font-mono text-zinc-400 truncate share-url-label" data-path="/queue.html">https://d459b01192e48d.lhr.life/queue.html</div>
+            </div>
+          </div>
+          <div class="flex items-center gap-2 flex-shrink-0">
+            <button onclick="copyShareOption(this, '/queue.html')" class="copy-btn px-3 py-1.5 rounded-lg bg-white/10 hover:bg-white/20 text-zinc-200 font-semibold text-xs flex items-center gap-1.5 transition-colors cursor-pointer">
+              <i data-lucide="copy" class="w-3.5 h-3.5"></i>
+              <span>Copier</span>
+            </button>
+            <a href="https://d459b01192e48d.lhr.life/queue.html" target="_blank" rel="noopener noreferrer" class="share-open-link px-3 py-1.5 rounded-lg bg-emerald-500 hover:bg-emerald-600 text-royal-950 font-bold text-xs flex items-center gap-1.5 transition-colors no-underline">
+              <span>Ouvrir</span>
+              <i data-lucide="external-link" class="w-3.5 h-3.5"></i>
+            </a>
+          </div>
+        </div>
+
+        <!-- 5. Prise d'Appel CAD -->
+        <div class="share-option-card bg-royal-950/80 hover:bg-royal-950 border border-white/5 hover:border-white/15 rounded-xl p-3 flex items-center justify-between gap-3 transition-colors">
+          <div class="flex items-center gap-3 min-w-0">
+            <div class="w-8 h-8 rounded-lg bg-cyan-500/10 border border-cyan-500/20 text-cyan-400 flex items-center justify-center flex-shrink-0">
+              <i data-lucide="radio" class="w-4 h-4"></i>
+            </div>
+            <div class="min-w-0">
+              <div class="font-bold text-white text-xs truncate">5. Prise d'Appel CAD</div>
+              <div class="text-[11px] font-mono text-zinc-400 truncate share-url-label" data-path="/dispatch.html">https://d459b01192e48d.lhr.life/dispatch.html</div>
+            </div>
+          </div>
+          <div class="flex items-center gap-2 flex-shrink-0">
+            <button onclick="copyShareOption(this, '/dispatch.html')" class="copy-btn px-3 py-1.5 rounded-lg bg-white/10 hover:bg-white/20 text-zinc-200 font-semibold text-xs flex items-center gap-1.5 transition-colors cursor-pointer">
+              <i data-lucide="copy" class="w-3.5 h-3.5"></i>
+              <span>Copier</span>
+            </button>
+            <a href="https://d459b01192e48d.lhr.life/dispatch.html" target="_blank" rel="noopener noreferrer" class="share-open-link px-3 py-1.5 rounded-lg bg-emerald-500 hover:bg-emerald-600 text-royal-950 font-bold text-xs flex items-center gap-1.5 transition-colors no-underline">
+              <span>Ouvrir</span>
+              <i data-lucide="external-link" class="w-3.5 h-3.5"></i>
+            </a>
+          </div>
+        </div>
+
+        <!-- 6. Radio MDT Direct -->
+        <div class="share-option-card bg-royal-950/80 hover:bg-royal-950 border border-white/5 hover:border-white/15 rounded-xl p-3 flex items-center justify-between gap-3 transition-colors">
+          <div class="flex items-center gap-3 min-w-0">
+            <div class="w-8 h-8 rounded-lg bg-pink-500/10 border border-pink-500/20 text-pink-400 flex items-center justify-center flex-shrink-0">
+              <i data-lucide="message-square" class="w-4 h-4"></i>
+            </div>
+            <div class="min-w-0">
+              <div class="font-bold text-white text-xs truncate">6. Radio MDT Direct</div>
+              <div class="text-[11px] font-mono text-zinc-400 truncate share-url-label" data-path="/messages.html">https://d459b01192e48d.lhr.life/messages.html</div>
+            </div>
+          </div>
+          <div class="flex items-center gap-2 flex-shrink-0">
+            <button onclick="copyShareOption(this, '/messages.html')" class="copy-btn px-3 py-1.5 rounded-lg bg-white/10 hover:bg-white/20 text-zinc-200 font-semibold text-xs flex items-center gap-1.5 transition-colors cursor-pointer">
+              <i data-lucide="copy" class="w-3.5 h-3.5"></i>
+              <span>Copier</span>
+            </button>
+            <a href="https://d459b01192e48d.lhr.life/messages.html" target="_blank" rel="noopener noreferrer" class="share-open-link px-3 py-1.5 rounded-lg bg-emerald-500 hover:bg-emerald-600 text-royal-950 font-bold text-xs flex items-center gap-1.5 transition-colors no-underline">
+              <span>Ouvrir</span>
+              <i data-lucide="external-link" class="w-3.5 h-3.5"></i>
+            </a>
+          </div>
+        </div>
+
+        <!-- 7. Facturation & Reçus -->
+        <div class="share-option-card bg-royal-950/80 hover:bg-royal-950 border border-white/5 hover:border-white/15 rounded-xl p-3 flex items-center justify-between gap-3 transition-colors">
+          <div class="flex items-center gap-3 min-w-0">
+            <div class="w-8 h-8 rounded-lg bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 flex items-center justify-center flex-shrink-0">
+              <i data-lucide="receipt" class="w-4 h-4"></i>
+            </div>
+            <div class="min-w-0">
+              <div class="font-bold text-white text-xs truncate">7. Facturation & Reçus</div>
+              <div class="text-[11px] font-mono text-zinc-400 truncate share-url-label" data-path="/receipt.html?call=5081">https://d459b01192e48d.lhr.life/receipt.html?call=5081</div>
+            </div>
+          </div>
+          <div class="flex items-center gap-2 flex-shrink-0">
+            <button onclick="copyShareOption(this, '/receipt.html?call=5081')" class="copy-btn px-3 py-1.5 rounded-lg bg-white/10 hover:bg-white/20 text-zinc-200 font-semibold text-xs flex items-center gap-1.5 transition-colors cursor-pointer">
+              <i data-lucide="copy" class="w-3.5 h-3.5"></i>
+              <span>Copier</span>
+            </button>
+            <a href="https://d459b01192e48d.lhr.life/receipt.html?call=5081" target="_blank" rel="noopener noreferrer" class="share-open-link px-3 py-1.5 rounded-lg bg-emerald-500 hover:bg-emerald-600 text-royal-950 font-bold text-xs flex items-center gap-1.5 transition-colors no-underline">
+              <span>Ouvrir</span>
+              <i data-lucide="external-link" class="w-3.5 h-3.5"></i>
+            </a>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Footer -->
+      <div class="mt-4 pt-3 border-t border-white/5 flex items-center justify-between text-xs text-zinc-500 flex-shrink-0">
+        <div class="flex items-center gap-1.5 text-zinc-400">
+          <i data-lucide="info" class="w-3.5 h-3.5 text-emerald-400"></i>
+          <span>Synchronisation temps réel par BroadcastChannel & LocalStorage</span>
+        </div>
+        <button onclick="closeShareModal()" class="text-xs text-zinc-400 hover:text-white px-2.5 py-1 rounded-lg bg-white/5 hover:bg-white/10 transition-colors">
+          Fermer
+        </button>
+      </div>
+
     </div>
   </div>
 
@@ -806,10 +1038,10 @@
       const btn = document.getElementById('toggle-waze-btn');
       if (wazeTrafficActive) {
         btn.className = 'status-badge-mono active text-rose-400 border-rose-500/40';
-        btn.innerHTML = `<span class="w-2 h-2 rounded-full bg-rose-500 inline-block animate-pulse"></span> CALQUE WAZE : ACTIF`;
+        btn.innerHTML = `<span class="w-2 h-2 rounded-full bg-rose-500 inline-block animate-pulse"></span> WAZE : ACTIF`;
       } else {
         btn.className = 'status-badge-mono text-zinc-400 border-white/10';
-        btn.innerHTML = `<span class="w-2 h-2 rounded-full bg-zinc-600 inline-block"></span> CALQUE WAZE : MASQUÉ`;
+        btn.innerHTML = `<span class="w-2 h-2 rounded-full bg-zinc-600 inline-block"></span> WAZE : MASQUÉ`;
       }
       renderWazeTrafficLayer();
     }
@@ -846,14 +1078,14 @@
         <div class="flex items-center justify-between pb-2 border-b border-white/10 mb-2.5">
           <div class="flex items-center gap-2">
             <span class="w-2 h-2 rounded-full bg-emerald-400 inline-block animate-pulse"></span>
-            <span class="text-xs font-bold uppercase tracking-wider text-white">OBD-II CAN BUS // ${veh.code}</span>
+            <span class="text-xs font-bold uppercase tracking-wider text-white">OBD-II // ${veh.code}</span>
           </div>
-          <span class="text-[9px] bg-white/10 text-zinc-300 font-mono px-2 py-0.5 rounded border border-white/10">CAN-ISO-11898</span>
+          <span class="text-[9px] bg-white/10 text-zinc-300 font-mono px-2 py-0.5 rounded border border-white/10">ISO-11898</span>
         </div>
 
         <div class="grid grid-cols-2 gap-2 text-[11px] mb-3">
           <div>
-            <div class="text-zinc-500 text-[9px] uppercase font-semibold">GPS FIX (6 DÉC.)</div>
+            <div class="text-zinc-500 text-[9px] uppercase font-semibold">GPS</div>
             <div class="font-mono font-medium text-white tracking-tight">${veh.lat.toFixed(6)}° N<br>${veh.lng.toFixed(6)}° W</div>
           </div>
           <div>
@@ -864,23 +1096,23 @@
 
         <div class="grid grid-cols-3 gap-2 text-center bg-black/40 p-2.5 rounded-lg border border-white/10 text-[11px] mb-3">
           <div>
-            <div class="text-[8px] text-zinc-400 uppercase font-medium">TENSION CAN</div>
+            <div class="text-[8px] text-zinc-400 uppercase font-medium">TENSION</div>
             <div class="font-bold text-emerald-400">${veh.batteryVoltage || 13.9} V</div>
           </div>
           <div>
-            <div class="text-[8px] text-zinc-400 uppercase font-medium">T° MOTEUR</div>
+            <div class="text-[8px] text-zinc-400 uppercase font-medium">MOTEUR</div>
             <div class="font-bold text-amber-400">${veh.coolantTemp || 91} °C</div>
           </div>
           <div>
-            <div class="text-[8px] text-zinc-400 uppercase font-medium">VITESSE CAN</div>
+            <div class="text-[8px] text-zinc-400 uppercase font-medium">VITESSE</div>
             <div class="font-bold text-white">${veh.speed} KM/H</div>
           </div>
         </div>
 
         <div class="text-[10px] text-zinc-400 space-y-1 border-t border-white/10 pt-2 leading-relaxed">
-          <div>MATÉRIEL : <strong class="text-zinc-200">${veh.mdtHardwareId || 'MDT-HW-99232-REV4'}</strong></div>
-          <div>N° VIN : <strong class="text-zinc-200 font-mono">${veh.vin || '2C3CDXAG8KH23209'}</strong></div>
-          <div>LIAISON IOT : <span class="text-emerald-400 font-semibold">4G/LTE · 24ms · RSSI ${veh.networkRssi || -68} dBm</span></div>
+          <div>MATÉRIEL : <strong class="text-zinc-200">${veh.mdtHardwareId || 'MDT-99232'}</strong></div>
+          <div>VIN : <strong class="text-zinc-200 font-mono">${veh.vin || '2C3CDXAG8KH23209'}</strong></div>
+          <div>LIAISON : <span class="text-emerald-400 font-semibold">4G · 24ms · ${veh.networkRssi || -68} dBm</span></div>
         </div>
       `;
     }
@@ -913,7 +1145,7 @@
             <div style="font-size:11px;color:#fff;margin-bottom:4px;"><strong>TYPE:</strong> ${v.type}</div>
             <div style="font-size:10px;color:#9da3af;margin-bottom:4px;"><strong>SECTEUR:</strong> ${v.zone}</div>
             <div style="font-size:10px;color:#fff;margin-bottom:4px;"><strong>GPS:</strong> ${v.lat.toFixed(6)}, ${v.lng.toFixed(6)}</div>
-            <div style="font-size:10px;color:#fff;margin-bottom:10px;"><strong>VITESSE CAN:</strong> ${v.speed} KM/H (CAP ${v.heading || 0}°)</div>
+            <div style="font-size:10px;color:#fff;margin-bottom:10px;"><strong>VITESSE:</strong> ${v.speed} KM/H (CAP ${v.heading || 0}°)</div>
             <a href="dispatch.html?assign=${v.id}" style="display:block;text-align:center;background:#10b981;color:#0e1013;padding:8px;border-radius:8px;font-size:11px;font-weight:700;text-decoration:none;text-transform:uppercase;">
               ASSIGNER CETTE UNITÉ [DISPATCH]
             </a>
@@ -1034,27 +1266,6 @@
 
     function filterDrawerList() {
       renderDrawerList();
-    }
-
-    // Share Modal
-    function openShareModal() {
-      const currentOrigin = window.location.origin.includes('lhr.life') ? window.location.origin : 'https://bc8b85ebe510c4.lhr.life';
-      const page = window.location.pathname.split('/').pop() || 'map.html';
-      const pubInput = document.getElementById('share-url-public');
-      if (pubInput) pubInput.value = `${currentOrigin}/${page}`;
-      document.getElementById('share-modal').style.display = 'flex';
-    }
-    function closeShareModal() {
-      document.getElementById('share-modal').style.display = 'none';
-    }
-    function closeShareModalOnBg(e) {
-      if (e.target === document.getElementById('share-modal')) closeShareModal();
-    }
-    function copyPublicUrl() {
-      const input = document.getElementById('share-url-public');
-      input.select();
-      navigator.clipboard.writeText(input.value);
-      alert("LIEN PUBLIC MONDIAL (HTTPS) COPIÉ ! Votre collaborateur peut l'ouvrir de n'importe où.");
     }
   </script>
 </body>
