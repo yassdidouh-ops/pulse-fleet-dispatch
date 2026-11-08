@@ -522,19 +522,22 @@
     };
 
     function calculateDistanceKm(call) {
+      if (!call) return 10.0;
       if (DISTANCE_MATRIX[call.id]) return DISTANCE_MATRIX[call.id];
       if (call.dest && (call.dest.toLowerCase().includes('yul') || call.dest.toLowerCase().includes('aérop'))) return 19.4;
       if (call.dest && call.dest.toLowerCase().includes('casino')) return 7.1;
       if (call.dest && call.dest.toLowerCase().includes('gare')) return 2.1;
       
       // Deterministic approximation based on ID
-      const num = parseInt(String(call.id).replace(/\D/g, ''), 10) || 5000;
-      return Number((3.5 + (num % 160) / 10).toFixed(1));
+      const num = parseInt(String(call.id || '5000').replace(/\D/g, ''), 10) || 5000;
+      const res = Number((3.5 + (num % 160) / 10).toFixed(1));
+      return isNaN(res) ? 10.0 : res;
     }
 
     function checkSpecialSurcharge(call) {
+      if (!call) return { applicable: false, amount: 0.00, label: 'SURCHARGE SPÉCIALE NON REQUISE', detail: 'Tarification urbaine standard' };
       const vehType = (call.vehType || '').toUpperCase();
-      const restrictions = (call.restrictions || []).join(' ').toUpperCase();
+      const restrictions = Array.isArray(call.restrictions) ? call.restrictions.join(' ').toUpperCase() : '';
       const notes = (call.notes || '').toUpperCase();
       const dest = (call.dest || '').toUpperCase();
       const client = (call.client || '').toUpperCase();
@@ -577,9 +580,10 @@
     }
 
     function getPaymentInfo(call) {
+      if (!call) return { tag: "PAIEMENT SANS CONTACT", auth: "NFC SANS CONTACT &bull; MDT" };
       const client = (call.client || '').toUpperCase();
       const notes = (call.notes || '').toUpperCase();
-      const restrictions = (call.restrictions || []).join(' ').toUpperCase();
+      const restrictions = Array.isArray(call.restrictions) ? call.restrictions.join(' ').toUpperCase() : '';
 
       const isCorporate = client.includes('CORP') || 
                           client.includes('AIR-CANADA') || 
@@ -717,10 +721,11 @@
       const select = document.getElementById('call-selector');
       if (!select) return;
       select.innerHTML = '';
-      calls.forEach(c => {
+      (calls || []).forEach(c => {
         const opt = document.createElement('option');
         opt.value = c.id;
-        opt.textContent = `#${c.id} - ${c.client.split('//')[0].trim()}`;
+        const clientLabel = (c.client || 'CLIENT PARTICULIER').split('//')[0].trim();
+        opt.textContent = `#${c.id} - ${clientLabel}`;
         if (String(c.id) === String(selectedId)) opt.selected = true;
         select.appendChild(opt);
       });

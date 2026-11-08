@@ -373,14 +373,14 @@
       const headers = ['ID', 'Client', 'Heure', 'PriseEnCharge', 'Destination', 'TypeVehicule', 'Statut', 'UniteAssignee', 'TarifEstime'];
       const rows = calls.map(c => [
         c.id,
-        `"${c.client.replace(/"/g, '""')}"`,
-        c.time,
-        `"${c.pickup.replace(/"/g, '""')}"`,
-        `"${c.dest.replace(/"/g, '""')}"`,
-        c.vehType,
-        c.status,
-        c.assignedVeh || 'AUCUNE',
-        `${c.price || 35.00} CAD`
+        `"${(c.client || '').replace(/"/g, '""')}"`,
+        c.time || c.createdAt || '--:--',
+        `"${(c.pickup || '').replace(/"/g, '""')}"`,
+        `"${(c.dest || '').replace(/"/g, '""')}"`,
+        c.vehType || 'BERLINE',
+        c.status || 'EN_ATTENTE',
+        (c.assignedVeh ? `UNIT-${c.assignedVeh}` : (c.assignedUnit ? `UNIT-${c.assignedUnit}` : 'AUCUNE')),
+        `${c.price ? Number(c.price).toFixed(2) : '35.00'} CAD`
       ]);
 
       const csvContent = 'data:text/csv;charset=utf-8,\uFEFF' + [headers.join(','), ...rows.map(e => e.join(','))].join('\n');
@@ -471,14 +471,18 @@
           statusBadge = `<span class="bg-white/5 text-zinc-300 px-2 py-0.5 rounded text-[11px] font-semibold">${call.status}</span>`;
         }
 
+        const assignedCode = call.assignedVeh 
+          ? `<span class="text-emerald-400">UNIT-${call.assignedVeh}</span>` 
+          : (call.assignedUnit ? `<span class="text-emerald-400">UNIT-${call.assignedUnit}</span>` : '<span class="text-zinc-500">NON ASSIGNÉ</span>');
+
         tr.innerHTML = `
           <td class="font-mono font-bold text-white">#${call.id}</td>
-          <td class="font-mono text-zinc-400">${call.time}</td>
-          <td class="font-semibold text-white">${call.client}</td>
-          <td class="text-zinc-300 truncate max-w-xs">${call.pickup}</td>
-          <td class="text-zinc-300 truncate max-w-xs">${call.dest}</td>
-          <td class="text-zinc-400 text-xs">${call.vehType}</td>
-          <td class="font-mono font-semibold">${call.assignedVeh ? `<span class="text-emerald-400">UNIT-${call.assignedVeh}</span>` : '<span class="text-zinc-500">NON ASSIGNÉ</span>'}</td>
+          <td class="font-mono text-zinc-400">${call.time || call.createdAt || '--:--'}</td>
+          <td class="font-semibold text-white">${call.client || 'CLIENT PARTICULIER'}</td>
+          <td class="text-zinc-300 truncate max-w-xs">${call.pickup || 'CENTRE-VILLE'}</td>
+          <td class="text-zinc-300 truncate max-w-xs">${call.dest || 'DESTINATION LIBRE'}</td>
+          <td class="text-zinc-400 text-xs">${call.vehType || 'BERLINE'}</td>
+          <td class="font-mono font-semibold">${assignedCode}</td>
           <td>${statusBadge}</td>
           <td style="text-align:right;">
             <div class="flex items-center justify-end gap-1.5">
