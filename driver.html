@@ -222,7 +222,7 @@
       <div class="flex items-center gap-2 mb-3">
         <label for="unit-select" class="text-xs font-semibold text-zinc-400 flex items-center gap-1.5 whitespace-nowrap">
           <i data-lucide="car" class="w-4 h-4 text-zinc-400"></i>
-          POSTE UNITÉ :
+          Unité :
         </label>
         <div class="relative flex-1">
           <select id="unit-select" onchange="onUnitSelectChange(this.value)" class="w-full bg-black/40 border border-white/10 rounded-xl font-mono text-xs text-white font-bold px-3 py-2 outline-none cursor-pointer focus:border-white/20 appearance-none pr-8 transition-colors">
@@ -237,12 +237,12 @@
       <div class="grid grid-cols-2 gap-2">
         <button id="btn-duty-service" onclick="setDutyState('LIBRE')" class="py-2.5 px-3 rounded-xl flex items-center justify-center gap-2 font-bold text-xs uppercase bg-emerald-500 text-royal-950 shadow-sm transition-colors">
           <span class="w-2 h-2 rounded-full bg-royal-950 inline-block"></span>
-          EN SERVICE / DISPO
+          En service
         </button>
 
         <button id="btn-duty-pause" onclick="setDutyState('PAUSE')" class="py-2.5 px-3 rounded-xl flex items-center justify-center gap-2 font-semibold text-xs uppercase bg-white/5 text-zinc-400 hover:bg-white/10 transition-colors">
           <i data-lucide="coffee" class="w-3.5 h-3.5"></i>
-          PAUSE / REPOS
+          Pause
         </button>
       </div>
     </div>
@@ -260,7 +260,7 @@
               <span class="relative inline-flex rounded-full h-3 w-3 bg-emerald-500"></span>
             </span>
             <span class="text-xs font-bold uppercase tracking-wider text-white">
-              Ordre de Mission Dispatch CAD
+              Nouvelle Mission
             </span>
           </div>
           <span id="alert-call-id" class="font-mono text-xs font-bold bg-white/10 text-white px-2.5 py-0.5 rounded-lg border border-white/10">
@@ -271,7 +271,7 @@
         <!-- 20s Countdown Bar -->
         <div class="mb-4 bg-black/40 p-3 rounded-xl border border-white/5">
           <div class="flex items-center justify-between text-xs font-semibold text-zinc-300 mb-1.5">
-            <span>DÉCOMPTE D'ATTRIBUTION :</span>
+            <span>Décompte :</span>
             <span id="countdown-text" class="font-mono text-sm font-bold text-rose-400 bg-rose-950/80 px-2 py-0.5 rounded border border-rose-800">
               20.0s
             </span>
@@ -284,24 +284,24 @@
         <!-- Mission Details -->
         <div class="space-y-3 text-xs mb-5">
           <div class="bg-black/30 p-3 rounded-xl border border-white/5">
-            <div class="text-[10px] text-zinc-500 font-semibold uppercase">CLIENT & PROTOCOLE :</div>
+            <div class="text-[10px] text-zinc-500 font-semibold uppercase">Client :</div>
             <div id="alert-client-name" class="font-bold text-sm text-white mt-0.5">CORP-AIR-CANADA // AC-882</div>
             <div id="alert-passenger-count" class="text-zinc-400 text-[11px] mt-0.5 font-medium">Passagers : 2 personnes · Catégorie : BERLINE</div>
           </div>
 
           <div class="bg-black/30 p-3 rounded-xl border border-white/5">
-            <div class="text-[10px] text-zinc-500 font-semibold uppercase">📍 POINT DE PRISE EN CHARGE :</div>
+            <div class="text-[10px] text-zinc-500 font-semibold uppercase">Départ :</div>
             <div id="alert-pickup-address" class="font-bold text-xs text-zinc-200 mt-0.5">1250 Boulevard René-Lévesque Ouest, Montréal</div>
             <div id="alert-pickup-suite" class="text-zinc-400 text-[11px] mt-0.5">Tour Bell / Entrée Sud</div>
           </div>
 
           <div class="bg-black/30 p-3 rounded-xl border border-white/5">
-            <div class="text-[10px] text-zinc-500 font-semibold uppercase">🏁 DESTINATION PRÉVUE :</div>
+            <div class="text-[10px] text-zinc-500 font-semibold uppercase">Destination :</div>
             <div id="alert-dest-address" class="font-bold text-xs text-zinc-200 mt-0.5">Aéroport International Montréal-Trudeau (YUL)</div>
           </div>
 
           <div>
-            <div class="text-[10px] text-zinc-500 font-semibold uppercase mb-1">CONSIGNES :</div>
+            <div class="text-[10px] text-zinc-500 font-semibold uppercase mb-1">Notes :</div>
             <div id="alert-restrictions-tags" class="flex flex-wrap gap-1.5">
               <span class="bg-white/10 text-white text-[10px] font-semibold px-2 py-0.5 rounded-md border border-white/10">PRIORITAIRE</span>
               <span class="bg-white/5 text-zinc-300 text-[10px] font-semibold px-2 py-0.5 rounded-md border border-white/5">CARTE CRÉDIT</span>
@@ -316,12 +316,12 @@
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
           <button onclick="acceptIncomingMission()" class="btn-noir-primary py-3.5 px-4 flex items-center justify-center gap-2 text-xs font-bold uppercase tracking-wider text-center">
             <i data-lucide="check-circle" class="w-4 h-4 text-royal-950"></i>
-            ACCEPTER LA MISSION
+            Accepter
           </button>
 
           <button onclick="rejectIncomingMission()" class="btn-soft-secondary py-3.5 px-4 flex items-center justify-center gap-2 text-xs font-semibold uppercase text-zinc-400 hover:text-rose-400 transition-colors">
             <i data-lucide="x-circle" class="w-4 h-4"></i>
-            REFUSER / PASSER
+            Refuser
           </button>
         </div>
 
@@ -334,22 +334,22 @@
       <!-- Stepper -->
       <div class="clean-surface p-4">
         <div class="flex items-center justify-between text-xs font-semibold text-zinc-400 pb-2 border-b border-white/5 mb-3">
-          <span>PROGRESSION DE LA MISSION</span>
+          <span>Progression</span>
           <span id="active-call-badge" class="font-mono text-xs font-bold bg-white/10 text-white px-2 py-0.5 rounded border border-white/10">#5081</span>
         </div>
 
         <div class="grid grid-cols-4 gap-1.5 text-[10px] font-bold text-center">
           <div id="step-en-route" class="py-2 rounded-lg bg-emerald-500 text-royal-950 font-black">
-            1. EN ROUTE
+            1. En route
           </div>
           <div id="step-sur-place" class="py-2 rounded-lg bg-white/5 text-zinc-500">
-            2. SUR PLACE
+            2. Sur place
           </div>
           <div id="step-en-course" class="py-2 rounded-lg bg-white/5 text-zinc-500">
-            3. EN COURSE
+            3. En course
           </div>
           <div id="step-termine" class="py-2 rounded-lg bg-white/5 text-zinc-500">
-            4. TERMINÉ
+            4. Terminé
           </div>
         </div>
       </div>
@@ -359,7 +359,7 @@
         <div class="flex items-center justify-between mb-3">
           <span id="mission-stage-label" class="text-xs font-bold px-2.5 py-1 bg-amber-950/80 text-amber-300 rounded-lg border border-amber-600/30 flex items-center gap-1.5">
             <span class="w-2 h-2 rounded-full bg-amber-400 inline-block animate-pulse"></span>
-            PRISE EN CHARGE CLIENT
+            Prise en charge
           </span>
           <span id="active-client-phone" class="font-mono text-xs font-bold text-zinc-400">
             (514) 872-4091
@@ -367,7 +367,7 @@
         </div>
 
         <div class="space-y-1 mb-4">
-          <div class="text-[10px] text-zinc-500 font-semibold uppercase">ADRESSE DE RENDEZ-VOUS :</div>
+          <div class="text-[10px] text-zinc-500 font-semibold uppercase">Adresse :</div>
           <h2 id="mission-target-address" class="text-lg font-bold leading-tight text-white">
             1250 Boulevard René-Lévesque Ouest, Montréal
           </h2>
@@ -398,35 +398,35 @@
         <!-- Waze Navigation -->
         <button onclick="launchWazeNavigation()" class="w-full btn-noir-primary py-3.5 px-4 mb-3 flex items-center justify-center gap-2 text-xs font-bold uppercase tracking-wider">
           <i data-lucide="navigation-2" class="w-4 h-4 text-emerald-600"></i>
-          📍 LANCER NAVIGATION WAZE DIRECTE
+          Navigation Waze
         </button>
 
         <div class="grid grid-cols-2 gap-2 mb-4">
           <button id="btn-radio-104" onclick="send104RadioAck()" class="btn-soft-secondary py-2.5 px-3 flex items-center justify-center gap-1.5 text-xs font-bold uppercase">
             <i data-lucide="radio" class="w-4 h-4 text-emerald-400"></i>
-            10-4 REÇU
+            10-4
           </button>
 
           <a id="btn-call-client" href="tel:(514)872-4091" class="btn-soft-secondary py-2.5 px-3 flex items-center justify-center gap-1.5 text-xs font-bold uppercase no-underline">
             <i data-lucide="phone-call" class="w-4 h-4 text-cyan-400"></i>
-            APPELER
+            Appeler
           </a>
         </div>
 
         <div id="lifecycle-action-wrapper" class="pt-3 border-t border-white/5">
           <button id="btn-signal-arrivee" onclick="signalArriveeSurPlace()" class="w-full py-3.5 px-4 rounded-xl flex items-center justify-center gap-2 text-xs font-bold uppercase bg-amber-400 text-royal-950 shadow-sm hover:bg-amber-300 transition-colors">
             <i data-lucide="flag" class="w-4 h-4"></i>
-            🏁 SIGNALER ARRIVÉE SUR PLACE
+            Arrivé sur place
           </button>
 
           <button id="btn-passager-bord" onclick="signalPassagerABord()" class="hidden w-full py-3.5 px-4 rounded-xl flex items-center justify-center gap-2 text-xs font-bold uppercase bg-emerald-500 text-royal-950 shadow-sm hover:bg-emerald-600 transition-colors">
             <i data-lucide="user-check" class="w-4 h-4"></i>
-            👤 PASSAGER À BORD (DÉMARRER)
+            Passager à bord
           </button>
 
           <button id="btn-terminer-course" onclick="terminerEtEncaisser()" class="hidden w-full py-3.5 px-4 rounded-xl flex items-center justify-center gap-2 text-xs font-bold uppercase bg-emerald-500 text-royal-950 shadow-sm hover:bg-emerald-600 transition-colors">
             <i data-lucide="check-square" class="w-4 h-4"></i>
-            ✅ COURSE TERMINÉE & ENCAISSER
+            Terminer & Encaisser
           </button>
         </div>
 
@@ -434,13 +434,13 @@
 
       <!-- Quick Radio Status -->
       <div class="clean-surface p-4 text-xs">
-        <div class="text-[10px] text-zinc-500 font-semibold uppercase mb-2">SIGNALEMENT RADIO AU CENTRAL :</div>
+        <div class="text-[10px] text-zinc-500 font-semibold uppercase mb-2">Signalement Radio :</div>
         <div class="grid grid-cols-2 gap-2 text-[11px] font-semibold">
           <button onclick="sendQuickRadioMsg('RETARD CIRCULATION', 'Ralentissement important sur le trajet client')" class="p-2.5 rounded-xl border border-white/5 bg-white/[0.03] hover:bg-white/[0.06] text-left transition-colors text-zinc-300">
-            ⚠️ Retard trafic (+5m)
+            Trafic (+5m)
           </button>
           <button onclick="sendQuickRadioMsg('CLIENT NON PRÉSENT', 'En attente devant la porte, client ne répond pas')" class="p-2.5 rounded-xl border border-white/5 bg-white/[0.03] hover:bg-white/[0.06] text-left transition-colors text-zinc-300">
-            ⏳ Client introuvable
+            Client absent
           </button>
         </div>
       </div>
@@ -463,20 +463,18 @@
           </span>
         </div>
 
-        <p class="text-xs text-zinc-400 mb-4 leading-relaxed font-normal">
-          Le terminal MDT est connecté au système central CAD. Les nouveaux ordres de mission assignés apparaîtront automatiquement avec alerte sonore.
-        </p>
+        <p class="text-xs text-zinc-400 mb-4">Connecté au central · En veille</p>
 
         <button onclick="simulateNewIncomingMission()" class="w-full btn-noir-primary py-3.5 px-4 flex items-center justify-center gap-2 text-xs font-bold uppercase tracking-wider shadow-sm">
           <i data-lucide="zap" class="w-4 h-4 text-royal-950"></i>
-          SIMULER NOUVELLE MISSION (ALERTE 20s)
+          Simuler Mission (20s)
         </button>
       </div>
 
       <!-- Telemetry Gauge Cluster -->
       <div class="clean-surface p-4">
         <div class="flex items-center justify-between text-xs font-semibold text-zinc-400 pb-2 border-b border-white/5 mb-3">
-          <span>TÉLÉMÉTRIE CAN-BUS EMBARQUÉE</span>
+          <span>TÉLÉMÉTRIE OBD-II</span>
           <span class="text-emerald-400 flex items-center gap-1 font-bold">
             <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 inline-block"></span> EN DIRECT
           </span>
@@ -484,7 +482,7 @@
 
         <div class="grid grid-cols-2 gap-2.5 font-mono">
           <div class="bg-black/30 p-3 rounded-xl border border-white/5">
-            <div class="text-[10px] text-zinc-500 uppercase font-semibold">VITESSE ACTUELLE :</div>
+            <div class="text-[10px] text-zinc-500 uppercase font-semibold">Vitesse</div>
             <div class="flex items-baseline gap-1 mt-0.5">
               <span id="telemetry-speed" class="text-2xl font-bold text-white">34</span>
               <span class="text-[11px] text-zinc-500 font-semibold">KM/H</span>
@@ -492,7 +490,7 @@
           </div>
 
           <div class="bg-black/30 p-3 rounded-xl border border-white/5">
-            <div class="text-[10px] text-zinc-500 uppercase font-semibold">TENSION CAN :</div>
+            <div class="text-[10px] text-zinc-500 uppercase font-semibold">Tension</div>
             <div class="flex items-baseline gap-1 mt-0.5">
               <span id="telemetry-voltage" class="text-2xl font-bold text-emerald-400">14.1</span>
               <span class="text-[11px] text-zinc-500 font-semibold">VOLTS</span>
@@ -500,7 +498,7 @@
           </div>
 
           <div class="bg-black/30 p-3 rounded-xl border border-white/5">
-            <div class="text-[10px] text-zinc-500 uppercase font-semibold">TEMPÉRATURE :</div>
+            <div class="text-[10px] text-zinc-500 uppercase font-semibold">Moteur</div>
             <div class="flex items-baseline gap-1 mt-0.5">
               <span id="telemetry-temp" class="text-2xl font-bold text-amber-400">92</span>
               <span class="text-[11px] text-zinc-500 font-semibold">°C</span>
@@ -508,7 +506,7 @@
           </div>
 
           <div class="bg-black/30 p-3 rounded-xl border border-white/5">
-            <div class="text-[10px] text-zinc-500 uppercase font-semibold">ODOMÈTRE :</div>
+            <div class="text-[10px] text-zinc-500 uppercase font-semibold">Odomètre</div>
             <div class="flex items-baseline gap-1 mt-0.5">
               <span id="telemetry-odometer" class="text-lg font-bold text-white">54,120</span>
               <span class="text-[10px] text-zinc-500 font-semibold">KM</span>
@@ -825,7 +823,7 @@
       const btn = document.getElementById('btn-radio-104');
       btn.innerHTML = `<i data-lucide="check" class="w-4 h-4 text-emerald-400"></i> ACK TRANSMIS`;
       setTimeout(() => {
-        btn.innerHTML = `<i data-lucide="radio" class="w-4 h-4 text-emerald-400"></i> 10-4 REÇU`;
+        btn.innerHTML = `<i data-lucide="radio" class="w-4 h-4 text-emerald-400"></i> 10-4`;
         lucide.createIcons();
       }, 2000);
       lucide.createIcons();
@@ -972,7 +970,7 @@
         const stepEnCourse = document.getElementById('step-en-course');
 
         if (activeCall.status === 'EN_ROUTE') {
-          stageLabel.innerHTML = `<span class="w-2 h-2 rounded-full bg-amber-400 inline-block animate-pulse"></span> PRISE EN CHARGE CLIENT`;
+          stageLabel.innerHTML = `<span class="w-2 h-2 rounded-full bg-amber-400 inline-block animate-pulse"></span> Prise en charge`;
           btnArrivee.classList.remove('hidden');
           btnPassager.classList.add('hidden');
           btnTerminer.classList.add('hidden');

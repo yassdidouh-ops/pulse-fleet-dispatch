@@ -870,6 +870,7 @@ window.addEventListener('keydown', (e) => {
     if (e.key === 'F4') { e.preventDefault(); window.location.href = 'map.html'; }
     if (e.key === 'F5') { e.preventDefault(); window.location.href = 'messages.html'; }
     if (e.key === 'F6') { e.preventDefault(); window.location.href = 'driver.html'; }
+    if (e.key === 'F7') { e.preventDefault(); window.location.href = 'video.html'; }
   }
 });
 
