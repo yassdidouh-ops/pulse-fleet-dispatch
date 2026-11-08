@@ -1,0 +1,687 @@
+<!DOCTYPE html>
+<html lang="fr-CA">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>PULSE CAD — File des Courses (Système Métropolitain)</title>
+
+  <!-- High-Readability Enterprise Typography: Plus Jakarta Sans + IBM Plex Mono -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&family=IBM+Plex+Mono:wght@400;500;600;700&display=swap" rel="stylesheet" />
+
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <script src="state.js"></script>
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Plus Jakarta Sans', 'sans-serif'],
+            mono: ['IBM Plex Mono', 'monospace'],
+          },
+          colors: {
+            noir: '#09090b',
+            charcoal: '#18181b',
+            bordercol: '#d4d4d8',
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      font-family: 'Plus Jakarta Sans', -apple-system, sans-serif;
+      background-color: #f4f4f5;
+      color: #09090b;
+      margin: 0;
+      height: 100vh;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    ::-webkit-scrollbar { width: 5px; height: 5px; }
+    ::-webkit-scrollbar-track { background: #f4f4f5; }
+    ::-webkit-scrollbar-thumb { background: #18181b; }
+
+    .brut-box {
+      background: #ffffff;
+      border: 1.5px solid #09090b;
+      box-shadow: 3px 3px 0px #09090b;
+    }
+
+    .nav-btn {
+      width: 44px;
+      height: 44px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #52525b;
+      border: 1px solid transparent;
+      transition: all 0.12s ease;
+      position: relative;
+    }
+    .nav-btn:hover {
+      background: #ffffff;
+      color: #09090b;
+      border-color: #09090b;
+    }
+    .nav-btn.active {
+      background: #09090b;
+      color: #ffffff;
+      border-color: #09090b;
+    }
+
+    /* Brutalist Table */
+    table { width: 100%; border-collapse: collapse; }
+    th {
+      background: #09090b;
+      color: #ffffff;
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      padding: 10px 12px;
+      text-align: left;
+      border-bottom: 2px solid #09090b;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+    td {
+      padding: 10px 12px;
+      border-bottom: 1px solid #e4e4e7;
+      font-size: 12px;
+      color: #09090b;
+      background: #ffffff;
+    }
+    tr.data-row:hover td {
+      background: #f4f4f5;
+    }
+
+    /* Segmented Filter Pills */
+    .filter-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 11px;
+      font-weight: 700;
+      padding: 6px 12px;
+      border: 1.5px solid #d4d4d8;
+      background: #ffffff;
+      color: #52525b;
+      cursor: pointer;
+      user-select: none;
+      transition: all 0.12s ease;
+    }
+    .filter-btn:hover {
+      border-color: #09090b;
+      color: #09090b;
+    }
+    .filter-btn.active {
+      background: #09090b;
+      color: #ffffff;
+      border-color: #09090b;
+      box-shadow: 2px 2px 0px #09090b;
+    }
+
+    /* Tactile Table Action Buttons */
+    .table-act-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 5px 9px;
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 10px;
+      font-weight: 800;
+      text-transform: uppercase;
+      border: 1.5px solid #09090b;
+      cursor: pointer;
+      transition: all 0.1s ease;
+    }
+    .table-act-btn:hover {
+      transform: translate(-1px, -1px);
+      box-shadow: 1px 1px 0px #09090b;
+    }
+    .table-act-btn:active {
+      transform: translate(1px, 1px);
+      box-shadow: none;
+    }
+
+    .chip-mono {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 10px;
+      font-weight: 700;
+      text-transform: uppercase;
+      padding: 2px 6px;
+      border: 1px solid #09090b;
+    }
+  </style>
+</head>
+<body class="bg-neutral-100 text-noir">
+
+  <!-- TOP HEADER -->
+  <header class="h-14 bg-white border-b-2 border-noir flex items-center justify-between px-4 z-40 flex-shrink-0 select-none">
+    
+    <div class="flex items-center gap-4">
+      <a href="index.html" class="flex items-center gap-2 text-decoration-none">
+        <div class="bg-noir text-white font-mono font-black text-sm px-2.5 py-1 tracking-widest flex items-center gap-1.5">
+          <span class="inline-block w-2 h-2 bg-white"></span>
+          PULSE<span class="text-neutral-400">//</span>CAD
+        </div>
+      </a>
+
+      <div class="h-5 w-px bg-neutral-300"></div>
+
+      <div class="flex items-center gap-2">
+        <span class="font-mono text-[11px] font-bold uppercase bg-neutral-100 border border-neutral-300 px-2 py-0.5 text-neutral-800">
+          FILE DES COURSES
+        </span>
+        <span class="text-neutral-400 text-xs">/</span>
+        <span class="font-mono text-[11px] font-bold text-neutral-900 tracking-wide uppercase">
+          MONITEUR DES ATTRIBUTIONS MÉTROPOLITAINES
+        </span>
+      </div>
+    </div>
+
+    <div class="flex items-center gap-3">
+      <!-- Collaboration Share Button -->
+      <button onclick="openShareModal()" class="bg-noir text-white font-mono text-xs font-bold uppercase px-3 py-1 flex items-center gap-1.5 border border-noir hover:bg-neutral-800 shadow-[2px_2px_0px_#09090b]">
+        <i data-lucide="share-2" class="w-3.5 h-3.5"></i>
+        PARTAGER AVEC COLLABORATEUR
+      </button>
+
+      <div class="hidden sm:flex items-center gap-2 bg-neutral-50 border border-neutral-300 px-2.5 py-1">
+        <span class="w-1.5 h-1.5 bg-black"></span>
+        <span id="live-clock" class="font-mono text-xs font-semibold text-neutral-900">--:--:--</span>
+      </div>
+
+      <div class="font-mono text-[11px] font-bold uppercase border border-neutral-300 px-2.5 py-1 bg-white text-neutral-700">
+        RÉSEAU CENTRAL CAD
+      </div>
+
+      <div class="flex items-center gap-2 bg-noir text-white px-2.5 py-1 border border-noir font-mono text-xs font-bold">
+        OP-408
+      </div>
+    </div>
+  </header>
+
+  <!-- BODY LAYOUT -->
+  <div class="flex flex-1 overflow-hidden">
+
+    <!-- LEFT SIDEBAR -->
+    <aside class="w-14 bg-white border-r-2 border-noir flex flex-col items-center py-3 gap-2 flex-shrink-0 select-none z-30">
+      <a href="index.html" class="nav-btn" title="Tableau de bord">
+        <i data-lucide="layout-grid" class="w-5 h-5"></i>
+      </a>
+      <a href="dispatch.html" class="nav-btn" title="Répartition">
+        <i data-lucide="radio" class="w-5 h-5"></i>
+      </a>
+      <a href="queue.html" class="nav-btn active" title="File des courses">
+        <i data-lucide="list-ordered" class="w-5 h-5"></i>
+      </a>
+      <a href="map.html" class="nav-btn" title="Carte Flotte">
+        <i data-lucide="map" class="w-5 h-5"></i>
+      </a>
+      <a href="messages.html" class="nav-btn" title="Messages Radio MDT">
+        <i data-lucide="message-square" class="w-5 h-5"></i>
+      </a>
+      <div class="flex-1"></div>
+      <button onclick="PulseState.resetDemoData(); renderAll();" class="nav-btn" title="Réinitialiser données démo">
+        <i data-lucide="rotate-ccw" class="w-5 h-5"></i>
+      </button>
+    </aside>
+
+    <!-- MAIN QUEUE WORKSPACE -->
+    <main class="flex-1 flex flex-col overflow-hidden p-5">
+      
+      <!-- TOP STATUS & DYNAMIC HUD BAR -->
+      <div class="brut-box p-3 mb-4 bg-white flex flex-wrap items-center justify-between gap-3 flex-shrink-0">
+        
+        <div class="flex items-center gap-4">
+          <!-- Metric 1: Pending -->
+          <div class="flex items-center gap-2 border-r border-neutral-300 pr-4">
+            <span class="w-2.5 h-2.5 bg-black"></span>
+            <div>
+              <div class="font-mono text-[10px] text-neutral-500 font-bold uppercase">EN ATTENTE ASSIGNATION</div>
+              <div class="font-mono text-lg font-black text-noir leading-none" id="hud-pending">0</div>
+            </div>
+          </div>
+
+          <!-- Metric 2: In route -->
+          <div class="flex items-center gap-2 border-r border-neutral-300 pr-4">
+            <div>
+              <div class="font-mono text-[10px] text-neutral-500 font-bold uppercase">COURSES EN PROGRESSION</div>
+              <div class="font-mono text-lg font-black text-noir leading-none" id="hud-enroute">0</div>
+            </div>
+          </div>
+
+          <!-- Metric 3: Ready units -->
+          <div class="flex items-center gap-2">
+            <div>
+              <div class="font-mono text-[10px] text-neutral-500 font-bold uppercase">UNITÉS DISPONIBLES</div>
+              <div class="font-mono text-lg font-black text-neutral-800 leading-none" id="hud-free-units">0</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="flex items-center gap-2 flex-wrap">
+          <!-- Search input -->
+          <div class="relative">
+            <input id="queue-search" oninput="applyFilters()" class="border-1.5 border-neutral-300 font-mono text-xs px-2.5 py-2 pl-8 outline-none focus:border-noir bg-neutral-50 w-60 font-bold" type="text" placeholder="RECHERCHE CLIENT / RUE..." />
+            <i data-lucide="search" class="w-3.5 h-3.5 text-neutral-500 absolute left-2.5 top-2.5"></i>
+          </div>
+
+          <a href="dispatch.html" class="bg-noir text-white font-mono text-xs font-bold uppercase px-3 py-2 flex items-center gap-1.5 border border-noir hover:bg-neutral-800 shadow-[2px_2px_0px_#09090b]">
+            <i data-lucide="plus" class="w-3.5 h-3.5"></i>
+            NOUVELLE COURSE [F2]
+          </a>
+
+          <button onclick="renderAll()" class="bg-white text-noir font-mono text-xs font-bold uppercase px-3 py-2 border border-neutral-300 hover:border-noir flex items-center gap-1">
+            <i data-lucide="refresh-cw" class="w-3.5 h-3.5"></i>
+            ACTUALISER
+          </button>
+        </div>
+
+      </div>
+
+      <!-- FILTER TOOLBAR (RESTRUCTURED SEGMENTED RACK) -->
+      <div class="flex items-center justify-between pb-3 flex-shrink-0">
+        <div class="flex items-center gap-2" id="filter-rack">
+          <button class="filter-btn active" data-filter="ALL" onclick="setFilter('ALL', this)">TOUTES (<span id="count-all">0</span>)</button>
+          <button class="filter-btn" data-filter="EN_ATTENTE" onclick="setFilter('EN_ATTENTE', this)">EN ATTENTE (<span id="count-pending">0</span>)</button>
+          <button class="filter-btn" data-filter="ASSIGNÉ" onclick="setFilter('ASSIGNÉ', this)">ASSIGNÉES / EN ROUTE (<span id="count-active">0</span>)</button>
+          <button class="filter-btn" data-filter="TERMINÉ" onclick="setFilter('TERMINÉ', this)">TERMINÉES (<span id="count-done">0</span>)</button>
+        </div>
+        <div class="font-mono text-xs text-neutral-500 font-bold">
+          SYNCHRONISATION INTER-TERMINAUX : ACTIVE
+        </div>
+      </div>
+
+      <!-- COURSES TABLE WORKSPACE -->
+      <div class="flex-1 brut-box overflow-hidden flex flex-col bg-white">
+        
+        <div class="flex-1 overflow-y-auto">
+          <table>
+            <thead>
+              <tr>
+                <th style="width:85px;">#COURSE</th>
+                <th style="width:90px;">HORODATAGE</th>
+                <th>IDENTIFIANT / COMPTE</th>
+                <th>PRISE EN CHARGE</th>
+                <th>DESTINATION</th>
+                <th>VÉHICULE REQUIS</th>
+                <th>UNITÉ ATTRIBUÉE</th>
+                <th>STATUT ACTUEL</th>
+                <th style="text-align:right; width:220px;">ACTIONS OPÉRATEUR</th>
+              </tr>
+            </thead>
+            <tbody id="queue-table-body">
+              <!-- Dynamically populated from PulseState -->
+            </tbody>
+          </table>
+        </div>
+
+        <div class="p-3 bg-neutral-50 border-t border-neutral-300 flex items-center justify-between font-mono text-[11px]">
+          <span class="text-neutral-500 font-bold">SYSTÈME OPÉRATIONNEL : <strong class="text-noir">PULSE CAD ENGINE</strong></span>
+          <span class="font-bold text-noir" id="queue-status-footer">DONNÉES EN DIRECT</span>
+        </div>
+
+      </div>
+
+    </main>
+
+  </div>
+
+  <!-- MODAL D'ASSIGNATION RAPIDE D'UNITÉ SYSTÈME -->
+  <div id="assign-modal" class="fixed inset-0 bg-black/60 z-50 items-center justify-center hidden p-4" onclick="closeModalOnBg(event)">
+    <div class="brut-box max-w-lg w-full bg-white p-6">
+      
+      <div class="flex items-center justify-between border-b-2 border-noir pb-2 mb-4">
+        <span class="bg-noir text-white font-mono text-xs font-black px-2 py-0.5 uppercase tracking-wider">
+          ATTRIBUTION CAD // COURSE <span id="modal-call-id">#0000</span>
+        </span>
+        <button onclick="closeAssignModal()" class="font-mono text-xs font-bold text-neutral-600 hover:text-black">
+          [FERMER X]
+        </button>
+      </div>
+
+      <div class="mb-4 bg-neutral-50 p-3 border border-neutral-200 font-mono text-xs">
+        <div class="text-neutral-500 uppercase font-bold">POINT DE DÉPART :</div>
+        <div class="font-black text-noir text-sm mb-1" id="modal-pickup-text">1250 René-Lévesque Ouest</div>
+        <div class="text-neutral-500 uppercase font-bold">COMPTE : <span class="text-noir font-black" id="modal-client-text">CORP-AIR-CANADA</span></div>
+      </div>
+
+      <label class="block font-mono text-xs font-bold uppercase text-neutral-700 mb-2">Sélectionner une Unité Flotte Disponible</label>
+      <div id="modal-units-list" class="flex flex-col gap-1.5 max-h-60 overflow-y-auto mb-5 border border-neutral-200 p-2">
+        <!-- Injected via JavaScript from PulseState.getVehicles() -->
+      </div>
+
+      <div class="flex justify-end gap-2 pt-2 border-t border-neutral-200">
+        <button onclick="closeAssignModal()" class="px-4 py-2 border border-neutral-300 font-mono font-bold text-xs uppercase hover:bg-neutral-100">
+          ANNULER
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- MODAL DE PARTAGE COLLABORATION (LAN / IP / QR) -->
+  <div id="share-modal" class="fixed inset-0 bg-black/60 z-50 items-center justify-center hidden p-4" onclick="closeShareModalOnBg(event)">
+    <div class="brut-box max-w-md w-full bg-white p-6">
+      
+      <div class="flex items-center justify-between border-b-2 border-noir pb-2 mb-4">
+        <span class="bg-noir text-white font-mono text-xs font-black px-2 py-0.5 uppercase tracking-wider">
+          PARTAGE SESSION COLLABORATIVE
+        </span>
+        <button onclick="closeShareModal()" class="font-mono text-xs font-bold text-neutral-600 hover:text-black">
+          [FERMER X]
+        </button>
+      </div>
+
+      <p class="font-mono text-xs text-neutral-600 mb-4 leading-relaxed font-semibold">
+        Partagez cette session CAD avec votre collaborateur. Toutes les modifications, dispatches et messages MDT sont synchronisés en direct :
+      </p>
+
+      <!-- Public Web URL -->
+      <div class="bg-neutral-50 p-3 border-1.5 border-noir mb-3 font-mono text-xs">
+        <div class="flex items-center justify-between mb-1">
+          <span class="text-[10px] text-neutral-900 uppercase font-black flex items-center gap-1.5">
+            <span class="w-2 h-2 bg-emerald-600 inline-block animate-pulse"></span>
+            1. ACCÈS PUBLIC INTERNET (HTTPS MONDIAL) :
+          </span>
+          <span class="text-[9px] bg-noir text-white px-1.5 py-0.2 font-bold">EN LIGNE</span>
+        </div>
+        <div class="flex items-center justify-between gap-2">
+          <input id="share-url-public" class="bg-white border border-neutral-300 px-2.5 py-1.5 font-bold text-xs flex-1 outline-none text-noir" readonly value="https://a90389d46bbc3d.lhr.life/queue.html" />
+          <button onclick="copyPublicUrl()" class="bg-noir text-white px-3 py-1.5 font-black uppercase text-[11px] hover:bg-neutral-800">
+            COPIER
+          </button>
+        </div>
+      </div>
+
+      <!-- Local Network LAN URL -->
+      <div class="bg-neutral-50 p-3 border-1.5 border-neutral-300 mb-4 font-mono text-xs">
+        <div class="text-[10px] text-neutral-500 uppercase font-bold mb-1">2. ACCÈS RÉSEAU LOCAL (WI-FI / LAN) :</div>
+        <div class="flex items-center justify-between gap-2">
+          <input id="share-url-input" class="bg-white border border-neutral-300 px-2.5 py-1.5 font-bold text-xs flex-1 outline-none text-noir" readonly value="http://192.168.1.95:8091/queue.html" />
+          <button onclick="copyShareUrl()" class="bg-white text-noir border border-noir px-3 py-1.5 font-bold uppercase text-[11px] hover:bg-neutral-100">
+            COPIER
+          </button>
+        </div>
+      </div>
+
+      <div class="border border-neutral-200 p-2.5 bg-neutral-100 font-mono text-[10px] text-neutral-600 mb-5 leading-normal">
+        • Hébergement : <strong>Tunnel Public TLS / HTTPS</strong> (terminaison SSL active)<br>
+        • Port d'écoute : <strong>8091</strong><br>
+        • Synchronisation inter-terminaux : <strong>Active (CAD Broadcast Sync)</strong>
+      </div>
+
+      <div class="flex justify-end">
+        <button onclick="closeShareModal()" class="px-4 py-2 bg-noir text-white font-mono font-bold text-xs uppercase">
+          FERMER
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+  <script>
+    let currentFilter = 'ALL';
+    let targetAssignCallId = null;
+
+    document.addEventListener('DOMContentLoaded', () => {
+      lucide.createIcons();
+      initClock();
+      renderAll();
+
+      PULSE_CHANNEL.onmessage = (e) => {
+        if (e.data.type === 'CALLS_UPDATED' || e.data.type === 'VEHICLES_UPDATED') {
+          renderAll();
+        }
+      };
+    });
+
+    function initClock() {
+      const update = () => {
+        const now = new Date();
+        const timeStr = now.toLocaleTimeString('fr-CA', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false });
+        const el = document.getElementById('live-clock');
+        if (el) el.textContent = timeStr;
+      };
+      update();
+      setInterval(update, 1000);
+    }
+
+    function setFilter(filter, btn) {
+      currentFilter = filter;
+      document.querySelectorAll('#filter-rack .filter-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      renderTable();
+    }
+
+    function applyFilters() {
+      renderTable();
+    }
+
+    function renderAll() {
+      updateHUD();
+      renderTable();
+    }
+
+    function updateHUD() {
+      const calls = PulseState.getCalls();
+      const vehicles = PulseState.getVehicles();
+
+      const pending = calls.filter(c => c.status === 'EN_ATTENTE').length;
+      const enroute = calls.filter(c => c.status === 'ASSIGNÉ' || c.status === 'EN_ROUTE').length;
+      const done = calls.filter(c => c.status === 'TERMINÉ').length;
+      const freeUnits = vehicles.filter(v => v.status === 'LIBRE').length;
+
+      document.getElementById('hud-pending').textContent = `${pending} APPELS`;
+      document.getElementById('hud-enroute').textContent = `${enroute} COURSES`;
+      document.getElementById('hud-free-units').textContent = `${freeUnits} UNITÉS`;
+
+      document.getElementById('count-all').textContent = calls.length;
+      document.getElementById('count-pending').textContent = pending;
+      document.getElementById('count-active').textContent = enroute;
+      document.getElementById('count-done').textContent = done;
+    }
+
+    function renderTable() {
+      const tbody = document.getElementById('queue-table-body');
+      tbody.innerHTML = '';
+      const query = (document.getElementById('queue-search').value || '').toLowerCase().trim();
+
+      let calls = PulseState.getCalls();
+
+      if (currentFilter === 'EN_ATTENTE') {
+        calls = calls.filter(c => c.status === 'EN_ATTENTE');
+      } else if (currentFilter === 'ASSIGNÉ') {
+        calls = calls.filter(c => c.status === 'ASSIGNÉ' || c.status === 'EN_ROUTE');
+      } else if (currentFilter === 'TERMINÉ') {
+        calls = calls.filter(c => c.status === 'TERMINÉ');
+      }
+
+      if (query) {
+        calls = calls.filter(c => 
+          c.id.toLowerCase().includes(query) ||
+          c.client.toLowerCase().includes(query) ||
+          c.pickup.toLowerCase().includes(query) ||
+          c.dest.toLowerCase().includes(query) ||
+          (c.assignedUnit && String(c.assignedUnit).includes(query))
+        );
+      }
+
+      if (calls.length === 0) {
+        tbody.innerHTML = `
+          <tr>
+            <td colspan="9" class="p-8 text-center font-mono text-neutral-500 font-bold">
+              AUCUNE COURSE CORRESPONDANTE DANS LA FILE DE RÉPARTITION
+            </td>
+          </tr>
+        `;
+        return;
+      }
+
+      calls.forEach(call => {
+        const tr = document.createElement('tr');
+        tr.className = 'data-row';
+
+        const statusPill = call.status === 'EN_ATTENTE'
+          ? `<span class="chip-mono bg-neutral-100 text-noir font-bold">EN ATTENTE</span>`
+          : call.status === 'ASSIGNÉ'
+          ? `<span class="chip-mono bg-noir text-white font-bold">ASSIGNÉ</span>`
+          : call.status === 'EN_ROUTE'
+          ? `<span class="chip-mono bg-neutral-800 text-white font-bold">EN ROUTE</span>`
+          : call.status === 'TERMINÉ'
+          ? `<span class="chip-mono bg-emerald-100 text-emerald-800 border-emerald-600 font-bold">TERMINÉ</span>`
+          : `<span class="chip-mono bg-neutral-200 text-neutral-700 font-bold">${call.status}</span>`;
+
+        const unitDisplay = call.assignedUnit
+          ? `<span class="font-mono font-black text-xs bg-noir text-white px-2 py-0.5">UNIT-${String(call.assignedUnit).padStart(3, '0')}</span>`
+          : `<span class="font-mono text-neutral-400 font-bold">— AUCUNE —</span>`;
+
+        tr.innerHTML = `
+          <td class="font-mono font-black text-xs text-noir">#${call.id}</td>
+          <td class="font-mono text-xs text-neutral-600 font-bold">${call.createdAt}</td>
+          <td>
+            <div class="font-black text-noir font-mono text-xs">${call.client}</div>
+            <div class="font-mono text-[10px] text-neutral-500">${call.phone}</div>
+          </td>
+          <td>
+            <div class="font-bold text-neutral-900">${call.pickup}</div>
+            <div class="text-[10px] text-neutral-500 font-mono">${call.suite || call.zone}</div>
+          </td>
+          <td>
+            <div class="font-bold text-neutral-900 truncate max-w-xs" title="${call.dest}">${call.dest}</div>
+          </td>
+          <td><span class="chip-mono bg-neutral-100 text-noir">${call.vehType}</span></td>
+          <td>${unitDisplay}</td>
+          <td>${statusPill}</td>
+          <td style="text-align:right;">
+            <div class="flex items-center justify-end gap-1">
+              ${call.status === 'EN_ATTENTE' ? `
+                <button onclick="openAssignModal('${call.id}')" class="table-act-btn bg-noir text-white hover:bg-neutral-800">
+                  <i data-lucide="user-plus" class="w-3 h-3"></i> ASSIGNER
+                </button>
+              ` : `
+                <button onclick="advanceCallStatus('${call.id}')" class="table-act-btn bg-neutral-100 text-noir hover:bg-neutral-200">
+                  <i data-lucide="check" class="w-3 h-3"></i> ÉTAPE
+                </button>
+              `}
+              <button onclick="cancelCallAction('${call.id}')" class="table-act-btn bg-white text-rose-700 border-rose-700 hover:bg-rose-50" title="Annuler">
+                <i data-lucide="x" class="w-3 h-3"></i>
+              </button>
+            </div>
+          </td>
+        `;
+
+        tbody.appendChild(tr);
+      });
+
+      lucide.createIcons();
+    }
+
+    function openAssignModal(callId) {
+      targetAssignCallId = callId;
+      const call = PulseState.getCalls().find(c => String(c.id) === String(callId));
+      if (!call) return;
+
+      document.getElementById('modal-call-id').textContent = `#${call.id}`;
+      document.getElementById('modal-pickup-text').textContent = call.pickup;
+      document.getElementById('modal-client-text').textContent = `${call.client} · [${call.vehType}]`;
+
+      const listContainer = document.getElementById('modal-units-list');
+      listContainer.innerHTML = '';
+
+      const vehicles = PulseState.getVehicles();
+      vehicles.forEach(v => {
+        const div = document.createElement('div');
+        div.className = 'p-2 border border-neutral-200 hover:border-black bg-white hover:bg-neutral-50 cursor-pointer flex items-center justify-between font-mono text-xs';
+        div.innerHTML = `
+          <div>
+            <span class="font-black text-noir">${v.code}</span>
+            <span class="text-neutral-500 text-[10px] ml-2">(${v.type} · ${v.zone})</span>
+          </div>
+          <span class="font-mono text-[10px] font-bold px-1.5 py-0.5 ${v.status === 'LIBRE' ? 'bg-emerald-100 text-emerald-800' : 'bg-neutral-200 text-neutral-700'}">
+            ${v.status}
+          </span>
+        `;
+        div.addEventListener('click', () => {
+          confirmAssignToUnit(v.id);
+        });
+        listContainer.appendChild(div);
+      });
+
+      document.getElementById('assign-modal').style.display = 'flex';
+    }
+
+    function closeAssignModal() {
+      document.getElementById('assign-modal').style.display = 'none';
+      targetAssignCallId = null;
+    }
+
+    function closeModalOnBg(e) {
+      if (e.target === document.getElementById('assign-modal')) closeAssignModal();
+    }
+
+    function confirmAssignToUnit(unitId) {
+      if (!targetAssignCallId) return;
+      PulseState.assignCall(targetAssignCallId, unitId);
+      closeAssignModal();
+      renderAll();
+    }
+
+    function advanceCallStatus(callId) {
+      const call = PulseState.getCalls().find(c => String(c.id) === String(callId));
+      if (!call) return;
+      let nextStatus = 'TERMINÉ';
+      if (call.status === 'ASSIGNÉ') nextStatus = 'EN_ROUTE';
+      else if (call.status === 'EN_ROUTE') nextStatus = 'SUR_PLACE';
+      else if (call.status === 'SUR_PLACE') nextStatus = 'TERMINÉ';
+      else if (call.status === 'TERMINÉ') nextStatus = 'EN_ATTENTE';
+
+      PulseState.updateCallStatus(callId, nextStatus);
+      renderAll();
+    }
+
+    function cancelCallAction(callId) {
+      if (confirm(`ANNULER LA COURSE #${callId} ET LIBÉRER L'UNITÉ ?`)) {
+        PulseState.updateCallStatus(callId, 'ANNULÉ');
+        renderAll();
+      }
+    }
+
+    // Share Modal
+    function openShareModal() {
+      document.getElementById('share-modal').style.display = 'flex';
+    }
+    function closeShareModal() {
+      document.getElementById('share-modal').style.display = 'none';
+    }
+    function closeShareModalOnBg(e) {
+      if (e.target === document.getElementById('share-modal')) closeShareModal();
+    }
+    function copyShareUrl() {
+      const input = document.getElementById('share-url-input');
+      input.select();
+      navigator.clipboard.writeText(input.value);
+      alert("LIEN LOCAL COPIÉ DANS LE PRESSE-PAPIER !");
+    }
+    function copyPublicUrl() {
+      const input = document.getElementById('share-url-public');
+      input.select();
+      navigator.clipboard.writeText(input.value);
+      alert("LIEN PUBLIC MONDIAL (HTTPS) COPIÉ ! Votre collaborateur peut l'ouvrir de n'importe où.");
+    }
+  </script>
+</body>
+</html>

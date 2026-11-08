@@ -1,0 +1,611 @@
+<!DOCTYPE html>
+<html lang="fr-CA">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>PULSE CAD — Messagerie & Communications MDT</title>
+
+  <!-- High-Readability Enterprise Typography: Plus Jakarta Sans + IBM Plex Mono -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&family=IBM+Plex+Mono:wght@400;500;600;700&display=swap" rel="stylesheet" />
+
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <script src="state.js"></script>
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Plus Jakarta Sans', 'sans-serif'],
+            mono: ['IBM Plex Mono', 'monospace'],
+          },
+          colors: {
+            noir: '#09090b',
+            charcoal: '#18181b',
+            bordercol: '#d4d4d8',
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      font-family: 'Plus Jakarta Sans', -apple-system, sans-serif;
+      background-color: #f4f4f5;
+      color: #09090b;
+      margin: 0;
+      height: 100vh;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    ::-webkit-scrollbar { width: 5px; height: 5px; }
+    ::-webkit-scrollbar-track { background: #f4f4f5; }
+    ::-webkit-scrollbar-thumb { background: #18181b; }
+
+    .brut-box {
+      background: #ffffff;
+      border: 1.5px solid #09090b;
+      box-shadow: 3px 3px 0px #09090b;
+    }
+
+    .nav-btn {
+      width: 44px;
+      height: 44px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #52525b;
+      border: 1px solid transparent;
+      transition: all 0.12s ease;
+      position: relative;
+    }
+    .nav-btn:hover {
+      background: #ffffff;
+      color: #09090b;
+      border-color: #09090b;
+    }
+    .nav-btn.active {
+      background: #09090b;
+      color: #ffffff;
+      border-color: #09090b;
+    }
+
+    .msg-item {
+      padding: 12px 14px;
+      border-bottom: 1px solid #e4e4e7;
+      background: #ffffff;
+      cursor: pointer;
+      transition: all 0.12s ease;
+      border-left: 3px solid transparent;
+    }
+    .msg-item:hover {
+      background: #f4f4f5;
+    }
+    .msg-item.selected {
+      background: #f4f4f5;
+      border-left-color: #09090b;
+    }
+    .msg-item.unread {
+      border-left-color: #09090b;
+      font-weight: 800;
+    }
+
+    .chip-filter {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 11px;
+      font-weight: 700;
+      padding: 6px 12px;
+      background: #ffffff;
+      border: 1.5px solid #d4d4d8;
+      color: #52525b;
+      cursor: pointer;
+      transition: all 0.12s ease;
+    }
+    .chip-filter:hover {
+      border-color: #09090b;
+      color: #09090b;
+    }
+    .chip-filter.active {
+      background: #09090b;
+      color: #ffffff;
+      border-color: #09090b;
+      box-shadow: 2px 2px 0px #09090b;
+    }
+
+    .btn-action-msg {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 6px 12px;
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 11px;
+      font-weight: 800;
+      text-transform: uppercase;
+      border: 1.5px solid #09090b;
+      cursor: pointer;
+      transition: all 0.12s ease;
+    }
+    .btn-action-msg:hover {
+      transform: translate(-1px, -1px);
+      box-shadow: 2px 2px 0px #09090b;
+    }
+  </style>
+</head>
+<body class="bg-neutral-100 text-noir">
+
+  <!-- TOP HEADER -->
+  <header class="h-14 bg-white border-b-2 border-noir flex items-center justify-between px-4 z-40 flex-shrink-0 select-none">
+    
+    <div class="flex items-center gap-4">
+      <a href="index.html" class="flex items-center gap-2 text-decoration-none">
+        <div class="bg-noir text-white font-mono font-black text-sm px-2.5 py-1 tracking-widest flex items-center gap-1.5">
+          <span class="inline-block w-2 h-2 bg-white"></span>
+          PULSE<span class="text-neutral-400">//</span>CAD
+        </div>
+      </a>
+
+      <div class="h-5 w-px bg-neutral-300"></div>
+
+      <div class="flex items-center gap-2">
+        <span class="font-mono text-[11px] font-bold uppercase bg-neutral-100 border border-neutral-300 px-2 py-0.5 text-neutral-800">
+          MESSAGERIE MDT & RADIO
+        </span>
+        <span class="text-neutral-400 text-xs">/</span>
+        <span class="font-mono text-[11px] font-bold text-neutral-900 tracking-wide uppercase">
+          RÉSEAU CENTRAL DE TÉLÉCOMMUNICATIONS CAD
+        </span>
+      </div>
+    </div>
+
+    <!-- Right Controls -->
+    <div class="flex items-center gap-3">
+      <!-- Collaboration Share Button -->
+      <button onclick="openShareModal()" class="bg-noir text-white font-mono text-xs font-bold uppercase px-3 py-1 flex items-center gap-1.5 border border-noir hover:bg-neutral-800 shadow-[2px_2px_0px_#09090b]">
+        <i data-lucide="share-2" class="w-3.5 h-3.5"></i>
+        PARTAGER AVEC COLLABORATEUR
+      </button>
+
+      <div class="hidden sm:flex items-center gap-2 bg-neutral-50 border border-neutral-300 px-2.5 py-1">
+        <span class="w-1.5 h-1.5 bg-black"></span>
+        <span id="live-clock" class="font-mono text-xs font-semibold text-neutral-900">--:--:--</span>
+      </div>
+
+      <div class="font-mono text-[11px] font-bold uppercase border border-neutral-300 px-2.5 py-1 bg-white text-neutral-700">
+        CANAL RADIO SÉCURISÉ
+      </div>
+
+      <div class="flex items-center gap-2 bg-noir text-white px-2.5 py-1 border border-noir font-mono text-xs font-bold">
+        OP-408
+      </div>
+    </div>
+  </header>
+
+  <!-- BODY LAYOUT -->
+  <div class="flex flex-1 overflow-hidden">
+
+    <!-- LEFT SIDEBAR -->
+    <aside class="w-14 bg-white border-r-2 border-noir flex flex-col items-center py-3 gap-2 flex-shrink-0 select-none z-30">
+      <a href="index.html" class="nav-btn" title="Tableau de bord">
+        <i data-lucide="layout-grid" class="w-5 h-5"></i>
+      </a>
+      <a href="dispatch.html" class="nav-btn" title="Répartition">
+        <i data-lucide="radio" class="w-5 h-5"></i>
+      </a>
+      <a href="queue.html" class="nav-btn" title="File des courses">
+        <i data-lucide="list-ordered" class="w-5 h-5"></i>
+      </a>
+      <a href="map.html" class="nav-btn" title="Carte Flotte">
+        <i data-lucide="map" class="w-5 h-5"></i>
+      </a>
+      <a href="messages.html" class="nav-btn active" title="Messages Radio MDT">
+        <i data-lucide="message-square" class="w-5 h-5"></i>
+      </a>
+      <div class="flex-1"></div>
+      <button onclick="PulseState.resetDemoData(); renderAll();" class="nav-btn" title="Réinitialiser données démo">
+        <i data-lucide="rotate-ccw" class="w-5 h-5"></i>
+      </button>
+    </aside>
+
+    <!-- MAIN MESSAGING CONSOLE -->
+    <main class="flex-1 flex flex-col overflow-hidden p-5">
+      
+      <!-- SUB-BAR / ACTIONS -->
+      <div class="brut-box p-3 mb-4 bg-white flex flex-wrap items-center justify-between gap-3 flex-shrink-0">
+        
+        <div class="flex items-center gap-2">
+          <button class="chip-filter active" onclick="filterCategory('all', this)">TOUTES TRANSMISSIONS (<span id="count-all">0</span>)</button>
+          <button class="chip-filter" onclick="filterCategory('unread', this)">NON LUS (<span id="count-unread">0</span>)</button>
+          <button class="chip-filter" onclick="filterCategory('urgent', this)">ALERTES URGENTES</button>
+          <button class="chip-filter" onclick="filterCategory('archive', this)">ARCHIVES CAD</button>
+        </div>
+
+        <div class="flex items-center gap-2">
+          <button onclick="openModal()" class="bg-noir text-white font-mono text-xs font-black uppercase px-4 py-2 flex items-center gap-1.5 border border-noir hover:bg-neutral-800 shadow-[2px_2px_0px_#09090b]">
+            <i data-lucide="send" class="w-3.5 h-3.5"></i>
+            DIFFUSER CONSIGNES FLOTTE [MDT]
+          </button>
+        </div>
+
+      </div>
+
+      <!-- TWO-PANEL SPLIT VIEW -->
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-5 flex-1 overflow-hidden">
+        
+        <!-- LEFT: MESSAGES THREAD LIST (5 COLS) -->
+        <div class="lg:col-span-5 flex flex-col brut-box overflow-hidden bg-white">
+          
+          <div class="bg-neutral-100 border-b border-neutral-300 px-4 py-2.5 flex items-center justify-between flex-shrink-0">
+            <span class="font-mono text-xs font-black uppercase tracking-wider text-noir">BOÎTE DE RÉCEPTION MDT</span>
+            <span class="font-mono text-[10px] text-neutral-500 font-bold uppercase">CANAL DISPATCH</span>
+          </div>
+
+          <div class="flex-1 overflow-y-auto" id="msg-list-container">
+            <!-- Injected via JavaScript -->
+          </div>
+
+        </div>
+
+        <!-- RIGHT: MESSAGE DETAIL & ACTIONS (7 COLS) -->
+        <div class="lg:col-span-7 flex flex-col brut-box overflow-hidden bg-white">
+          
+          <div id="preview-panel" class="flex-1 flex flex-col overflow-hidden">
+            <!-- Injected by JavaScript -->
+          </div>
+
+        </div>
+
+      </div>
+
+    </main>
+
+  </div>
+
+  <!-- MODAL: NOUVEAU MESSAGE MDT -->
+  <div id="msg-modal" class="fixed inset-0 bg-black/60 z-50 items-center justify-center hidden p-4" onclick="closeModalOnBg(event)">
+    <div class="brut-box max-w-xl w-full bg-white p-6">
+      
+      <div class="flex items-center justify-between border-b-2 border-noir pb-2 mb-4">
+        <span class="bg-noir text-white font-mono text-xs font-black px-2 py-0.5 uppercase tracking-wider">
+          ÉMISSION MDT // DISPATCH CENTRAL
+        </span>
+        <button onclick="closeModal()" class="font-mono text-xs font-bold text-neutral-600 hover:text-black">
+          [FERMER X]
+        </button>
+      </div>
+
+      <div class="flex flex-col gap-3 font-mono text-xs">
+        <div>
+          <label class="block font-bold text-neutral-700 uppercase mb-1">Cible de Diffusion</label>
+          <select id="modal-to" class="w-full border-1.5 border-neutral-300 p-2 font-mono font-bold outline-none focus:border-noir">
+            <option value="TOUTE LA FLOTTE MÉTROPOLITAINE">DIFFUSION GÉNÉRALE — TOUTE LA FLOTTE</option>
+            <option value="ZONE-01 (CENTRE-VILLE)">ZONE-01 (CENTRE-VILLE)</option>
+            <option value="ZONE-02 (AÉROPORT-YUL)">ZONE-02 (AÉROPORT TRUDEAU YUL)</option>
+            <option value="ZONE-03 (VIEUX-PORT)">ZONE-03 (VIEUX-PORT & CITÉ)</option>
+            <option value="UNIT-232 // TERMINAL EMBARQUÉ">UNIT-232 (TERMINAL SPÉCIFIQUE)</option>
+            <option value="UNIT-184 // TERMINAL EMBARQUÉ">UNIT-184 (TERMINAL SPÉCIFIQUE)</option>
+          </select>
+        </div>
+
+        <div>
+          <label class="block font-bold text-neutral-700 uppercase mb-1">Niveau de Priorité</label>
+          <div class="grid grid-cols-3 gap-2" id="modal-prio-group">
+            <button type="button" onclick="setModalPrio('NORMALE', this)" class="modal-prio-btn border border-neutral-300 p-2 font-bold uppercase bg-neutral-100 hover:bg-neutral-200">NORMALE</button>
+            <button type="button" onclick="setModalPrio('URGENTE', this)" class="modal-prio-btn border border-neutral-300 p-2 font-bold uppercase bg-noir text-white">URGENTE</button>
+            <button type="button" onclick="setModalPrio('VIP', this)" class="modal-prio-btn border border-neutral-300 p-2 font-bold uppercase bg-neutral-100 hover:bg-neutral-200">VIP / COMPTE</button>
+          </div>
+        </div>
+
+        <div>
+          <label class="block font-bold text-neutral-700 uppercase mb-1">Objet de la Consigne</label>
+          <input id="modal-subject" class="w-full border-1.5 border-neutral-300 p-2 font-mono font-bold outline-none focus:border-noir" type="text" placeholder="Ex: Ralentissement A-15 / Déviation voirie" />
+        </div>
+
+        <div>
+          <label class="block font-bold text-neutral-700 uppercase mb-1">Corps de Transmission MDT</label>
+          <textarea id="modal-body" rows="5" class="w-full border-1.5 border-neutral-300 p-2 font-sans text-sm font-semibold outline-none focus:border-noir" placeholder="Saisir la consigne opérationnelle..."></textarea>
+        </div>
+
+        <div class="flex justify-end gap-2 pt-2 border-t border-neutral-200">
+          <button type="button" onclick="closeModal()" class="px-4 py-2 border border-neutral-300 font-bold uppercase hover:bg-neutral-100">
+            ANNULER
+          </button>
+          <button type="button" onclick="sendMessageAction()" class="px-5 py-2 bg-noir text-white font-bold uppercase border border-noir hover:bg-neutral-800 shadow-[2px_2px_0px_#09090b]">
+            TRANSMETTRE IMMÉDIATEMENT
+          </button>
+        </div>
+
+      </div>
+
+    </div>
+  </div>
+
+  <!-- MODAL DE PARTAGE COLLABORATION (LAN / IP / QR) -->
+  <div id="share-modal" class="fixed inset-0 bg-black/60 z-50 items-center justify-center hidden p-4" onclick="closeShareModalOnBg(event)">
+    <div class="brut-box max-w-md w-full bg-white p-6">
+      
+      <div class="flex items-center justify-between border-b-2 border-noir pb-2 mb-4">
+        <span class="bg-noir text-white font-mono text-xs font-black px-2 py-0.5 uppercase tracking-wider">
+          PARTAGE SESSION COLLABORATIVE
+        </span>
+        <button onclick="closeShareModal()" class="font-mono text-xs font-bold text-neutral-600 hover:text-black">
+          [FERMER X]
+        </button>
+      </div>
+
+      <p class="font-mono text-xs text-neutral-600 mb-4 leading-relaxed font-semibold">
+        Partagez cette messagerie CAD MDT avec votre collaborateur. Tous les flux radio et transmissions sont synchronisés en direct :
+      </p>
+
+      <!-- Public Web URL -->
+      <div class="bg-neutral-50 p-3 border-1.5 border-noir mb-3 font-mono text-xs">
+        <div class="flex items-center justify-between mb-1">
+          <span class="text-[10px] text-neutral-900 uppercase font-black flex items-center gap-1.5">
+            <span class="w-2 h-2 bg-emerald-600 inline-block animate-pulse"></span>
+            1. ACCÈS PUBLIC INTERNET (HTTPS MONDIAL) :
+          </span>
+          <span class="text-[9px] bg-noir text-white px-1.5 py-0.2 font-bold">EN LIGNE</span>
+        </div>
+        <div class="flex items-center justify-between gap-2">
+          <input id="share-url-public" class="bg-white border border-neutral-300 px-2.5 py-1.5 font-bold text-xs flex-1 outline-none text-noir" readonly value="https://a90389d46bbc3d.lhr.life/messages.html" />
+          <button onclick="copyPublicUrl()" class="bg-noir text-white px-3 py-1.5 font-black uppercase text-[11px] hover:bg-neutral-800">
+            COPIER
+          </button>
+        </div>
+      </div>
+
+      <!-- Local Network LAN URL -->
+      <div class="bg-neutral-50 p-3 border-1.5 border-neutral-300 mb-4 font-mono text-xs">
+        <div class="text-[10px] text-neutral-500 uppercase font-bold mb-1">2. ACCÈS RÉSEAU LOCAL (WI-FI / LAN) :</div>
+        <div class="flex items-center justify-between gap-2">
+          <input id="share-url-input" class="bg-white border border-neutral-300 px-2.5 py-1.5 font-bold text-xs flex-1 outline-none text-noir" readonly value="http://192.168.1.95:8091/messages.html" />
+          <button onclick="copyShareUrl()" class="bg-white text-noir border border-noir px-3 py-1.5 font-bold uppercase text-[11px] hover:bg-neutral-100">
+            COPIER
+          </button>
+        </div>
+      </div>
+
+      <div class="border border-neutral-200 p-2.5 bg-neutral-100 font-mono text-[10px] text-neutral-600 mb-5 leading-normal">
+        • Hébergement : <strong>Tunnel Public TLS / HTTPS</strong> (terminaison SSL active)<br>
+        • Port d'écoute : <strong>8091</strong><br>
+        • Synchronisation inter-terminaux : <strong>Active (CAD Broadcast Sync)</strong>
+      </div>
+
+      <div class="flex justify-end">
+        <button onclick="closeShareModal()" class="px-4 py-2 bg-noir text-white font-mono font-bold text-xs uppercase">
+          FERMER
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+  <script>
+    let currentSelectedId = null;
+    let selectedModalPrio = 'URGENTE';
+    let currentMsgFilter = 'all';
+
+    document.addEventListener('DOMContentLoaded', () => {
+      lucide.createIcons();
+      initClock();
+      renderAll();
+
+      PULSE_CHANNEL.onmessage = (e) => {
+        if (e.data.type === 'MESSAGES_UPDATED') {
+          renderAll();
+        }
+      };
+    });
+
+    function initClock() {
+      const update = () => {
+        const now = new Date();
+        const timeStr = now.toLocaleTimeString('fr-CA', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false });
+        const el = document.getElementById('live-clock');
+        if (el) el.textContent = timeStr;
+      };
+      update();
+      setInterval(update, 1000);
+    }
+
+    function renderAll() {
+      const msgs = PulseState.getMessages();
+      if (!currentSelectedId && msgs.length > 0) {
+        currentSelectedId = msgs[0].id;
+      }
+      renderList();
+      renderCurrentPreview();
+      updateCounters();
+    }
+
+    function updateCounters() {
+      const msgs = PulseState.getMessages();
+      document.getElementById('count-all').textContent = msgs.length;
+      document.getElementById('count-unread').textContent = msgs.filter(m => m.unread).length;
+    }
+
+    function renderList() {
+      const container = document.getElementById('msg-list-container');
+      container.innerHTML = '';
+
+      let msgs = PulseState.getMessages();
+      if (currentMsgFilter === 'unread') {
+        msgs = msgs.filter(m => m.unread);
+      } else if (currentMsgFilter === 'urgent') {
+        msgs = msgs.filter(m => m.prio === 'URGENTE');
+      }
+
+      if (msgs.length === 0) {
+        container.innerHTML = `
+          <div class="p-8 text-center font-mono text-neutral-500 text-xs font-bold">
+            AUCUN MESSAGE DANS CETTE CATÉGORIE
+          </div>
+        `;
+        return;
+      }
+
+      msgs.forEach(msg => {
+        const div = document.createElement('div');
+        div.className = `msg-item ${msg.id === currentSelectedId ? 'selected' : ''} ${msg.unread ? 'unread' : ''}`;
+        div.innerHTML = `
+          <div class="flex items-center justify-between font-mono text-[10px] mb-1">
+            <span class="bg-noir text-white px-1.5 py-0.2 font-black">${msg.prio}</span>
+            <span class="text-neutral-500 font-bold">${msg.date}</span>
+          </div>
+          <div class="text-xs font-black text-noir uppercase truncate">${msg.subject}</div>
+          <div class="font-mono text-[11px] text-neutral-500 mt-0.5 truncate">${msg.from} → ${msg.to}</div>
+        `;
+        div.addEventListener('click', () => {
+          currentSelectedId = msg.id;
+          msg.unread = false;
+          PulseState.saveMessages(PulseState.getMessages());
+          renderAll();
+        });
+        container.appendChild(div);
+      });
+    }
+
+    function renderCurrentPreview() {
+      const msgs = PulseState.getMessages();
+      const msg = msgs.find(m => String(m.id) === String(currentSelectedId)) || msgs[0];
+      const panel = document.getElementById('preview-panel');
+      if (!msg) {
+        panel.innerHTML = `<div class="p-8 text-center font-mono text-neutral-500">SÉLECTIONNEZ UN MESSAGE</div>`;
+        return;
+      }
+
+      panel.innerHTML = `
+        <div class="bg-neutral-100 border-b border-neutral-300 p-4 flex items-center justify-between flex-shrink-0">
+          <div>
+            <span class="bg-noir text-white font-mono text-[10px] font-black px-2 py-0.5 uppercase tracking-wider">
+              PRIORITÉ : ${msg.prio}
+            </span>
+            <h2 class="text-base font-black uppercase text-noir mt-2 mb-0 tracking-tight leading-snug">
+              ${msg.subject}
+            </h2>
+          </div>
+          <div class="flex items-center gap-2">
+            <button onclick="replyToMsg('${msg.from}')" class="btn-action-msg bg-noir text-white hover:bg-neutral-800">
+              <i data-lucide="reply" class="w-3.5 h-3.5"></i> RÉPONDRE
+            </button>
+            <button onclick="archiveMsg('${msg.id}')" class="btn-action-msg bg-white text-noir hover:bg-neutral-100">
+              <i data-lucide="archive" class="w-3.5 h-3.5"></i> ARCHIVER
+            </button>
+          </div>
+        </div>
+
+        <div class="p-4 bg-neutral-50 border-b border-neutral-200 grid grid-cols-2 gap-3 font-mono text-xs">
+          <div><span class="text-neutral-500 font-bold uppercase">ÉMETTEUR :</span> <span class="font-bold text-noir">${msg.from}</span></div>
+          <div><span class="text-neutral-500 font-bold uppercase">CIBLE :</span> <span class="font-bold text-noir">${msg.to}</span></div>
+          <div class="col-span-2"><span class="text-neutral-500 font-bold uppercase">HORODATAGE SYSTÈME :</span> <span class="text-neutral-800 font-bold">${msg.date}</span></div>
+        </div>
+
+        <div class="flex-1 p-5 overflow-y-auto bg-white font-sans text-sm text-neutral-900 leading-relaxed whitespace-pre-wrap font-semibold">
+${msg.body}
+        </div>
+
+        <div class="p-3 bg-neutral-50 border-t border-neutral-200 font-mono text-[11px] text-neutral-500 flex justify-between">
+          <span>CANAL : MDT ENCRYPTÉ CAD</span>
+          <span class="font-bold text-noir">TRANSMISSION CONFIRMÉE SUR TERMINAUX</span>
+        </div>
+      `;
+      lucide.createIcons();
+    }
+
+    function filterCategory(cat, btn) {
+      document.querySelectorAll('.chip-filter').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      currentMsgFilter = cat;
+      renderList();
+    }
+
+    function setModalPrio(prio, btn) {
+      selectedModalPrio = prio;
+      document.querySelectorAll('.modal-prio-btn').forEach(b => {
+        b.className = 'modal-prio-btn border border-neutral-300 p-2 font-bold uppercase bg-neutral-100 hover:bg-neutral-200';
+      });
+      btn.className = 'modal-prio-btn border border-neutral-300 p-2 font-bold uppercase bg-noir text-white';
+    }
+
+    function openModal() {
+      document.getElementById('msg-modal').style.display = 'flex';
+      document.getElementById('modal-subject').focus();
+    }
+    function closeModal() {
+      document.getElementById('msg-modal').style.display = 'none';
+    }
+    function closeModalOnBg(e) {
+      if (e.target === document.getElementById('msg-modal')) closeModal();
+    }
+
+    function sendMessageAction() {
+      const subject = document.getElementById('modal-subject').value.trim();
+      const body = document.getElementById('modal-body').value.trim();
+      const to = document.getElementById('modal-to').value;
+
+      if (!subject || !body) {
+        alert("VEUILLEZ SAISIR UN OBJET ET LE CORPS DU MESSAGE.");
+        return;
+      }
+
+      const newMsg = {
+        id: Date.now(),
+        prio: selectedModalPrio,
+        from: "CENTRAL CAD DISPATCH",
+        to,
+        subject,
+        date: `AUJOURD'HUI ${new Date().toLocaleTimeString('fr-CA', { hour: '2-digit', minute: '2-digit', hour12: false })}`,
+        unread: false,
+        body
+      };
+
+      PulseState.sendMessage(newMsg);
+      closeModal();
+      currentSelectedId = newMsg.id;
+      renderAll();
+      alert("MESSAGE RADIO DIFFUSÉ SUR L'ENSEMBLE DES TERMINAUX DE LA FLOTTE");
+    }
+
+    function replyToMsg(sender) {
+      openModal();
+      document.getElementById('modal-subject').value = `REPONSE: ${sender}`;
+    }
+
+    function archiveMsg(id) {
+      alert(`MESSAGE #${id} ARCHIVÉ DANS LES REGISTRES CAD`);
+    }
+
+    // Share Modal
+    function openShareModal() {
+      document.getElementById('share-modal').style.display = 'flex';
+    }
+    function closeShareModal() {
+      document.getElementById('share-modal').style.display = 'none';
+    }
+    function closeShareModalOnBg(e) {
+      if (e.target === document.getElementById('share-modal')) closeShareModal();
+    }
+    function copyShareUrl() {
+      const input = document.getElementById('share-url-input');
+      input.select();
+      navigator.clipboard.writeText(input.value);
+      alert("LIEN LOCAL COPIÉ DANS LE PRESSE-PAPIER !");
+    }
+    function copyPublicUrl() {
+      const input = document.getElementById('share-url-public');
+      input.select();
+      navigator.clipboard.writeText(input.value);
+      alert("LIEN PUBLIC MONDIAL (HTTPS) COPIÉ ! Votre collaborateur peut l'ouvrir de n'importe où.");
+    }
+  </script>
+</body>
+</html>
