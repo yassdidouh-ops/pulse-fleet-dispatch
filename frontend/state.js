@@ -5,7 +5,7 @@
  * dynamic GPS micro-step interpolation, OBD-II CAN bus emulation and waypoint routing.
  */
 
-// Resilient BroadcastChannel
+// Resilient BroadcastChannel & Cloud Event Dispatcher
 const PULSE_CHANNEL = (typeof BroadcastChannel !== 'undefined') 
   ? new BroadcastChannel('pulse_cad_sync') 
   : {
@@ -14,6 +14,17 @@ const PULSE_CHANNEL = (typeof BroadcastChannel !== 'undefined')
       removeEventListener: () => {},
       onmessage: null
     };
+
+function broadcastStateChange(type, payload) {
+  try {
+    PULSE_CHANNEL.postMessage({ type, payload });
+  } catch (e) {}
+  try {
+    if (typeof window !== 'undefined' && window.PulseCloudSync && typeof window.PulseCloudSync.broadcast === 'function') {
+      window.PulseCloudSync.broadcast(type, payload);
+    }
+  } catch (e) {}
+}
 
 // Leaflet Default Icon Path Fix (prevents 404 on marker-icon.png)
 if (typeof window !== 'undefined' && typeof window.L !== 'undefined' && window.L.Icon && window.L.Icon.Default) {
@@ -548,7 +559,7 @@ class PulseState {
     try {
       safeStorage.setItem('pulse_vehicles', JSON.stringify(vehicles));
       if (!skipBroadcast) {
-        PULSE_CHANNEL.postMessage({ type: 'VEHICLES_UPDATED', payload: vehicles });
+        broadcastStateChange({ type: 'VEHICLES_UPDATED', payload: vehicles });
       }
     } catch (e) {
       console.error('PulseState.saveVehicles error:', e);
@@ -592,7 +603,7 @@ class PulseState {
   static saveCalls(calls) {
     try {
       safeStorage.setItem('pulse_calls', JSON.stringify(calls));
-      PULSE_CHANNEL.postMessage({ type: 'CALLS_UPDATED', payload: calls });
+      broadcastStateChange({ type: 'CALLS_UPDATED', payload: calls });
     } catch (e) {
       console.error('PulseState.saveCalls error:', e);
     }
@@ -693,7 +704,7 @@ class PulseState {
   static saveMessages(msgs) {
     try {
       safeStorage.setItem('pulse_messages', JSON.stringify(msgs));
-      PULSE_CHANNEL.postMessage({ type: 'MESSAGES_UPDATED', payload: msgs });
+      broadcastStateChange({ type: 'MESSAGES_UPDATED', payload: msgs });
     } catch (e) {
       console.error('PulseState.saveMessages error:', e);
     }
@@ -769,13 +780,13 @@ class PulseState {
       createdAt: new Date().toLocaleTimeString('fr-CA', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false })
     };
     this.activeWaypoints.push(wp);
-    PULSE_CHANNEL.postMessage({ type: 'WAYPOINTS_UPDATED', payload: this.activeWaypoints });
+    broadcastStateChange({ type: 'WAYPOINTS_UPDATED', payload: this.activeWaypoints });
     return wp;
   }
 
   static clearWaypoints() {
     this.activeWaypoints = [];
-    PULSE_CHANNEL.postMessage({ type: 'WAYPOINTS_UPDATED', payload: [] });
+    broadcastStateChange({ type: 'WAYPOINTS_UPDATED', payload: [] });
   }
 
   /* -------------------------------------------------------------
@@ -795,7 +806,7 @@ class PulseState {
       color: '#dc2626'
     };
     this.activeIncidents.push(newInc);
-    PULSE_CHANNEL.postMessage({ type: 'WAZE_INCIDENTS_UPDATED', payload: this.activeIncidents });
+    broadcastStateChange({ type: 'WAZE_INCIDENTS_UPDATED', payload: this.activeIncidents });
     return newInc;
   }
 
@@ -804,13 +815,13 @@ class PulseState {
    * ----------------------------------------------------------- */
   static setSimulationRunning(running) {
     this.simulationRunning = Boolean(running);
-    PULSE_CHANNEL.postMessage({ type: 'SIMULATION_STATE', payload: { running: this.simulationRunning, speed: this.simulationSpeed } });
+    broadcastStateChange({ type: 'SIMULATION_STATE', payload: { running: this.simulationRunning, speed: this.simulationSpeed } });
   }
 
   static setSimulationSpeed(speed) {
     this.simulationSpeed = Number(speed) || 1;
     this.startSimulationTimer();
-    PULSE_CHANNEL.postMessage({ type: 'SIMULATION_STATE', payload: { running: this.simulationRunning, speed: this.simulationSpeed } });
+    broadcastStateChange({ type: 'SIMULATION_STATE', payload: { running: this.simulationRunning, speed: this.simulationSpeed } });
   }
 
   static startSimulationTimer() {
@@ -891,10 +902,10 @@ class PulseState {
       safeStorage.setItem('pulse_calls', JSON.stringify(INITIAL_CALLS));
       safeStorage.setItem('pulse_messages', JSON.stringify(INITIAL_MESSAGES));
       this.activeWaypoints = [];
-      PULSE_CHANNEL.postMessage({ type: 'CALLS_UPDATED', payload: INITIAL_CALLS });
-      PULSE_CHANNEL.postMessage({ type: 'VEHICLES_UPDATED', payload: INITIAL_VEHICLES });
-      PULSE_CHANNEL.postMessage({ type: 'MESSAGES_UPDATED', payload: INITIAL_MESSAGES });
-      PULSE_CHANNEL.postMessage({ type: 'WAYPOINTS_UPDATED', payload: [] });
+      broadcastStateChange({ type: 'CALLS_UPDATED', payload: INITIAL_CALLS });
+      broadcastStateChange({ type: 'VEHICLES_UPDATED', payload: INITIAL_VEHICLES });
+      broadcastStateChange({ type: 'MESSAGES_UPDATED', payload: INITIAL_MESSAGES });
+      broadcastStateChange({ type: 'WAYPOINTS_UPDATED', payload: [] });
     } catch (e) {
       console.warn("resetDemoData error:", e);
     }
@@ -1119,7 +1130,7 @@ const PulseWaze = {
 // =========================================================================
 // ACTIVE PUBLIC HTTPS TUNNEL & SHARE SYNCHRONIZER
 // =========================================================================
-const PULSE_TUNNEL_URL = 'https://artists-monster-equal-workplace.trycloudflare.com';
+const PULSE_TUNNEL_URL = 'https://pulse-fleet-dispatch.netlify.app';
 
 function getEffectiveOrigin() {
   if (typeof window === 'undefined') return PULSE_TUNNEL_URL;
